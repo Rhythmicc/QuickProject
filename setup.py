@@ -1,11 +1,16 @@
 from setuptools import setup, find_packages
 
-VERSION = '0.0.6'
+
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+VERSION = '0.0.7'
 
 setup(
     name='Qpro',
     version=VERSION,
     description='create some practical scripts for your clion project!',
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

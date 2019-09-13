@@ -6,7 +6,11 @@ setup(
     name='Qpro',
     version=VERSION,
     description='create some practical scripts for your clion project!',
-    classifiers=[],
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+    ],
     keywords='script for CLionProjects',
     author='RhythmLian',
     author_mail='RhythmLian@outlook.com',
@@ -17,7 +21,7 @@ setup(
     zip_safe=True,
     entry_points={
         'console_scripts': [
-            'Qpro = QuickProject.Qpro:main'
+            'Qpro = QuickProject.Qpro'
         ]
     },
 )

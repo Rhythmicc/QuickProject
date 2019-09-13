@@ -1,4 +1,4 @@
-Metadata-Version: 1.0
+Metadata-Version: 1.1
 Name: Qpro
 Version: 0.1.1
 Summary: create some practical scripts for your clion project!
@@ -9,3 +9,6 @@ License: MIT
 Description: UNKNOWN
 Keywords: script for CLionProjects
 Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent

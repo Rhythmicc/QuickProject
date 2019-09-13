@@ -9,7 +9,8 @@ else:
     dir_char = '/'
 base_dir += dir_char
 
-if __name__ == '__main__':
+
+def main():
     if not os.path.exists('CMakeLists.txt'):
         exit("Not an CLion Project!")
     with open("CMakeLists.txt", 'r') as f:
@@ -27,8 +28,8 @@ if __name__ == '__main__':
     index = sys.argv.index('-add')
     scripts = sys.argv[index + 1:]
     for script in scripts:
-        if os.path.exists(base_dir+script):
-            with open(base_dir+script, 'r') as f:
+        if os.path.exists(base_dir + script):
+            with open(base_dir + script, 'r') as f:
                 content = f.read()
             if script == 'run':
                 content = content.replace('__COMPILE_TOOL__', 'g++ -std=c++11' if is_cpp else 'gcc -std=c11')
@@ -36,17 +37,16 @@ if __name__ == '__main__':
                 content = content.replace('__PROJECT_NAME__', project_name)
                 with open('cmake-build-debug' + dir_char + 'input.txt', 'w') as f:
                     f.write('edit this file to make input')
-                with open('run.py','w') as f:
+                with open('run.py', 'w') as f:
                     f.write(content)
             elif script == 'refresh':
                 os.mkdir('template')
                 with open('main.cpp' if is_cpp else 'main.c', 'r')as f:
                     main_cont = f.read()
-                with open('template' + dir_char + 'main','w') as f:
+                with open('template' + dir_char + 'main', 'w') as f:
                     f.write(main_cont)
                 with open('refresh.py', 'w') as f:
                     f.write(content)
             else:
-                with open(script+'.py','w') as f:
+                with open(script + '.py', 'w') as f:
                     f.write(content)
-

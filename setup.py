@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-VERSION = '0.1.1'
+VERSION = '0.0.4'
 
 setup(
     name='Qpro',
@@ -21,7 +21,7 @@ setup(
     zip_safe=True,
     entry_points={
         'console_scripts': [
-            'Qpro = QuickProject.Qpro'
+            'Qpro = QuickProject.Qpro:main'
         ]
     },
 )

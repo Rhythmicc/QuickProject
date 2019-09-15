@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
-VERSION = '0.0.8'
+VERSION = '0.0.9'
 
 setup(
     name='Qpro',
@@ -24,6 +24,7 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     zip_safe=True,
+    install_requires=['pyperclip'],
     entry_points={
         'console_scripts': [
             'Qpro = QuickProject.Qpro:main'

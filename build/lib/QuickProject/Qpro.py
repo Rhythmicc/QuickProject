@@ -11,6 +11,7 @@ else:
 run = """#!/usr/bin/env python3
 import os
 import sys
+import pyperclip
 
 base_dir = sys.path[0]
 if sys.platform.startswith('win'):

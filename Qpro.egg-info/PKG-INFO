@@ -1,14 +1,28 @@
-Metadata-Version: 1.1
+Metadata-Version: 2.1
 Name: Qpro
-Version: 0.0.6
+Version: 0.0.8
 Summary: create some practical scripts for your clion project!
 Home-page: https://github.com/Rhythmicc/QuickProject
 Author: RhythmLian
-Author-email: UNKNOWN
 License: MIT
-Description: UNKNOWN
+Description: # QuickProject
+        
+        ## Install:
+        
+          - `pip3 install Qpro [--upgrade]`
+        
+        ## usage:
+          
+          - run `Qpro -add [scripts split by ' ']` to add scripts into your CLion Projects
+            
+            - `Qpro -add run` : add run.py to your project
+            - `Qpro -add refresh` : add refresh.py to your project
+            - `Qpro -add TextCmp` : add TextCmp.py to your project
+            - You can see script usage in this link: https://github.com/Rhythmicc/ACM-Template/blob/master/README.md
+        
 Keywords: script for CLionProjects
 Platform: UNKNOWN
 Classifier: Programming Language :: Python :: 3
 Classifier: License :: OSI Approved :: MIT License
 Classifier: Operating System :: OS Independent
+Description-Content-Type: text/markdown

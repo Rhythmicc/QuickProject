@@ -225,7 +225,7 @@ def main():
         exit("Not an CLion Project!")
     with open("CMakeLists.txt", 'r') as f:
         content = f.read()
-    project_name = re.findall('project\((.*?)\)', content)[0]
+    project_name = re.findall('project\((.*?)\)', content)[0].split()[0]
     if '.cpp' in content or '.CPP' in content:
         is_cpp = True
     else:

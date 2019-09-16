@@ -1,5 +1,6 @@
 # QuickProject
 ## Project description
+
 [![](https://img.shields.io/badge/version-0.2.1-green)]()
 [![](https://img.shields.io/badge/Author-RhythmLian-blue)]()
 

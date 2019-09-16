@@ -51,18 +51,18 @@ if __name__ == '__main__':
     flag = False
     input_file = config['input_file']
     if '-h' in sys.argv:
-        print(blue_col('usage: run.py:\n') +
-              '  * ' + blue_col('build or run:\n') +
-              '    # ' + red_col('[ -b ]') + ' : ' + blue_col('build\n') +
-              '    # ' + red_col('[ -r ]') + ' : ' + blue_col('run\n') +
-              '    # ' + red_col('[ -br]') + ' : ' + blue_col('build and run\n') +
-              blue_col('    (it will run if neither of commands in "build or run")\n') +
-              '  * ' + red_col('[ -i ]') + ' : ' + blue_col('use input.txt as input\n') +
-              '  * ' + red_col('[ -if  *.* ]') + ' : ' + blue_col('set input file(*.*) as input\n') +
-              '  * ' + red_col('[-if -paste]') + ' : ' + blue_col('use Clipboard content as input\n') +
-              '  * ' + red_col('[ -f  *.cpp]') + ' : ' + blue_col('set build file as *.cpp\n') +
-              '  * ' + red_col('[ -h ]') + ' : ' + blue_col('help\n') +
-              '  * ' + red_col('[ *  ]') + ' : ' + blue_col('add parameters for program\n') +
+        print(blue_col('usage: run.py:\\n') +
+              '  * ' + blue_col('build or run:\\n') +
+              '    # ' + red_col('[ -b ]') + ' : ' + blue_col('build\\n') +
+              '    # ' + red_col('[ -r ]') + ' : ' + blue_col('run\\n') +
+              '    # ' + red_col('[ -br]') + ' : ' + blue_col('build and run\\n') +
+              blue_col('    (it will run if neither of commands in "build or run")\\n') +
+              '  * ' + red_col('[ -i ]') + ' : ' + blue_col('use input.txt as input\\n') +
+              '  * ' + red_col('[ -if  *.* ]') + ' : ' + blue_col('set input file(*.*) as input\\n') +
+              '  * ' + red_col('[-if -paste]') + ' : ' + blue_col('use Clipboard content as input\\n') +
+              '  * ' + red_col('[ -f  *.cpp]') + ' : ' + blue_col('set build file as *.cpp\\n') +
+              '  * ' + red_col('[ -h ]') + ' : ' + blue_col('help\\n') +
+              '  * ' + red_col('[ *  ]') + ' : ' + blue_col('add parameters for program\\n') +
               '  * ' + blue_col('Modify config to adjust default configuration'))
         exit(0)
     if '-f' in sys.argv:

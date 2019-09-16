@@ -1,10 +1,13 @@
 # QuickProject
+## Project description
+[![](https://img.shields.io/badge/version-0.1.0-green)](https://img.shields.io/badge/version-0.1.0-green)
+[![](https://img.shields.io/badge/author-RhythmLian-blue)](https://img.shields.io/badge/author-RhythmLian-blue)
 
 ## Install:
 
   - `pip3 install Qpro [--upgrade]`
 
-## usage:
+## Usage:
   
   - run `Qpro -add [scripts split by ' ']` to add scripts into your CLion Projects
     

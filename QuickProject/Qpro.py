@@ -21,7 +21,7 @@ else:
 base_dir += dir_char
 
 config = {
-    'compile_tool': '__COMPILE_TOOL__',
+    'compile_tool': ('__COMPILE_TOOL__',''),
     'compile_filename': base_dir + '__COMPILE_FILENAME__',
     'executable_filename': base_dir + 'cmake-build-debug' + dir_char + '__PROJECT_NAME__',
     'input_file': base_dir + 'cmake-build-debug' + dir_char + 'input.txt'
@@ -94,7 +94,7 @@ if __name__ == '__main__':
     if to_build:
         if flag:
             o_file = base_dir + filename.split(dir_char)[-1].split('.')[0]
-        os.system(config['compile_tool'] + ' ' + filename + ' -o ' + o_file)
+        os.system(config['compile_tool'][0] + ' ' + filename + ' -o ' + o_file + config['compile_tool'][1])
     if to_run:
         argv = []
         add_flag = True

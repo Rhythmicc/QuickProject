@@ -1,12 +1,13 @@
 Metadata-Version: 2.1
 Name: Qpro
-Version: 0.2.1
+Version: 0.2.2
 Summary: create some practical scripts for your clion project!
 Home-page: https://github.com/Rhythmicc/QuickProject
 Author: RhythmLian
 License: MIT
 Description: # QuickProject
         ## Project description
+        
         [![](https://img.shields.io/badge/version-0.2.1-green)]()
         [![](https://img.shields.io/badge/Author-RhythmLian-blue)]()
         

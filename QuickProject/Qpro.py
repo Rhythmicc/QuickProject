@@ -53,6 +53,7 @@ def blue_col(string):
 
 
 if __name__ == '__main__':
+    cmd_ls = ['-b', '-r', '-br', '-h', '-f', '-if', '-paste']
     to_build = '-b' in sys.argv or '-br' in sys.argv
     to_run = '-r' in sys.argv or '-b' not in sys.argv
     filename = config['compile_filename']
@@ -106,13 +107,12 @@ if __name__ == '__main__':
     if to_run:
         argv = []
         add_flag = True
-        for i in sys.argv[1:]:
+        for i in enumerate(sys.argv, 1):
+            if i[1] not in cmd_ls and add_flag:
+                argv.append(i[1])
             if not add_flag:
                 add_flag = True
-                continue
-            if not i.startswith('-'):
-                argv.append(i)
-            elif i == '-if' or i == '-f':
+            if i[1] == '-f' or i[1] == '-if':
                 add_flag = False
         run('-i' in sys.argv or '-if' in sys.argv, o_file)
     if flag:

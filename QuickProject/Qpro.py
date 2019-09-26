@@ -25,7 +25,7 @@ else:
 base_dir += dir_char
 
 config = {
-    'compile_tool': ('__COMPILE_TOOL__', ''),
+    'compile_tool': ['__COMPILE_TOOL__', ''],
     'compile_filename': base_dir + '__COMPILE_FILENAME__',
     'executable_filename': base_dir + 'cmake-build-debug' + dir_char + '__PROJECT_NAME__',
     'input_file': base_dir + 'cmake-build-debug' + dir_char + 'input.txt'
@@ -85,6 +85,8 @@ if __name__ == '__main__':
         if not filename.endswith('.cpp') and not filename.endswith('.c'):
             print(red_col("ERROR: %s is not an C/CPP file" % filename))
             exit(-1)
+        if filename.endswith('.c'):
+            config['compile_tool'][0] = 'gcc -std=c11'
         flag = True
     if '-if' in sys.argv:
         index = sys.argv.index('-if')

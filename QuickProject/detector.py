@@ -55,11 +55,11 @@ def cmp():
         messagebox.showerror("文件数不足", "请选择两个文件进行对比")
         return
     if file3 == '使用默认输入文件':
-        os.system('run -br -i -f %s > content1' % file1)
-        os.system('run -br -i -f %s > content2' % file2)
+        os.system('QProRun -br -i -f %s > content1' % file1)
+        os.system('QProRun -br -i -f %s > content2' % file2)
     else:
-        os.system('run -br -if %s -f %s > content1' % (file3, file1))
-        os.system('run -br -if %s -f %s > content2' % (file3, file2))
+        os.system('QProRun -br -if %s -f %s > content1' % (file3, file1))
+        os.system('QProRun -br -if %s -f %s > content2' % (file3, file2))
     compare_file('content1', 'content2', './res.html')
     wb.open('file://res.html')
     os.remove('content1')

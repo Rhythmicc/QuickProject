@@ -1,7 +1,7 @@
 # QuickProject
 ## Project description
 
-[![](https://img.shields.io/badge/version-0.3.3-green)]()
+[![](https://img.shields.io/badge/version-0.3.4-green)]()
 [![](https://img.shields.io/badge/Author-RhythmLian-blue)]()
 
 ## 安装:
@@ -12,12 +12,24 @@
 
 | Command | Result |
 | :----- | :----- |
-| `Qpro -init` | 为项目添加配置表和相关文件，令`QPro*`命令可执行 |
+| `Qpro -init` | 为项目添加[配置表](#配置表)和相关文件，令`QPro*`命令可执行 |
 | `QproRefresh` | 调用[刷新脚本](#刷新脚本)，刷新项目中的默认源文件 |
 | `QproRun *` | 使用[运行脚本](#运行脚本)运行你的项目 |
 | `detector` | 运行[对拍器](#对拍器)（对拍器只能在`Qpro -init`后的文件夹下运行） |
 
 添加配置表后的项目，可以手动编辑`project_configure.csv`来调整配置。
+
+### 配置表
+
+  - 修改`project_configure.csv`来调整脚本默认配置
+  
+      | 键值 | 含义 | 默认 |
+      | :----- | :----- | :----- |
+      | `compile_tool` | (编译工具, 编译后缀) | (gcc, '') / (g++, '') / ... |
+      | `compile_filename` | 待编译的文件 | main.cpp / main.c |
+      | `executable_filename` | 编译出的可执行文件名 | 项目名 |
+      | `input_file` | 默认的输入文件 | `./cmake-build-debug/input.txt`|
+      | `template_file` | 默认的快照位置 | `template/main` |
 
 ### 运行脚本:
 
@@ -53,7 +65,7 @@
   - 查看帮助
     
       - `QProRun -h` : 可以查看使用帮助(Windows系统不支持颜色显示)
-        ![help](https://github.com/Rhythmicc/QuickProject/blob/master/img/2.png?raw=true) 
+        ![help](https://github.com/Rhythmicc/QuickProject/blob/master/img/2.png?raw=true)
   
   - 推荐的命令示例:
     
@@ -62,15 +74,6 @@
       | `QProRun -i` | 使用默认输入文件并运行 |
       | `QProRun`| 运行 |
       | `QProRun -br -i` |  编译且使用输入文件运行 |
-  
-  - 修改config字典来调整脚本默认配置
-  
-      | 键值 | 含义 | 默认 |
-      | :----- | :----- | :----- |
-      | `compile_tool` | (编译工具, 编译后缀) | (gcc, '') / (g++, '') / ... |
-      | `compile_filename` | 待编译的文件 | main.cpp / main.c |
-      | `executable_filename` | 编译出的可执行文件名 | 项目名 |
-      | `input_file` | 默认的输入文件 | `./cmake-build-debug/input.txt`|
 
 ### 刷新脚本:
 

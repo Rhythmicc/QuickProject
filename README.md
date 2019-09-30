@@ -1,7 +1,7 @@
 # QuickProject
 ## Project description
 
-[![](https://img.shields.io/badge/version-0.2.1-green)]()
+[![](https://img.shields.io/badge/version-0.3.1-green)]()
 [![](https://img.shields.io/badge/Author-RhythmLian-blue)]()
 
 ## Install:
@@ -14,7 +14,8 @@
     
     | Command | Result |
     | :----- | :----- |
-    | `Qpro -add run` | add run.py to your project |
-    | `Qpro -add refresh` | add refresh.py to your project |
-    | `Qpro -add TextCmp` | add TextCmp.py to your project |
+    | `Qpro -init` | add configure so that command "run" can work |
+    | `QproRefresh` | refresh your project |
+    | `QproRun *` | run your C/CPP project |
+    | `detector` | run detector for two source files(based on QproRun) |
     - You can see script usage in this link: https://github.com/Rhythmicc/ACM-Template/blob/master/README.md

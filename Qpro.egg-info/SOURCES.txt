@@ -10,3 +10,6 @@ Qpro.egg-info/top_level.txt
 Qpro.egg-info/zip-safe
 QuickProject/Qpro.py
 QuickProject/__init__.py
+QuickProject/detector.py
+QuickProject/refresh.py
+QuickProject/run.py

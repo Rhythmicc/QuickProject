@@ -1,3 +1,6 @@
 [console_scripts]
 Qpro = QuickProject.Qpro:main
+QproRefresh = QuickProject.refresh:main
+QproRun = QuickProject.run:main
+detector = QuickProject.detector:main
 

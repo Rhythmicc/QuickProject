@@ -97,6 +97,7 @@ def main():
     if to_build:
         if flag:
             o_file = filename.split(dir_char)[-1].split('.')[0]
+            o_file = os.path.abspath(o_file)
         os.system(config['compile_tool'][0] + ' ' + filename + ' -o ' + o_file + ' ' + config['compile_tool'][1])
     if to_run:
         add_flag = True

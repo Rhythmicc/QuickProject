@@ -61,7 +61,8 @@ def cmp():
         os.system('QProRun -br -if %s -f %s > content1' % (file3, file1))
         os.system('QProRun -br -if %s -f %s > content2' % (file3, file2))
     compare_file('content1', 'content2', './res.html')
-    wb.open('file://res.html')
+    res_path = os.path.abspath('./res.html')
+    wb.open('file://%s' % res_path)
     os.remove('content1')
     os.remove('content2')
 

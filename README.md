@@ -12,9 +12,9 @@
 
 | Command | Result |
 | :----- | :----- |
-| `Qpro -init` | 为项目添加[配置表](#配置表)和相关文件，令`QPro*`命令可执行 |
-| `QproRefresh` | 调用[刷新脚本](#刷新脚本)，刷新项目中的默认源文件 |
-| `QproRun *` | 使用[运行脚本](#运行脚本)运行你的项目 |
+| `Qpro -init` | 为项目添加[配置表](#配置表)和相关文件，令下面命令可执行 |
+| `refresh` | 调用[刷新脚本](#刷新脚本)，刷新项目中的默认源文件 |
+| `run *` | 使用[运行脚本](#运行脚本)运行你的项目 |
 | `detector` | 运行[对拍器](#对拍器)（对拍器只能在`Qpro -init`后的文件夹下运行） |
 
 添加配置表后的项目，可以手动编辑`project_configure.csv`来调整配置。
@@ -50,7 +50,7 @@
   - 输入输出:
     
       - 可以编辑 `./cmake-build-debug/input.txt` 来设置默认输入
-      - 运行 `QProRun [...] > output.txt` 使程序输出到 `./output.txt`
+      - 运行 `run [...] > output.txt` 使程序输出到 `./output.txt`
       
       | 参数 | 效果 |
       | :----- | :----- |
@@ -64,20 +64,20 @@
       
   - 查看帮助
     
-      - `QProRun -h` : 可以查看使用帮助(Windows系统不支持颜色显示)
+      - `run -h` : 可以查看使用帮助(Windows系统不支持颜色显示)
         ![help](https://github.com/Rhythmicc/QuickProject/blob/master/img/2.png?raw=true)
   
   - 推荐的命令示例:
     
       | 命令 | 效果 |
       | :----- | :----- |
-      | `QProRun -i` | 使用默认输入文件并运行 |
-      | `QProRun`| 运行 |
-      | `QProRun -br -i` |  编译且使用输入文件运行 |
+      | `run -i` | 使用默认输入文件并运行 |
+      | `run`| 运行 |
+      | `run -br -i` |  编译且使用输入文件运行 |
 
 ### 刷新脚本:
 
-  - 运行 `QProRefresh` 来初始化 `main.cpp` 为存储在 `./template/main` 文件中的内容。
+  - 运行 `refresh` 来初始化 `main.cpp` 为存储在 `./template/main` 文件中的内容。
 
 ### 对拍器
 

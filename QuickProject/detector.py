@@ -6,7 +6,6 @@ import tkinter as tk
 from tkinter import filedialog
 from tkinter import messagebox
 
-
 if sys.platform.startswith('win'):
     dir_char = '\\'
 else:
@@ -54,12 +53,38 @@ def cmp():
     if not file1 or not file2:
         messagebox.showerror("文件数不足", "请选择两个文件进行对比")
         return
+    cp1 = len(sys.argv) < 2 or sys.argv[1].startswith('-p')
+    cp2 = len(sys.argv) < 2 or sys.argv[1].endswith('p')
     if file3 == '使用默认输入文件':
-        os.system('QProRun -br -i -f %s > content1' % file1)
-        os.system('QProRun -br -i -f %s > content2' % file2)
+        if cp1:
+            os.system('run -br -i -f %s > content1' % file1)
+        else:
+            with open(file1, 'r') as f:
+                content1 = f.read()
+            with open('content1', 'w') as f:
+                f.write(content1)
+        if cp2:
+            os.system('run -br -i -f %s > content2' % file2)
+        else:
+            with open(file2, 'r') as f:
+                content2 = f.read()
+            with open('content2', 'w') as f:
+                f.write(content2)
     else:
-        os.system('QProRun -br -if %s -f %s > content1' % (file3, file1))
-        os.system('QProRun -br -if %s -f %s > content2' % (file3, file2))
+        if cp1:
+            os.system('run -br -if %s -f %s > content1' % (file3, file1))
+        else:
+            with open(file1, 'r') as f:
+                content1 = f.read()
+            with open('content1', 'w') as f:
+                f.write(content1)
+        if cp2:
+            os.system('run -br -if %s -f %s > content2' % (file3, file2))
+        else:
+            with open(file2, 'r') as f:
+                content2 = f.read()
+            with open('content2', 'w') as f:
+                f.write(content2)
     compare_file('content1', 'content2', './res.html')
     res_path = os.path.abspath('./res.html')
     wb.open('file://%s' % res_path)
@@ -67,29 +92,38 @@ def cmp():
     os.remove('content2')
 
 
+status = {
+    '-pp': '程序--程序',
+    '-pf': '程序--文件',
+    '-fp': '文件--程序',
+    '-ff': '文件--文件',
+}
+
+title_status = '默认' if len(sys.argv) < 2 else status[sys.argv[1]]
+width = 30
 win = tk.Tk()
-win.title('对拍器')
+win.title('对拍器 %s' % title_status)
 file1, path1 = '', tk.StringVar()
 file2, path2 = '', tk.StringVar()
 file3, path3 = '使用默认输入文件', tk.StringVar()
 path3.set(file3)
-width = 30
-tk.Label(win, text='%12s' % "文件1路径:").grid(row=0, column=0)
-tk.Label(win, textvariable=path1, width=width).grid(row=0, column=1)
-tk.Button(win, text="路径选择", command=get_path1).grid(row=0, column=2)
-tk.Label(win, text='%12s' % "文件2路径:").grid(row=1, column=0)
-tk.Label(win, textvariable=path2, width=width).grid(row=1, column=1)
-tk.Button(win, text="路径选择", command=get_path2).grid(row=1, column=2)
-tk.Label(win, text='%12s' % "输入文件:").grid(row=2, column=0)
 ll = tk.Label(win, textvariable=path3, width=width, fg='red')
-ll.grid(row=2, column=1)
-tk.Button(win, text="路径选择", command=get_path3).grid(row=2, column=2)
-tk.Button(win, text="对比", command=cmp).grid(row=3, column=1)
 
 
 def main():
     if not os.path.exists('project_configure.csv'):
         exit("You must run \"Qpro -init\" first")
+    tk.Label(win, text='%12s' % "文件1路径:").grid(row=0, column=0)
+    tk.Label(win, textvariable=path1, width=width).grid(row=0, column=1)
+    tk.Button(win, text="路径选择", command=get_path1).grid(row=0, column=2)
+    tk.Label(win, text='%12s' % "文件2路径:").grid(row=1, column=0)
+    tk.Label(win, textvariable=path2, width=width).grid(row=1, column=1)
+    tk.Button(win, text="路径选择", command=get_path2).grid(row=1, column=2)
+    if len(sys.argv) < 2 or 'p' in sys.argv[1]:
+        tk.Label(win, text='%12s' % "输入文件:").grid(row=2, column=0)
+        ll.grid(row=2, column=1)
+        tk.Button(win, text="路径选择", command=get_path3).grid(row=2, column=2)
+    tk.Button(win, text="对比", command=cmp).grid(row=3, column=1)
     tk.mainloop()
 
 

@@ -1,5 +1,6 @@
 import difflib
 import os
+import shutil
 import webbrowser as wb
 import sys
 import tkinter as tk
@@ -49,47 +50,45 @@ def get_path3():
     ll.configure(fg='black')
 
 
+def remove(path):
+    if os.path.exists(path):
+        if os.path.isdir(path):
+            shutil.rmtree(path)
+        else:
+            os.remove(path)
+
+
 def cmp():
     if not file1 or not file2:
         messagebox.showerror("文件数不足", "请选择两个文件进行对比")
         return
     cp1 = len(sys.argv) < 2 or sys.argv[1].startswith('-p')
     cp2 = len(sys.argv) < 2 or sys.argv[1].endswith('p')
+    file_path1 = 'content1'
+    file_path2 = 'content2'
     if file3 == '使用默认输入文件':
         if cp1:
             os.system('run -br -i -f %s > content1' % file1)
         else:
-            with open(file1, 'r') as f:
-                content1 = f.read()
-            with open('content1', 'w') as f:
-                f.write(content1)
+            file_path1 = file1
         if cp2:
             os.system('run -br -i -f %s > content2' % file2)
         else:
-            with open(file2, 'r') as f:
-                content2 = f.read()
-            with open('content2', 'w') as f:
-                f.write(content2)
+            file_path2 = file2
     else:
         if cp1:
             os.system('run -br -if %s -f %s > content1' % (file3, file1))
         else:
-            with open(file1, 'r') as f:
-                content1 = f.read()
-            with open('content1', 'w') as f:
-                f.write(content1)
+            file_path1 = file1
         if cp2:
             os.system('run -br -if %s -f %s > content2' % (file3, file2))
         else:
-            with open(file2, 'r') as f:
-                content2 = f.read()
-            with open('content2', 'w') as f:
-                f.write(content2)
-    compare_file('content1', 'content2', './res.html')
+            file_path2 = file2
+    compare_file(file_path1, file_path2, './res.html')
     res_path = os.path.abspath('./res.html')
     wb.open('file://%s' % res_path)
-    os.remove('content1')
-    os.remove('content2')
+    remove('content1')
+    remove('content2')
 
 
 status = {

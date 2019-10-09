@@ -1,7 +1,6 @@
 import os
 import re
 import sys
-import csv
 
 if sys.platform.startswith('win'):
     is_win = True
@@ -56,8 +55,8 @@ def main():
             ['template_file', 'template' + dir_char + 'main']
         ]
         with open('project_configure.csv', 'w') as f:
-            writer = csv.writer(f)
-            writer.writerows(info)
+            for row in info:
+                f.write(','.join(row) + '\n')
         with open(default_input, 'w') as f:
             f.write('edit this file to make input')
         if not os.path.exists('template') or not os.path.isdir('template'):

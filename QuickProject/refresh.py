@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import sys
-import csv
 
 if sys.platform.startswith('win'):
     dir_char = '\\'
@@ -12,8 +11,8 @@ def main():
     config = {}
     try:
         with open('project_configure.csv', 'r') as f:
-            reader = csv.reader(f)
-            for row in reader:
+            for row in f.readlines():
+                row = row.split(',')
                 config[row[0]] = row[1:]
             for i in config:
                 if i != 'compile_tool':

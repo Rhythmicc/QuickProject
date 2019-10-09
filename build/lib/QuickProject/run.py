@@ -2,7 +2,6 @@
 import os
 import sys
 import pyperclip
-import csv
 
 if sys.platform.startswith('win'):
     is_win = True
@@ -14,8 +13,8 @@ else:
 config = {}
 try:
     with open('project_configure.csv', 'r') as f:
-        reader = csv.reader(f)
-        for row in reader:
+        for row in f.readlines():
+            row = row.split(',')
             config[row[0]] = row[1:]
         for i in config:
             if i != 'compile_tool':

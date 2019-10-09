@@ -1,7 +1,6 @@
 import os
 import re
 import sys
-import csv
 
 if sys.platform.startswith('win'):
     is_win = True
@@ -14,11 +13,11 @@ else:
 def main():
     if '-h' in sys.argv or '-init' not in sys.argv:
         print('usage:\n'
-              '\t * [Qpro -init ]: add configure so that command \"Qpro*\" can work\n'
-              '\t * [Qpro -h    ]: help\n'
-              '\t * [QproRefresh]: refresh your project\n'
-              '\t * [QproRun *  ]: run your C/CPP project\n'
-              '\t * [detector   ]: run beat detector for two source files')
+              '\t * [Qpro -init    ]: add configure so that command \"Qpro*\" can work\n'
+              '\t * [Qpro -h       ]: help\n'
+              '\t * [refresh       ]: refresh your project\n'
+              '\t * [run *         ]: run your C/CPP project\n'
+              '\t * [detector -[p/f][p/f]  ]: run beat detector for two source files')
         exit(0 if '-h' in sys.argv else 'wrong usage')
     if not os.path.exists('project_configure.csv'):
         work_dir = os.getcwd() + dir_char
@@ -56,8 +55,8 @@ def main():
             ['template_file', 'template' + dir_char + 'main']
         ]
         with open('project_configure.csv', 'w') as f:
-            writer = csv.writer(f)
-            writer.writerows(info)
+            for row in info:
+                f.write(','.join(row) + '\n')
         with open(default_input, 'w') as f:
             f.write('edit this file to make input')
         if not os.path.exists('template') or not os.path.isdir('template'):

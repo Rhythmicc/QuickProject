@@ -1,7 +1,7 @@
 # QuickProject
 ## Project description
 
-[![](https://img.shields.io/badge/version-0.3.13-green)]()
+[![](https://img.shields.io/badge/version-0.3.14-green)]()
 [![](https://img.shields.io/badge/Author-RhythmLian-blue)]()
 
 ## 安装:

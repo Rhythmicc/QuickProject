@@ -50,6 +50,8 @@ def main():
     to_run = '-r' in sys.argv or '-b' not in sys.argv
     filename = config['compile_filename']
     flag = False
+    if '-debug' in sys.argv:
+        raise ImportError
     if '-h' in sys.argv:
         print(blue_col('usage: run.py:\n') +
               '  * ' + blue_col('build or run:\n') +

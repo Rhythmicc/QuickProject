@@ -15,7 +15,7 @@ def main():
         print('usage:\n'
               '\t * [Qpro -init    ]: add configure so that command \"Qpro*\" can work\n'
               '\t * [Qpro -h       ]: help\n'
-              '\t * [Qpro -update  ]: update Qpro'
+              '\t * [Qpro -update  ]: update Qpro\n'
               '\t * [refresh       ]: refresh your project\n'
               '\t * [run *         ]: run your C/CPP project\n'
               '\t * [detector -[p/f][p/f]  ]: run beat detector for two source files')

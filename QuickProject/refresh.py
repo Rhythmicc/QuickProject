@@ -13,7 +13,7 @@ def main():
         with open('project_configure.csv', 'r') as f:
             for row in f.readlines():
                 row = row.split(',')
-                config[row[0]] = row[1:]
+                config[row[0]] = [i.strip() for i in row[1:]]
             for i in config:
                 if i != 'compile_tool':
                     config[i] = config[i][0]

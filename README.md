@@ -1,7 +1,7 @@
 # QuickProject
 ## Project description
 
-[![](https://img.shields.io/badge/version-0.3.14-green)]()
+[![](https://img.shields.io/badge/version-0.3.15-green)]()
 [![](https://img.shields.io/badge/Author-RhythmLian-blue)]()
 
 ## 安装:
@@ -13,6 +13,8 @@
 | Command | Result |
 | :----- | :----- |
 | `Qpro -init` | 为项目添加[配置表](#配置表)和相关文件，令下面命令可执行 |
+| `Qpro -h` | 查看帮助 |
+| `Qpro -update` | 更新Qpro |
 | `refresh` | 调用[刷新脚本](#刷新脚本)，刷新项目中的默认源文件 |
 | `run *` | 使用[运行脚本](#运行脚本)运行你的项目 |
 | `detector [-[p/f][p/f]]` | 运行[对拍器](#对拍器)（对拍器只能在`Qpro -init`后的文件夹下运行） |

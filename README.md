@@ -1,7 +1,7 @@
 # QuickProject
 ## Project description
 
-[![](https://img.shields.io/badge/version-0.4.5.4-green)]()
+[![](https://img.shields.io/badge/version-0.4.5.6-green)]()
 [![](https://img.shields.io/badge/Author-RhythmLian-blue)]()
 
 ## 安装:
@@ -79,6 +79,8 @@
 
 ### 模板脚本:
 
+- 使用
+ 
   | 命令 | 效果 |
   |:---|:---|
   | `tmpm` | 调用[刷新脚本](#刷新脚本)，刷新项目中的默认源文件 |

@@ -29,7 +29,7 @@ def match_algorithm():
             content = re.findall('/// __START__(.*?)/// __END__', file.read(), re.S)[0]
         except IndexError:
             exit('No template index found! Insert "/// __START__" and "/// __END__" to your code!')
-    return content
+    return content.strip()
 
 
 def create():
@@ -45,9 +45,9 @@ def create():
             exit(0)
     content = match_algorithm()
     with open(config['template_root'] + temp_name, 'w') as file:
-        file.write('# %s\n ```%s\n' % (algorithm_name, 'c++' if is_cpp else 'c'))
+        file.write('\n## %s\n\n ```%s\n' % (algorithm_name, 'c++' if is_cpp else 'c'))
         file.write(content)
-        file.write('\n```')
+        file.write('\n```\n')
 
 
 def append():
@@ -61,9 +61,9 @@ def append():
     if os.path.exists(config['template_root'] + temp_name):
         content = match_algorithm()
         with open(config['template_root'] + temp_name, 'a') as file:
-            file.write('# %s\n ```%s\n' % (algorithm_name, 'c++' if is_cpp else 'c'))
+            file.write('\n## %s\n\n ```%s\n' % (algorithm_name, 'c++' if is_cpp else 'c'))
             file.write(content)
-            file.write('\n```')
+            file.write('\n```\n')
     else:
         sys.argv[indx] = '-c'
         create()
@@ -84,7 +84,7 @@ def join():
             indx = int(input('%s选择:' % ('\n' if len(content) % 10 else ''))) - 1
             content = content[indx]
         with open(config['compile_filename'], 'r') as file:
-            content = file.read().replace('/// __TEMPLATE__', content[1])
+            content = file.read().replace('/// __TEMPLATE__', content[1].strip())
         with open(config['compile_filename'], 'w') as file:
             file.write(content)
     else:

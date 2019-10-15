@@ -1,7 +1,7 @@
 # QuickProject
 ## Project description
 
-[![](https://img.shields.io/badge/version-0.4.2-green)]()
+[![](https://img.shields.io/badge/version-0.4.4-green)]()
 [![](https://img.shields.io/badge/Author-RhythmLian-blue)]()
 
 ## 安装:
@@ -15,7 +15,7 @@
 | `Qpro -init` | 为项目添加[配置表](#配置表)和相关文件，令下面命令可执行 |
 | `Qpro -h` | 查看帮助 |
 | `Qpro -update` | 更新Qpro |
-| `refresh` | 调用[刷新脚本](#刷新脚本)，刷新项目中的默认源文件 |
+| `refresh *` | 调用[刷新脚本](#刷新脚本)，刷新项目中的默认源文件 |
 | `run *` | 使用[运行脚本](#运行脚本)运行你的项目 |
 | `detector [-[p/f][p/f]]` | 运行[对拍器](#对拍器)（对拍器只能在`Qpro -init`后的文件夹下运行） |
 
@@ -31,7 +31,7 @@
       | `compile_filename` | 待编译的文件 | main.cpp / main.c |
       | `executable_filename` | 编译出的可执行文件名 | 项目名 |
       | `input_file` | 默认的输入文件 | `./cmake-build-debug/input.txt`|
-      | `template_file` | 默认的快照位置 | `template/main` |
+      | `template_root` | 默认的模板根目录 | `template/` |
 
 ### 运行脚本:
 
@@ -79,7 +79,11 @@
 
 ### 刷新脚本:
 
-  - 运行 `refresh` 来初始化 `main.cpp` 为存储在 `./template/main` 文件中的内容。
+  | 命令 | 效果 |
+  |:---|:---|
+  | `refresh` | 调用[刷新脚本](#刷新脚本)，刷新项目中的默认源文件 |
+  | `refresh -c name` | 拷贝`compile_filename`创建`name.md`作为模板 |
+  | `refresh name`| 在`/// __TEMPLATE__`处插入`name.md`模板 |
 
 ### 对拍器
 

@@ -25,7 +25,7 @@ argv = []
 input_file = config['input_file']
 
 
-def run(use_txt=False, executable_file=config['executable_filename']):
+def run(use_txt=False, executable_file=str(config['executable_filename'])):
     cmd = executable_file + ' '
     if argv:
         cmd += ' '.join(argv)
@@ -87,12 +87,12 @@ def main():
             print(red_col('ERROR: No file with -if'))
         tmp_file = sys.argv[index + 1]
         if tmp_file == '-paste':
-            with open('cmake-build-debug' + dir_char + 'input.txt', 'w') as f:
-                f.write(pyperclip.paste())
+            with open('cmake-build-debug' + dir_char + 'input.txt', 'w') as file:
+                file.write(pyperclip.paste())
         else:
-            input_file = tmp_file
-            if not os.path.exists(input_file):
-                print(red_col('ERROR: No such file:%s' % input_file))
+            __input_file__ = tmp_file
+            if not os.path.exists(__input_file__):
+                print(red_col('ERROR: No such file:%s' % __input_file__))
                 exit(-1)
     o_file = config['executable_filename']
     if to_build:

@@ -1,7 +1,7 @@
 # QuickProject
 ## Project description
 
-[![](https://img.shields.io/badge/version-0.4.4-green)]()
+[![](https://img.shields.io/badge/version-0.4.5.4-green)]()
 [![](https://img.shields.io/badge/Author-RhythmLian-blue)]()
 
 ## 安装:
@@ -15,7 +15,7 @@
 | `Qpro -init` | 为项目添加[配置表](#配置表)和相关文件，令下面命令可执行 |
 | `Qpro -h` | 查看帮助 |
 | `Qpro -update` | 更新Qpro |
-| `refresh *` | 调用[刷新脚本](#刷新脚本)，刷新项目中的默认源文件 |
+| `tmpm *` | 调用[模板脚本](#模板脚本)，刷新项目中的默认源文件 |
 | `run *` | 使用[运行脚本](#运行脚本)运行你的项目 |
 | `detector [-[p/f][p/f]]` | 运行[对拍器](#对拍器)（对拍器只能在`Qpro -init`后的文件夹下运行） |
 
@@ -77,13 +77,16 @@
       | `run`| 运行 |
       | `run -br -i` |  编译且使用输入文件运行 |
 
-### 刷新脚本:
+### 模板脚本:
 
   | 命令 | 效果 |
   |:---|:---|
-  | `refresh` | 调用[刷新脚本](#刷新脚本)，刷新项目中的默认源文件 |
-  | `refresh -c name` | 拷贝`compile_filename`创建`name.md`作为模板 |
-  | `refresh name`| 在`/// __TEMPLATE__`处插入`name.md`模板 |
+  | `tmpm` | 调用[刷新脚本](#刷新脚本)，刷新项目中的默认源文件 |
+  | `tmpm -c template algorithm` |拷贝指定位置, 创建模板集并写入算法|
+  | `tmpm -a template algorithm` |拷贝指定位置, 向模板集追加算法|
+  | `tmpm name`| 在`/// __TEMPLATE__`处插入`name`模板集内的模板 |
+
+- 关于指定位置: `tmpm` 将会把`compile_filename`中处于`/// __START__`和`/// __END__`之间的内容识别, 并拷贝
 
 ### 对拍器
 
@@ -94,6 +97,6 @@
   | `detector (-pp)` | 打开默认对拍器(`文件1`与`文件2`都是程序) |
   | `detector -pf` | 运行`文件1`程序并将结果与`文件2`对比 |
   | `detector -fp` | 运行`文件2`程序并将结果与`文件1`对比 |
-  | `detector -ff` | 对比`文件1`与`文件2`的内容 |
+  | `detector -ff` | 对比`文件1`与`文件2`的内容(你可以在任何位置调用)|
   - 如果脚本未能自动打开`./res.html`, 你可以用浏览器打开它。
     ![GUI](https://github.com/Rhythmicc/QuickProject/blob/master/img/1.png?raw=true)

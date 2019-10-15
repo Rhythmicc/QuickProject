@@ -13,11 +13,13 @@ else:
 def main():
     if '-h' in sys.argv:
         print('usage:\n'
-              '\t * [Qpro -init    ]: add configure so that command \"Qpro*\" can work\n'
-              '\t * [Qpro -h       ]: help\n'
-              '\t * [Qpro -update  ]: update Qpro\n'
-              '\t * [refresh       ]: refresh your project\n'
-              '\t * [run *         ]: run your C/CPP project\n'
+              '\t * [Qpro -init     ]: add configure so that command \"Qpro*\" can work\n'
+              '\t * [Qpro -h        ]: help\n'
+              '\t * [Qpro -update   ]: update Qpro\n'
+              '\t * [refresh        ]: refresh your project\n'
+              '\t * [refresh -c name]: create template named "name"\n'
+              '\t * [refresh name   ]: refresh compile_file to template name\n'
+              '\t * [run *          ]: run your C/CPP project\n'
               '\t * [detector -[p/f][p/f]  ]: run beat detector for two source files')
         exit(0)
     elif '-update' in sys.argv:
@@ -58,7 +60,7 @@ def main():
             ['compile_filename', source_file],
             ['executable_filename', project_name],
             ['input_file', default_input],
-            ['template_file', 'template' + dir_char + 'main']
+            ['template_root', 'template' + dir_char]
         ]
         with open('project_configure.csv', 'w') as f:
             for row in info:

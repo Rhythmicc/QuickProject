@@ -45,7 +45,7 @@ def create():
             exit(0)
     content = match_algorithm()
     with open(config['template_root'] + temp_name, 'w') as file:
-        file.write('\n## %s\n\n ```%s\n' % (algorithm_name, 'c++' if is_cpp else 'c'))
+        file.write('\n## %s\n\n```%s\n' % (algorithm_name, 'c++' if is_cpp else 'c'))
         file.write(content)
         file.write('\n```\n')
 
@@ -61,7 +61,7 @@ def append():
     if os.path.exists(config['template_root'] + temp_name):
         content = match_algorithm()
         with open(config['template_root'] + temp_name, 'a') as file:
-            file.write('\n## %s\n\n ```%s\n' % (algorithm_name, 'c++' if is_cpp else 'c'))
+            file.write('\n## %s\n\n```%s\n' % (algorithm_name, 'c++' if is_cpp else 'c'))
             file.write(content)
             file.write('\n```\n')
     else:

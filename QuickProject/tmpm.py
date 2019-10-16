@@ -26,10 +26,18 @@ def match_algorithm():
     with open(config['compile_filename'], 'r') as file:
         import re
         try:
-            content = re.findall('/// __START__(.*?)/// __END__', file.read(), re.S)[0]
+            content = re.findall('/// __START__(.*?)/// __END__', file.read(), re.S)[0].strip()
         except IndexError:
             exit('No template index found! Insert "/// __START__" and "/// __END__" to your code!')
-    return content.strip()
+    content = content.replace('/// __TEMPLATE__', '')
+    return content
+
+
+def write_algorithm(temp, algorithm, content):
+    with open(config['template_root'] + temp, 'w') as file:
+        file.write('\n## %s\n\n```%s\n' % (algorithm, 'c++' if is_cpp else 'c'))
+        file.write(content)
+        file.write('\n```\n')
 
 
 def create():
@@ -44,10 +52,7 @@ def create():
         if input('Template %s is already exist, would you cover it?[y/n]:' % temp_name) == 'n':
             exit(0)
     content = match_algorithm()
-    with open(config['template_root'] + temp_name, 'w') as file:
-        file.write('\n## %s\n\n```%s\n' % (algorithm_name, 'c++' if is_cpp else 'c'))
-        file.write(content)
-        file.write('\n```\n')
+    write_algorithm(temp_name, algorithm_name, content)
 
 
 def append():
@@ -60,10 +65,7 @@ def append():
         exit('usage: tmpm -a template algorithm')
     if os.path.exists(config['template_root'] + temp_name):
         content = match_algorithm()
-        with open(config['template_root'] + temp_name, 'a') as file:
-            file.write('\n## %s\n\n```%s\n' % (algorithm_name, 'c++' if is_cpp else 'c'))
-            file.write(content)
-            file.write('\n```\n')
+        write_algorithm(temp_name, algorithm_name, content)
     else:
         sys.argv[indx] = '-c'
         create()
@@ -84,7 +86,7 @@ def join():
             indx = int(input('%s选择:' % ('\n' if len(content) % 10 else ''))) - 1
             content = content[indx]
         with open(config['compile_filename'], 'r') as file:
-            content = file.read().replace('/// __TEMPLATE__', content[1].strip())
+            content = file.read().replace('/// __TEMPLATE__', content[1].strip() + '\n/// __TEMPLATE__')
         with open(config['compile_filename'], 'w') as file:
             file.write(content)
     else:

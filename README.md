@@ -1,7 +1,7 @@
 # QuickProject
 ## Project description
 
-[![](https://img.shields.io/badge/version-0.5-green)]()
+[![](https://img.shields.io/badge/version-0.5.1-green)]()
 [![](https://img.shields.io/badge/Author-RhythmLian-blue)]()
 
 ## 安装:
@@ -83,10 +83,10 @@
  
   | 命令 | 效果 |
   |:---|:---|
-  | `tmpm` | 调用[刷新脚本](#刷新脚本)，刷新项目中的默认源文件 |
+  | `tmpm` | 刷新项目中的默认源文件 |
   | `tmpm -c template algorithm` |拷贝指定位置, 创建模板集并写入算法|
   | `tmpm -a template algorithm` |拷贝指定位置, 向模板集追加算法|
-  | `tmpm name`| 在`/// __TEMPLATE__`处插入`name`模板集内的模板 |
+  | `tmpm name`| 在`/// __TEMPLATE__`处插入`name`模板集内的模板|
 
 - 关于指定位置: `tmpm` 将会把`compile_filename`中处于`/// __START__`和`/// __END__`之间的内容识别, 并拷贝
 

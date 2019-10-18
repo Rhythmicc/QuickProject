@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import os
 import sys
 import pyperclip
@@ -113,3 +112,7 @@ def main():
         run('-i' in sys.argv or '-if' in sys.argv, o_file)
     if flag:
         os.remove(o_file)
+
+
+if __name__ == '__main__':
+    main()

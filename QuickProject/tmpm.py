@@ -32,8 +32,8 @@ def match_algorithm():
     return content
 
 
-def write_algorithm(temp, algorithm, content):
-    with open(config['template_root'] + temp, 'w') as file:
+def write_algorithm(temp, algorithm, content, mode):
+    with open(config['template_root'] + temp, mode) as file:
         file.write('\n## %s\n\n```%s\n' % (algorithm, 'c++' if is_cpp else 'c'))
         file.write(content)
         file.write('\n```\n')
@@ -51,7 +51,7 @@ def create():
         if input('Template %s is already exist, would you cover it?[y/n]:' % temp_name) == 'n':
             exit(0)
     content = match_algorithm()
-    write_algorithm(temp_name, algorithm_name, content)
+    write_algorithm(temp_name, algorithm_name, content, 'w')
 
 
 def append():
@@ -64,7 +64,7 @@ def append():
         exit('usage: tmpm -a template algorithm')
     if os.path.exists(config['template_root'] + temp_name):
         content = match_algorithm()
-        write_algorithm(temp_name, algorithm_name, content)
+        write_algorithm(temp_name, algorithm_name, content, 'a')
     else:
         sys.argv[indx] = '-c'
         create()

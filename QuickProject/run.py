@@ -21,14 +21,13 @@ try:
 except IOError:
     exit("No file named: project_configure.csv\n May you need run:\"Qpro -init\" first!")
 argv = []
-input_file = config['input_file']
 
 
 def run(use_txt=False, executable_file=str(config['executable_filename'])):
     cmd = executable_file + ' '
     if argv:
         cmd += ' '.join(argv)
-    cmd += (' < ' + input_file if use_txt else '')
+    cmd += (' < ' + config['input_file'] if use_txt else '')
     os.system(cmd)
 
 
@@ -93,6 +92,7 @@ def main():
             if not os.path.exists(__input_file__):
                 print(red_col('ERROR: No such file:%s' % __input_file__))
                 exit(-1)
+            config['input_file'] = __input_file__
     o_file = config['executable_filename']
     if to_build:
         if flag:

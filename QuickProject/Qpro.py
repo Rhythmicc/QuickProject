@@ -8,7 +8,9 @@ if sys.platform.startswith('win'):
 else:
     is_win = False
     dir_char = '/'
-work_dir = os.getcwd() + dir_char
+work_dir = os.getcwd()
+work_project = work_dir.split(dir_char)[-1]
+work_dir += dir_char
 
 cpp_template = """
 #include <iostream>
@@ -46,47 +48,52 @@ def main():
         exit(0)
     elif '-c' in sys.argv:
         try:
-            project_name = sys.argv[sys.argv.index('-c')+1]
+            project_name = sys.argv[sys.argv.index('-c') + 1]
         except IndexError:
             exit('usage: Qpro -c project')
         else:
+            if os.path.exists(project_name) and os.path.isdir(project_name):
+                exit('"%s" is exist!' % (work_dir + project_name + dir_char))
             os.mkdir(project_name)
             is_cpp = True if input('Is a cpp project? [y/n]:') == 'y' else False
             source_file = 'main.cpp' if is_cpp else 'main.c'
-            with open(project_name+dir_char+source_file, 'w') as f:
+            with open(project_name + dir_char + source_file, 'w') as f:
                 f.write(cpp_template if is_cpp else c_template)
-            os.mkdir(project_name+dir_char+'dist')
-            os.mkdir(project_name+dir_char+'template')
+            os.mkdir(project_name + dir_char + 'dist')
+            os.mkdir(project_name + dir_char + 'template')
             info = [
                 ['compile_tool', 'g++ -std=c++11' if is_cpp else 'gcc -std=c11', ''],
                 ['compile_filename', source_file],
-                ['executable_filename', 'dist'+dir_char+project_name],
-                ['input_file', 'dist'+dir_char+'input.txt'],
+                ['executable_filename', 'dist' + dir_char + project_name],
+                ['input_file', 'dist' + dir_char + 'input.txt'],
                 ['template_root', 'template' + dir_char]
             ]
-            with open(project_name+dir_char+'project_configure.csv', 'w') as f:
+            with open(project_name + dir_char + 'project_configure.csv', 'w') as f:
                 for row in info:
                     f.write(','.join(row) + '\n')
-            with open(project_name+dir_char+info[3][-1], 'w') as f:
+            with open(project_name + dir_char + info[3][-1], 'w') as f:
                 f.write('edit this file to make input')
-            with open(project_name+dir_char+info[1][-1], 'r') as f:
+            with open(project_name + dir_char + info[1][-1], 'r') as f:
                 main_cont = f.read()
-            with open(project_name+dir_char+'template' + dir_char + 'main', 'w') as f:
+            with open(project_name + dir_char + 'template' + dir_char + 'main', 'w') as f:
                 f.write(main_cont)
     elif '-init' not in sys.argv:
         exit('wrong usage! Run "Qpro -h" for help!')
     elif not os.path.exists('project_configure.csv'):
         if not os.path.exists('CMakeLists.txt'):
-            ask = input('Not an CLion Project!' + 'You need make configure manually [y/n]:')
+            ask = input('Not an CLion Project!' + 'You need make configure manually [y/n]:').strip()
             if 'y' not in ask and 'Y' not in ask:
                 exit(0)
-            is_cpp = True if input('Is a cpp project? [y/n]:') == 'y' else False
-            project_name = os.path.abspath(input('Set executable file path:')).replace(work_dir, '')
-            if dir_char not in project_name:
-                project_name = '.' + dir_char + project_name
+            is_cpp = True if input('Is a cpp project? [y/n]:').strip() == 'y' else False
             source_file = 'main.c' + ('pp' if is_cpp else '')
             while not os.path.exists(source_file):
-                source_file = input('Not found "%s", set compile_filename:' % source_file)
+                source_file = input('Not found "%s", set compile_filename:' % source_file).strip()
+            global work_project
+            while not work_project:
+                work_project = input('You need to set project name:').strip()
+            if not os.path.exists('dist') or not os.path.isdir('dist'):
+                os.mkdir('dist')
+            project_name = 'dist' + dir_char + work_project
         else:
             with open("CMakeLists.txt", 'r') as f:
                 content = f.read()
@@ -121,3 +128,7 @@ def main():
             f.write(main_cont)
     else:
         exit("You have configured your project, see project_configure to adjust your configure!")
+
+
+if __name__ == '__main__':
+    main()

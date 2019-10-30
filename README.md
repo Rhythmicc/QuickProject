@@ -1,7 +1,7 @@
 # QuickProject
 ## Project description
 
-[![](https://img.shields.io/badge/version-0.5.5-green)]() [![](https://img.shields.io/badge/Author-RhythmLian-blue)]()
+[![](https://img.shields.io/badge/version-0.5.6-green)]() [![](https://img.shields.io/badge/Author-RhythmLian-blue)]()
 
 ### 环境
 
@@ -103,7 +103,10 @@
 
   | 命令 | 效果 |
   |:---|:---|
-  | `tmpm` | 刷新项目中的默认源文件 |
+  | `tmpm -h` | 查看帮助 |
+  | `tmpm -r` | 选择备份并恢复 |
+  | `tmpm -r backup` | 恢复为`template/backup` |
+  | `tmpm -c backup` | 创建或覆盖`template/backup` |
   | `tmpm -c template algorithm` |拷贝指定位置, 创建模板集并写入算法|
   | `tmpm -a template algorithm` |拷贝指定位置, 向模板集追加算法|
   | `tmpm name`| 在`/// __TEMPLATE__`处插入`name`模板集内的模板|

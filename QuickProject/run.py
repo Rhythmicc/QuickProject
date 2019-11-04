@@ -18,6 +18,8 @@ try:
         for i in config:
             if i != 'compile_tool':
                 config[i] = config[i][0]
+        if not config['template_root'].endswith(dir_char):
+            config['template_root'] += dir_char
 except IOError:
     exit("No file named: project_configure.csv\n May you need run:\"Qpro -init\" first!")
 argv = []

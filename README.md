@@ -1,7 +1,7 @@
 # QuickProject
 ## Project description
 
-[![](https://img.shields.io/badge/version-0.5.7-green)]() [![](https://img.shields.io/badge/Author-RhythmLian-blue)]()
+[![](https://img.shields.io/badge/version-0.5.8-green)]() [![](https://img.shields.io/badge/Author-RhythmLian-blue)]()
 
 ### 环境
 
@@ -35,6 +35,7 @@
 | `Qpro -h` | 查看帮助 |
 | `Qpro -update` | 更新Qpro |
 | `Qpro -adjust` | 修改配置表 |
+| `Qpro -scp file` |将file上传到默认服务器|
 | `Qpro -c project` | 创建一个Qpro项目 |
 | `tmpm *` | 调用[模板脚本](#模板脚本)，刷新项目中的默认源文件 |
 | `run *` | 使用[运行脚本](#运行脚本)运行你的项目 |
@@ -53,6 +54,7 @@
       | `executable_filename` | 编译出的可执行文件名 | 项目名 |
       | `input_file` | 默认的输入文件 | `./cmake-build-debug/input.txt`|
       | `template_root` | 默认的模板库根目录 | `template/` |
+      |`server_target`|默认的服务器映射位置|空/`user@ip:dir_path/`|
 
   - 运行`Qpro -adjust`修改配置表:
   ![GUI](https://github.com/Rhythmicc/QuickProject/blob/master/img/3.png?raw=true)

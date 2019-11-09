@@ -12,22 +12,20 @@ work_dir = os.getcwd()
 work_project = work_dir.split(dir_char)[-1]
 work_dir += dir_char
 
-cpp_template = """
-#include <iostream>
+cpp_template = """#include <iostream>
 using namespace std;
 
 int main(int argc, char **argv) {
 
-    return 0;    
+    return 0;
 }
 """
 
-c_template = """
-#include <stdio.h>
+c_template = """#include <stdio.h>
 
 int main(int argc, char **argv) {
 
-    return 0;    
+    return 0;
 }
 """
 
@@ -38,6 +36,7 @@ def main():
               '\t * [Qpro -init   ]: let dir be a Qpro project!\n'
               '\t * [Qpro -h      ]: help\n'
               '\t * [Qpro -update ]: update Qpro\n'
+              '\t * [Qpro -adjust ]: adjust configure\n'
               '\t * [Qpro -c name ]: create a Qpro project\n'
               '\t * [tmpm *       ]: manage your template\n'
               '\t * [run *        ]: run your Qpro project\n'
@@ -77,6 +76,63 @@ def main():
                 main_cont = f.read()
             with open(project_name + dir_char + 'template' + dir_char + 'main', 'w') as f:
                 f.write(main_cont)
+    elif '-adjust' in sys.argv:
+        config = {}
+        try:
+            with open('project_configure.csv', 'r') as f:
+                for row in f.readlines():
+                    row = row.split(',')
+                    config[row[0]] = [i.strip() for i in row[1:]]
+                for i in config:
+                    if i != 'compile_tool':
+                        config[i] = config[i][0]
+        except IOError:
+            exit("No file named: project_configure.csv\n May you need run:\"Qpro -init\" first!")
+        import tkinter as tk
+        win = tk.Tk()
+        win.title('Qpro项目调整器')
+        key_to_name = {
+            'compile_tool': '编译指令:',
+            'compile_filename': '源程序:',
+            'executable_filename': '项目地址:',
+            'input_file': '输入文件:',
+            'template_root': '模板目录:'
+        }
+        all_dt = {}
+        for i, v in enumerate(config):
+            tk.Label(win, text='%12s' % key_to_name[v]).grid(row=i, column=0)
+            if v == 'compile_tool':
+                stringvar1 = tk.Variable()
+                stringvar1.set(config[v][0])
+                stringvar2 = tk.Variable()
+                stringvar2.set(config[v][1])
+                tk.Entry(win, textvariable=stringvar1, width=20).grid(row=i, column=1)
+                tk.Entry(win, textvariable=stringvar2, width=19).grid(row=i, column=2)
+                all_dt[v] = [stringvar1, stringvar2]
+            else:
+                stringvar1 = tk.Variable()
+                stringvar1.set(config[v])
+                tk.Entry(win, textvariable=stringvar1, width=40).grid(row=i, column=1, columnspan=2)
+                all_dt[v] = stringvar1
+
+        def deal_config():
+            for i in all_dt:
+                if i == 'compile_tool':
+                    config[i] = [all_dt[i][0].get(), all_dt[i][1].get()]
+                else:
+                    config[i] = all_dt[i].get()
+            if not config['template_root'].endswith(dir_char):
+                config['template_root'] += dir_char
+            win.destroy()
+            with open('project_configure.csv', 'w') as file:
+                for line in config:
+                    if line == 'compile_tool':
+                        file.write('%s,%s\n' % (line, ','.join(config[line])))
+                    else:
+                        file.write('%s,%s\n' % (line, config[line]))
+
+        tk.Button(win, text='确认', command=deal_config, width=10).grid(row=5, column=0, columnspan=3)
+        tk.mainloop()
     elif '-init' not in sys.argv:
         exit('wrong usage! Run "Qpro -h" for help!')
     elif not os.path.exists('project_configure.csv'):

@@ -30,16 +30,32 @@ int main(int argc, char **argv) {
 """
 
 
+def get_config():
+    config = {}
+    try:
+        with open('project_configure.csv', 'r') as f:
+            for row in f.readlines():
+                row = row.split(',')
+                config[row[0]] = [i.strip() for i in row[1:]]
+            for i in config:
+                if i != 'compile_tool':
+                    config[i] = config[i][0]
+    except IOError:
+        exit("No file named: project_configure.csv\n May you need run:\"Qpro -init\" first!")
+    return config
+
+
 def main():
     if '-h' in sys.argv:
         print('usage:\n'
-              '\t * [Qpro -init   ]: let dir be a Qpro project!\n'
-              '\t * [Qpro -h      ]: help\n'
-              '\t * [Qpro -update ]: update Qpro\n'
-              '\t * [Qpro -adjust ]: adjust configure\n'
-              '\t * [Qpro -c name ]: create a Qpro project\n'
-              '\t * [tmpm *       ]: manage your template\n'
-              '\t * [run *        ]: run your Qpro project\n'
+              '\t * [Qpro -init    ]: let dir be a Qpro project!\n'
+              '\t * [Qpro -h       ]: help\n'
+              '\t * [Qpro -update  ]: update Qpro\n'
+              '\t * [Qpro -adjust  ]: adjust configure\n'
+              '\t * [Qpro -scp file]: post file to default server target'
+              '\t * [Qpro -c name  ]: create a Qpro project\n'
+              '\t * [tmpm *        ]: manage your template\n'
+              '\t * [run *         ]: run your Qpro project\n'
               '\t * [detector -[p/f][p/f] ]: run beat detector for two source files')
         exit(0)
     elif '-update' in sys.argv:
@@ -76,18 +92,20 @@ def main():
                 main_cont = f.read()
             with open(project_name + dir_char + 'template' + dir_char + 'main', 'w') as f:
                 f.write(main_cont)
-    elif '-adjust' in sys.argv:
-        config = {}
+    elif '-scp' in sys.argv:
         try:
-            with open('project_configure.csv', 'r') as f:
-                for row in f.readlines():
-                    row = row.split(',')
-                    config[row[0]] = [i.strip() for i in row[1:]]
-                for i in config:
-                    if i != 'compile_tool':
-                        config[i] = config[i][0]
-        except IOError:
-            exit("No file named: project_configure.csv\n May you need run:\"Qpro -init\" first!")
+            file = sys.argv[sys.argv.index('-scp')+1]
+        except IndexError:
+            exit('usage: Qpro -scp file')
+        else:
+            if not os.path.exists(file):
+                exit('No such file named: '+file)
+            if os.path.isdir(file):
+                exit('scp can only post file but not dictionary!')
+            config = get_config()
+            os.system('scp %s %s' % (file, config['server_target']+file))
+    elif '-adjust' in sys.argv:
+        config = get_config()
         import tkinter as tk
         win = tk.Tk()
         win.title('Qpro项目调整器')
@@ -96,7 +114,8 @@ def main():
             'compile_filename': '源程序:',
             'executable_filename': '项目地址:',
             'input_file': '输入文件:',
-            'template_root': '模板目录:'
+            'template_root': '模板目录:',
+            'server_target': '远程映射:'
         }
         all_dt = {}
         for i, v in enumerate(config):
@@ -131,8 +150,9 @@ def main():
                     else:
                         file.write('%s,%s\n' % (line, config[line]))
 
-        tk.Button(win, text='确认', command=deal_config, width=10).grid(row=5, column=0, columnspan=3)
+        tk.Button(win, text='确认', command=deal_config, width=10).grid(row=6, column=0, columnspan=3)
         tk.mainloop()
+
     elif '-init' not in sys.argv:
         exit('wrong usage! Run "Qpro -h" for help!')
     elif not os.path.exists('project_configure.csv'):
@@ -163,13 +183,17 @@ def main():
             source_file = 'main.c' + ('pp' if is_cpp else '')
         pro_root = dir_char.join(project_name.split(dir_char)[:-1])
         default_input = pro_root + dir_char + 'input.txt'
+        server_target = input('input [user@ip:dir_path] if you need scp:')
+        if server_target and not server_target.endswith('/') and not server_target.endswith(':'):
+            server_target += '/'
         print('adding project_configure')
         info = [
             ['compile_tool', 'g++ -std=c++11' if is_cpp else 'gcc -std=c11', ''],
             ['compile_filename', source_file],
             ['executable_filename', project_name],
             ['input_file', default_input],
-            ['template_root', 'template' + dir_char]
+            ['template_root', 'template' + dir_char],
+            ['server_target', server_target]
         ]
         with open('project_configure.csv', 'w') as f:
             for row in info:

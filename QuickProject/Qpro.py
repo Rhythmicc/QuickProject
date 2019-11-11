@@ -145,10 +145,10 @@ def adjust():
             if dt == 'compile_tool':
                 config[dt] = [all_dt[dt][0].get(), all_dt[dt][1].get()]
             elif dt == 'server_target':
-                server_target = all_dt[dt].get()
-                if ':' in server_target and not server_target.endswith('/') and not server_target.endswith(':'):
-                    server_target += '/'
-                elif server_target:
+                config[dt] = all_dt[dt].get()
+                if ':' in config[dt] and not config[dt].endswith('/') and not config[dt].endswith(':'):
+                    config[dt] += '/'
+                elif config[dt]:
                     print('Not a legal server target!\n'
                           'You can run "Qpro -adjust" to adjust target\n'
                           'and run "Qpro -scp-init" to upload project.')

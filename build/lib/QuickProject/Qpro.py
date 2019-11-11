@@ -141,11 +141,19 @@ def adjust():
             all_dt[v] = stringvar1
 
     def deal_config():
-        for i in all_dt:
-            if i == 'compile_tool':
-                config[i] = [all_dt[i][0].get(), all_dt[i][1].get()]
+        for dt in all_dt:
+            if dt == 'compile_tool':
+                config[dt] = [all_dt[dt][0].get(), all_dt[dt][1].get()]
+            elif dt == 'server_target':
+                config[dt] = all_dt[dt].get()
+                if ':' in config[dt] and not config[dt].endswith('/') and not config[dt].endswith(':'):
+                    config[dt] += '/'
+                elif config[dt]:
+                    print('Not a legal server target!\n'
+                          'You can run "Qpro -adjust" to adjust target\n'
+                          'and run "Qpro -scp-init" to upload project.')
             else:
-                config[i] = all_dt[i].get()
+                config[dt] = all_dt[dt].get()
         if not config['template_root'].endswith(dir_char):
             config['template_root'] += dir_char
         win.destroy()

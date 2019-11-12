@@ -1,7 +1,7 @@
 # QuickProject
 ## Project description
 
-[![](https://img.shields.io/badge/version-0.5.85-green)]() [![](https://img.shields.io/badge/Author-RhythmLian-blue)]()
+[![](https://img.shields.io/badge/version-0.5.91-green)]() [![](https://img.shields.io/badge/Author-RhythmLian-blue)]()
 
 ### 环境
 
@@ -36,6 +36,7 @@
 | `Qpro -c project` | 创建一个Qpro项目 |
 | `Qpro -update` | 更新Qpro |
 | `Qpro -adjust` | 修改配置表 |
+| `Qpro -ssh` | 进入服务器Qpro项目位置 |
 | `Qpro -scp path` |将项目内文件夹或文件上传到默认服务器|
 | `Qpro -scp-init` |将整个项目上传到默认服务器|
 | `Qpro -get path` |从服务器上拉取项目内文件|

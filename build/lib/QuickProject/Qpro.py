@@ -240,33 +240,42 @@ def pro_init():
     scp_init(server_target)
 
 
+def ssh():
+    server, target = get_config()['server_target'].split(':')
+    os.system("ssh -t %s 'cd %s ; exec $SHELL -l'" % (server, target))
+
+
+func = {
+    '-c': create,
+    '-scp': scp,
+    '-get': get,
+    '-adjust': adjust,
+    '-ssh': ssh
+}
+
+
 def main():
-    if '-h' in sys.argv:
+    if '-h' == sys.argv[1]:
         print('usage:\n'
               '\t * [Qpro -init    ]: let dir be a Qpro project!\n'
               '\t * [Qpro -h       ]: help\n'
               '\t * [Qpro -c name  ]: create a Qpro project\n'
               '\t * [Qpro -update  ]: update Qpro\n'
               '\t * [Qpro -adjust  ]: adjust configure\n'
+              '\t * [Qpro -ssh     ]: login server by ssh\n'
               '\t * [Qpro -scp path]: upload path to default server target\n'
               '\t * [Qpro -scp-init]: upload all of project to server target\n'
               '\t * [Qpro -get path]: download file from server target\n'
               '\t * [tmpm *        ]: manage your template\n'
               '\t * [run *         ]: run your Qpro project\n'
               '\t * [detector -[p/f][p/f] ]: run beat detector for two source files')
-    elif '-update' in sys.argv:
+    elif '-update' == sys.argv[1]:
         os.system('pip3 install Qpro --upgrade')
         exit(0)
-    elif '-c' in sys.argv:
-        create()
-    elif '-scp' in sys.argv:
-        scp()
-    elif '-get' in sys.argv:
-        get()
-    elif '-scp-init' in sys.argv:
+    elif sys.argv[1] in func:
+        func[sys.argv[1]]()
+    elif sys.argv[1] == '-scp-init':
         scp_init(get_config()['server_target'])
-    elif '-adjust' in sys.argv:
-        adjust()
     elif '-init' not in sys.argv:
         exit('wrong usage! Run "Qpro -h" for help!')
     elif not os.path.exists('project_configure.csv'):

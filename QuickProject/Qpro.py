@@ -45,10 +45,10 @@ def get_config():
     return config
 
 
-def scp_init(server_target):
+def scp_init(server_target, ct=False):
     if server_target:
-        if server_target.endswith(work_project+'/'):
-            st = os.system('scp -r %s %s' % (work_dir, server_target))
+        if ct:
+            st = os.system('scp -r %s %s' % (work_project, server_target))
         else:
             st = os.system('scp -r * %s' % server_target)
         if st:
@@ -58,6 +58,8 @@ def scp_init(server_target):
 def create():
     try:
         project_name = sys.argv[sys.argv.index('-c') + 1]
+        global work_project
+        work_project = project_name
     except IndexError:
         exit('usage: Qpro -c project')
     else:
@@ -90,7 +92,7 @@ def create():
             main_cont = f.read()
         with open(project_name + dir_char + 'template' + dir_char + 'main', 'w') as f:
             f.write(main_cont)
-        scp_init(server_target)
+        scp_init(server_target, True)
 
 
 def scp():
@@ -108,6 +110,18 @@ def scp():
             os.system('scp -r %s %s' % (path, config['server_target'] + path))
         else:
             os.system('scp %s %s' % (path, config['server_target'] + path))
+
+
+def get():
+    try:
+        path = sys.argv[sys.argv.index('-get') + 1]
+    except IndexError:
+        exit('usage: Qpro -get file')
+    else:
+        if not os.path.abspath(path).startswith(work_dir):
+            exit("%s is not in this Qpro project!" % path)
+        config = get_config()
+        os.system('scp -r %s %s' % (config['server_target'] + path, path))
 
 
 def adjust():
@@ -201,8 +215,8 @@ def pro_init():
         server_target += '/'
     elif server_target:
         print('Not a legal server target!\n'
-                'You can run "Qpro -adjust" to adjust target\n'
-                'and run "Qpro -scp-init" to upload project.')
+              'You can run "Qpro -adjust" to adjust target\n'
+              'and run "Qpro -scp-init" to upload project.')
     print('adding project_configure')
     info = [
         ['compile_tool', 'g++ -std=c++11' if is_cpp else 'gcc -std=c11', ''],
@@ -231,11 +245,12 @@ def main():
         print('usage:\n'
               '\t * [Qpro -init    ]: let dir be a Qpro project!\n'
               '\t * [Qpro -h       ]: help\n'
+              '\t * [Qpro -c name  ]: create a Qpro project\n'
               '\t * [Qpro -update  ]: update Qpro\n'
               '\t * [Qpro -adjust  ]: adjust configure\n'
               '\t * [Qpro -scp path]: upload path to default server target\n'
               '\t * [Qpro -scp-init]: upload all of project to server target\n'
-              '\t * [Qpro -c name  ]: create a Qpro project\n'
+              '\t * [Qpro -get path]: download file from server target\n'
               '\t * [tmpm *        ]: manage your template\n'
               '\t * [run *         ]: run your Qpro project\n'
               '\t * [detector -[p/f][p/f] ]: run beat detector for two source files')
@@ -246,6 +261,8 @@ def main():
         create()
     elif '-scp' in sys.argv:
         scp()
+    elif '-get' in sys.argv:
+        get()
     elif '-scp-init' in sys.argv:
         scp_init(get_config()['server_target'])
     elif '-adjust' in sys.argv:
@@ -260,4 +277,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

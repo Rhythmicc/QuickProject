@@ -148,7 +148,7 @@ def adjust():
                 config[dt] = all_dt[dt].get()
                 if ':' in config[dt] and not config[dt].endswith('/') and not config[dt].endswith(':'):
                     config[dt] += '/'
-                elif config[dt]:
+                elif ':' not in config[dt]:
                     print('Not a legal server target!\n'
                           'You can run "Qpro -adjust" to adjust target\n'
                           'and run "Qpro -scp-init" to upload project.')

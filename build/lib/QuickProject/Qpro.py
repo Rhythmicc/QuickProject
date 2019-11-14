@@ -210,7 +210,7 @@ def pro_init():
         source_file = 'main.c' + ('pp' if is_cpp else '')
     pro_root = dir_char.join(project_name.split(dir_char)[:-1])
     default_input = pro_root + dir_char + 'input.txt'
-    server_target = input('input [user@ip:dir_path] if you need scp:')
+    server_target = input('input [user@ip:dir_path] if you need scp:').strip().replace('\\', '/')
     if ':' in server_target and not server_target.endswith('/') and not server_target.endswith(':'):
         server_target += '/'
     elif server_target:

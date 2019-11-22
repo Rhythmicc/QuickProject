@@ -1,9 +1,11 @@
 from setuptools import setup, find_packages
+import sys
 
+is_win = sys.platform.startswith('win')
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
-VERSION = '0.6'
+VERSION = '0.6.1'
 
 setup(
     name='Qpro',
@@ -28,7 +30,7 @@ setup(
     entry_points={
         'console_scripts': [
             'Qpro = QuickProject.Qpro:main',
-            'run = QuickProject.run:main',
+            'qrun = QuickProject.run:main' if is_win else 'run = QuickProject.run:main',
             'tmpm = QuickProject.tmpm:main',
             'detector = QuickProject.detector:main'
         ]

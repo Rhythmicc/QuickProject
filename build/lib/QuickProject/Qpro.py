@@ -12,22 +12,31 @@ work_dir = os.getcwd()
 work_project = work_dir.split(dir_char)[-1]
 work_dir += dir_char
 
-cpp_template = """#include <iostream>
+lang_template = {
+    'cpp': """#include <iostream>
 using namespace std;
 
 int main(int argc, char **argv) {
-
+    cout<<"hello world\\n";
     return 0;
 }
-"""
-
-c_template = """#include <stdio.h>
+""",
+    'c': """#include <stdio.h>
 
 int main(int argc, char **argv) {
-
+    puts("hello world");
     return 0;
 }
-"""
+""",
+    'java': """class CLASS_NAME {
+    public static void main(String[] args) {
+		System.out.println("hello world!");
+	}
+}
+""",
+    'python': """print 'hello world'""",
+    'python3': """print('hello world')"""
+}
 
 
 def get_config():
@@ -65,20 +74,50 @@ def create():
     else:
         if os.path.exists(project_name) and os.path.isdir(project_name):
             exit('"%s" is exist!' % (work_dir + project_name + dir_char))
+        lang_tool_exe = {
+            'c': ['gcc -std=c11', '', '', '.c'],
+            'cpp': ['g++ -std=c++11', '', '', '.cpp'],
+            'java': ['javac', '-d dist', 'java -classpath dist ', '.java'],
+            'python3': ['', '', 'python3 ', '.py'],
+            'python': ['', '', 'python ', '.py'],
+        }
         os.mkdir(project_name)
-        is_cpp = True if input('Is a cpp project? [y/n]:') == 'y' else False
+        langs = list(lang_tool_exe.keys())
+        langs.append('other')
+        for i, lang in enumerate(langs):
+            print('[%d] %-5s' % (i + 1, lang), end='\t' if (i + 1) % 3 else '\n')
+        if len(langs) % 3:
+            print()
+        id_lang = 0
+        while id_lang <= 0 or id_lang > len(langs):
+            try:
+                id_lang = int(input('choose one:'))
+            except:
+                id_lang = 0
+        if langs[id_lang - 1] == 'other':
+            lang = ['other_compile_tool', 'other_execute_command ', '.other']
+        else:
+            lang = lang_tool_exe[langs[id_lang - 1]]
         server_target = input('input [user@ip:dir_path] if you need scp:')
         if server_target and not server_target.endswith('/') and not server_target.endswith(':'):
             server_target += '/'
-        source_file = 'main.cpp' if is_cpp else 'main.c'
+        source_file = ('main' + lang[-1]) if lang[0] != 'javac' else project_name + lang[-1]
+        if lang[0] != 'javac':
+            execute = lang[2] + 'dist' + dir_char + project_name if lang[0] else lang[2] + source_file
+        else:
+            execute = lang[2] + project_name
         with open(project_name + dir_char + source_file, 'w') as f:
-            f.write(cpp_template if is_cpp else c_template)
+            if lang[-1] != '.other':
+                content = lang_template[langs[id_lang - 1]]
+                if lang[0] == 'javac':
+                    content = content.replace('CLASS_NAME', project_name)
+                f.write(content)
         os.mkdir(project_name + dir_char + 'dist')
         os.mkdir(project_name + dir_char + 'template')
         info = [
-            ['compile_tool', 'g++ -std=c++11' if is_cpp else 'gcc -std=c11', ''],
+            ['compile_tool', lang[0], lang[1]],
             ['compile_filename', source_file],
-            ['executable_filename', 'dist' + dir_char + project_name],
+            ['executable_filename', execute],
             ['input_file', 'dist' + dir_char + 'input.txt'],
             ['template_root', 'template' + dir_char],
             ['server_target', server_target]
@@ -130,9 +169,9 @@ def adjust():
     win = tk.Tk()
     win.title('Qpro项目调整器')
     key_to_name = {
-        'compile_tool': '运行指令:',
+        'compile_tool': '编译指令:',
         'compile_filename': '源程序:',
-        'executable_filename': '项目地址:',
+        'executable_filename': '运行指令:',
         'input_file': '输入文件:',
         'template_root': '模板目录:',
         'server_target': '远程映射:'
@@ -160,12 +199,13 @@ def adjust():
                 config[dt] = [all_dt[dt][0].get(), all_dt[dt][1].get()]
             elif dt == 'server_target':
                 config[dt] = all_dt[dt].get()
-                if ':' in config[dt] and not config[dt].endswith('/') and not config[dt].endswith(':'):
-                    config[dt] += '/'
-                elif ':' not in config[dt]:
-                    print('Not a legal server target!\n'
-                          'You can run "Qpro -adjust" to adjust target\n'
-                          'and run "Qpro -scp-init" to upload project.')
+                if config[dt]:
+                    if ':' in config[dt] and not config[dt].endswith('/') and not config[dt].endswith(':'):
+                        config[dt] += '/'
+                    elif ':' not in config[dt]:
+                        print('Not a legal server target!\n'
+                              'You can run "Qpro -adjust" to adjust target\n'
+                              'and run "Qpro -scp-init" to upload project.')
             else:
                 config[dt] = all_dt[dt].get()
         if not config['template_root'].endswith(dir_char):
@@ -187,16 +227,53 @@ def pro_init():
         ask = input('Not an CLion Project!' + 'You need make configure manually [y/n]:').strip()
         if 'y' not in ask and 'Y' not in ask:
             exit(0)
-        is_cpp = True if input('Is a cpp project? [y/n]:').strip() == 'y' else False
-        source_file = 'main.c' + ('pp' if is_cpp else '')
-        while not os.path.exists(source_file):
-            source_file = input('Not found "%s", set compile_filename:' % source_file).strip()
         global work_project
         while not work_project:
             work_project = input('You need to set project name:').strip()
+        lang_tool_exe = {
+            'c': ['gcc -std=c11', '', '', '.c'],
+            'cpp': ['g++ -std=c++11', '', '', '.cpp'],
+            'java': ['javac', '-d dist', 'java -classpath dist ', '.java'],
+            'python3': ['', '', 'python3 ', '.py'],
+            'python': ['', '', 'python ', '.py'],
+        }
+        langs = list(lang_tool_exe.keys())
+        langs.append('other')
+        for i, lang in enumerate(langs):
+            print('[%d] %-5s' % (i + 1, lang), end='\t' if (i + 1) % 3 else '\n')
+        if len(langs) % 3:
+            print()
+        id_lang = 0
+        while id_lang <= 0 or id_lang > len(langs):
+            try:
+                id_lang = int(input('choose one:'))
+            except:
+                id_lang = 0
+        if langs[id_lang - 1] == 'other':
+            lang = ['other_compile_tool', 'other_execute_command ', '.other']
+        else:
+            lang = lang_tool_exe[langs[id_lang - 1]]
+        source_file = ('main' + lang[-1]) if lang[0] != 'javac' else work_project + lang[-1]
+        while not os.path.exists(source_file):
+            source_file = input('Not found "%s", set compile_filename:' % source_file).strip()
+        server_target = input('input [user@ip:dir_path] if you need scp:').strip().replace('\\', '/')
+        if ':' in server_target and not server_target.endswith('/') and not server_target.endswith(':'):
+            server_target += '/'
+        if lang[0] != 'javac':
+            execute = lang[2] + 'dist' + dir_char + work_project if lang[0] else lang[2] + source_file
+        else:
+            work_project = source_file.split(dir_char)[-1].split('.')[0]
+            execute = lang[2] + work_project
         if not os.path.exists('dist') or not os.path.isdir('dist'):
             os.mkdir('dist')
-        project_name = 'dist' + dir_char + work_project
+        info = [
+            ['compile_tool', lang[0], lang[1]],
+            ['compile_filename', source_file],
+            ['executable_filename', execute],
+            ['input_file', 'dist' + dir_char + 'input.txt'],
+            ['template_root', 'template' + dir_char],
+            ['server_target', server_target]
+        ]
     else:
         with open("CMakeLists.txt", 'r') as f:
             content = f.read()
@@ -208,24 +285,24 @@ def pro_init():
         print('Project name:%s(%s)' % (project_name, 'CPP' if is_cpp else 'C'))
         project_name = 'cmake-build-debug' + dir_char + project_name
         source_file = 'main.c' + ('pp' if is_cpp else '')
-    pro_root = dir_char.join(project_name.split(dir_char)[:-1])
-    default_input = pro_root + dir_char + 'input.txt'
-    server_target = input('input [user@ip:dir_path] if you need scp:').strip().replace('\\', '/')
-    if ':' in server_target and not server_target.endswith('/') and not server_target.endswith(':'):
-        server_target += '/'
-    elif server_target:
-        print('Not a legal server target!\n'
-              'You can run "Qpro -adjust" to adjust target\n'
-              'and run "Qpro -scp-init" to upload project.')
-    print('adding project_configure')
-    info = [
-        ['compile_tool', 'g++ -std=c++11' if is_cpp else 'gcc -std=c11', ''],
-        ['compile_filename', source_file],
-        ['executable_filename', project_name],
-        ['input_file', default_input],
-        ['template_root', 'template' + dir_char],
-        ['server_target', server_target]
-    ]
+        pro_root = dir_char.join(project_name.split(dir_char)[:-1])
+        default_input = pro_root + dir_char + 'input.txt'
+        server_target = input('input [user@ip:dir_path] if you need scp:').strip().replace('\\', '/')
+        if ':' in server_target and not server_target.endswith('/') and not server_target.endswith(':'):
+            server_target += '/'
+        elif server_target:
+            print('Not a legal server target!\n'
+                  'You can run "Qpro -adjust" to adjust target\n'
+                  'and run "Qpro -scp-init" to upload project.')
+        print('adding project_configure')
+        info = [
+            ['compile_tool', 'g++ -std=c++11' if is_cpp else 'gcc -std=c11', ''],
+            ['compile_filename', source_file],
+            ['executable_filename', project_name],
+            ['input_file', default_input],
+            ['template_root', 'template' + dir_char],
+            ['server_target', server_target]
+        ]
     with open('project_configure.csv', 'w') as f:
         for row in info:
             f.write(','.join(row) + '\n')

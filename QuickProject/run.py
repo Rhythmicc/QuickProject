@@ -75,11 +75,6 @@ def main():
         if not os.path.exists(filename):
             print(red_col('ERROR: No such file:%s' % filename))
             exit(-1)
-        if not filename.endswith('.cpp') and not filename.endswith('.c'):
-            print(red_col("ERROR: %s is not an C/CPP file" % filename))
-            exit(-1)
-        if filename.endswith('.c'):
-            config['compile_tool'][0] = 'gcc -std=c11'
         flag = True
     if '-if' in sys.argv:
         index = sys.argv.index('-if')
@@ -96,11 +91,20 @@ def main():
                 exit(-1)
             config['input_file'] = __input_file__
     o_file = config['executable_filename']
-    if to_build:
-        if flag:
-            o_file = filename.split(dir_char)[-1].split('.')[0]
-            o_file = os.path.abspath(o_file)
-        os.system(config['compile_tool'][0] + ' ' + filename + ' -o ' + o_file + ' ' + config['compile_tool'][1])
+    if config['compile_tool'][0] and to_build:
+        clang = ['clang', 'gcc', 'g++']
+        use_lang = config['compile_tool'][0].split()[0]
+        if use_lang in clang:
+            if flag:
+                o_file = filename.split(dir_char)[-1].split('.')[0]
+                o_file = os.path.abspath(o_file)
+            os.system(config['compile_tool'][0] + ' ' + filename + ' -o ' + o_file + ' ' + config['compile_tool'][1])
+        else:  # java
+            if flag:
+                o_file = filename.split(dir_char)[-1].split('.')[0]
+                record_file_name = o_file
+                o_file = ' '.join(config['executable_filename'].split()[:-1]) + ' ' + o_file
+            os.system(config['compile_tool'][0] + ' ' + filename + ' ' + config['compile_tool'][1])
     if to_run:
         add_flag = True
         for i in sys.argv[1:]:
@@ -112,8 +116,11 @@ def main():
             elif i == '-if' or i == '-f':
                 add_flag = False
         run('-i' in sys.argv or '-if' in sys.argv, o_file)
-    if flag:
-        os.remove(o_file)
+    if config['compile_tool'][0] and flag:
+        if config['compile_tool'][0].split()[0] == 'javac':
+            os.remove('dist' + dir_char + record_file_name + '.class')
+        else:
+            os.remove(o_file)
 
 
 if __name__ == '__main__':

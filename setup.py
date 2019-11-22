@@ -3,12 +3,12 @@ from setuptools import setup, find_packages
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
-VERSION = '0.5.93'
+VERSION = '0.6'
 
 setup(
     name='Qpro',
     version=VERSION,
-    description='create some practical scripts for your clion project!',
+    description='Small but powerful command line IDE.',
     long_description=long_description,
     long_description_content_type="text/markdown",
     classifiers=[

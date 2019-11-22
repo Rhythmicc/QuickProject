@@ -1,12 +1,12 @@
 # QuickProject
 ## Project description
 
-[![](https://img.shields.io/badge/version-0.5.93-green)]() [![](https://img.shields.io/badge/Author-RhythmLian-blue)]()
+[![](https://img.shields.io/badge/version-0.6-green)]() [![](https://img.shields.io/badge/Author-RhythmLian-blue)]()
 
 ### 环境
 
-- Qpro基于`gcc/g++/clang/...`与`python3`,
-- 请确保电脑在拥有Python环境的同时, 至少安装了一套C/CPP编译指令.
+- Qpro基于`python3`,
+- 请确保电脑在拥有Python环境的同时, 至少安装一套`其他要使用的语言`环境.
 
 ### 功能
 
@@ -18,7 +18,9 @@
 
 - **Qpro对CLion的特殊支持: 在CLion项目中，Qpro可以自动将其初始化为Qpro项目**
 
-- **任意一个包含C/CPP文件的文件夹都可以成为Qpro项目, Qpro不会对原IDE项目产生影响**
+- **Qpro现内置`c`,`cpp`, `java`, `python2@3`的支持。你可以使用`Qpro -c`创建相应项目**
+
+- **`Qpro -init`将同时支持将Python项目或java项目初始化为Qpro项目**
 
 - **一个文件夹可以同时是Qpro项目和其他IDE项目**
 
@@ -44,7 +46,8 @@
 | `run *` | 使用[运行脚本](#运行脚本)运行你的项目 |
 | `detector [-[p/f][p/f]]` | 运行[对拍器](#对拍器)（对拍器只能在`Qpro -init`后的文件夹下运行） |
 
-初始化后的项目，可以手动编辑配置表`project_configure.csv`来调整配置。
+- 初始化后的项目，可以手动编辑配置表`project_configure.csv`来调整配置。
+- 支持`C/CPP`但不止于`C/CPP`，理论上你可以使用Qpro运行任何语言项目。
 
 ### 配置表
 

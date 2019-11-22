@@ -233,10 +233,13 @@ def pro_init():
         f.write('edit this file to make input')
     if not os.path.exists('template') or not os.path.isdir('template'):
         os.mkdir('template')
-    with open(info[1][-1], 'r') as f:
-        main_cont = f.read()
-    with open('template' + dir_char + 'main', 'w') as f:
-        f.write(main_cont)
+    try:
+        with open(info[1][-1], 'r') as f:
+            main_cont = f.read()
+        with open('template' + dir_char + 'main', 'w') as f:
+            f.write(main_cont)
+    except Exception as e:
+        print("make backup failed with error: %s, you need backup code by yourself!" % e)
     scp_init(server_target)
 
 
@@ -255,7 +258,7 @@ func = {
 
 
 def main():
-    if '-h' == sys.argv[1]:
+    if len(sys.argv) < 2 or '-h' == sys.argv[1]:
         print('usage:\n'
               '\t * [Qpro -init    ]: let dir be a Qpro project!\n'
               '\t * [Qpro -h       ]: help\n'

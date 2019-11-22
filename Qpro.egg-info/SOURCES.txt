@@ -1,0 +1,15 @@
+README.md
+setup.cfg
+setup.py
+Qpro.egg-info/PKG-INFO
+Qpro.egg-info/SOURCES.txt
+Qpro.egg-info/dependency_links.txt
+Qpro.egg-info/entry_points.txt
+Qpro.egg-info/requires.txt
+Qpro.egg-info/top_level.txt
+Qpro.egg-info/zip-safe
+QuickProject/Qpro.py
+QuickProject/__init__.py
+QuickProject/detector.py
+QuickProject/run.py
+QuickProject/tmpm.py

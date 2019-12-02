@@ -2,6 +2,7 @@ import os
 import re
 import sys
 
+
 if sys.platform.startswith('win'):
     is_win = True
     dir_char = '\\'
@@ -30,13 +31,22 @@ int main(int argc, char **argv) {
 """,
     'java': """class CLASS_NAME {
     public static void main(String[] args) {
-		System.out.println("hello world!");
-	}
+        System.out.println("hello world!");
+    }
 }
 """,
     'python': """print 'hello world'""",
     'python3': """print('hello world')"""
 }
+
+
+def remove(path):
+    import shutil
+    if os.path.exists(path):
+        if os.path.isdir(path):
+            shutil.rmtree(path)
+        else:
+            os.remove(path)
 
 
 def get_config():
@@ -80,10 +90,10 @@ def create():
             'java': ['javac', '-d dist', 'java -classpath dist ', '.java'],
             'python3': ['', '', 'python3 ', '.py'],
             'python': ['', '', 'python ', '.py'],
+            'empty': ['', '', '', '']
         }
         os.mkdir(project_name)
         langs = list(lang_tool_exe.keys())
-        langs.append('other')
         for i, lang in enumerate(langs):
             print('[%d] %-5s' % (i + 1, lang), end='\t' if (i + 1) % 3 else '\n')
         if len(langs) % 3:
@@ -94,43 +104,45 @@ def create():
                 id_lang = int(input('choose one:'))
             except:
                 id_lang = 0
-        if langs[id_lang - 1] == 'other':
-            lang = ['other_compile_tool', 'other_execute_command ', '.other']
-        else:
-            lang = lang_tool_exe[langs[id_lang - 1]]
+        lang = lang_tool_exe[langs[id_lang - 1]]
         server_target = input('input [user@ip:dir_path] if you need scp:')
         if server_target and not server_target.endswith('/') and not server_target.endswith(':'):
             server_target += '/'
-        source_file = ('main' + lang[-1]) if lang[0] != 'javac' else project_name + lang[-1]
-        if lang[0] != 'javac':
-            execute = lang[2] + 'dist' + dir_char + project_name if lang[0] else lang[2] + source_file
+        if not lang[-1]:
+            source_file = ''
+            execute = ''
         else:
-            execute = lang[2] + project_name
-        with open(project_name + dir_char + source_file, 'w') as f:
-            if lang[-1] != '.other':
-                content = lang_template[langs[id_lang - 1]]
-                if lang[0] == 'javac':
-                    content = content.replace('CLASS_NAME', project_name)
-                f.write(content)
-        os.mkdir(project_name + dir_char + 'dist')
-        os.mkdir(project_name + dir_char + 'template')
+            source_file = ('main' + lang[-1]) if lang[0] != 'javac' else project_name + lang[-1]
+            if lang[0] != 'javac':
+                execute = lang[2] + 'dist' + dir_char + project_name if lang[0] else lang[2] + source_file
+            else:
+                execute = lang[2] + project_name
+            with open(project_name + dir_char + source_file, 'w') as f:
+                if lang[-1] != '.other':
+                    content = lang_template[langs[id_lang - 1]]
+                    if lang[0] == 'javac':
+                        content = content.replace('CLASS_NAME', project_name)
+                    f.write(content)
+            os.mkdir(project_name + dir_char + 'dist')
+            os.mkdir(project_name + dir_char + 'template')
         info = [
             ['compile_tool', lang[0], lang[1]],
             ['compile_filename', source_file],
             ['executable_filename', execute],
-            ['input_file', 'dist' + dir_char + 'input.txt'],
-            ['template_root', 'template' + dir_char],
+            ['input_file', 'dist' + dir_char + 'input.txt' if lang[-1] else ''],
+            ['template_root', 'template' + dir_char if lang[-1] else ''],
             ['server_target', server_target]
         ]
         with open(project_name + dir_char + 'project_configure.csv', 'w') as f:
             for row in info:
                 f.write(','.join(row) + '\n')
-        with open(project_name + dir_char + info[3][-1], 'w') as f:
-            f.write('edit this file to make input')
-        with open(project_name + dir_char + info[1][-1], 'r') as f:
-            main_cont = f.read()
-        with open(project_name + dir_char + 'template' + dir_char + 'main', 'w') as f:
-            f.write(main_cont)
+        if lang[-1]:
+            with open(project_name + dir_char + info[3][-1], 'w') as f:
+                f.write('edit this file to make input')
+            with open(project_name + dir_char + info[1][-1], 'r') as f:
+                main_cont = f.read()
+            with open(project_name + dir_char + 'template' + dir_char + 'main', 'w') as f:
+                f.write(main_cont)
         scp_init(server_target, True)
 
 
@@ -325,12 +337,45 @@ def ssh():
     os.system("ssh -t %s 'cd %s ; exec $SHELL -l'" % (server, target))
 
 
+def delete_all():
+    config = get_config()
+    if ':' in config['server_target']:
+        server, target = config['server_target'].split(':')
+        st = os.system("ssh %s 'rm -rf %s'" % (server, target))
+        if st:
+            return
+    remove(os.getcwd())
+
+
+def delete():
+    try:
+        path = sys.argv[sys.argv.index('-del')+1]
+    except IndexError:
+        exit('usage: Qpro -del path')
+    else:
+        if not os.path.abspath(path).startswith(work_dir):
+            exit("%s is not in this Qpro project!" % path)
+        if not os.path.exists(path):
+            exit('No such file named: ' + path)
+        config = get_config()
+        path = path.strip('.' + dir_char)
+        path = path.strip(dir_char)
+        if ':' in config['server_target']:
+            server, target = config['server_target'].split(':')
+            st = os.system("ssh %s 'rm -rf %s'" % (server, target + path))
+            if st:
+                return
+        remove(os.getcwd())
+
+
 func = {
     '-c': create,
     '-scp': scp,
     '-get': get,
     '-adjust': adjust,
-    '-ssh': ssh
+    '-ssh': ssh,
+    '-del-all': delete_all,
+    '-del': delete
 }
 
 
@@ -346,6 +391,8 @@ def main():
               '\t * [Qpro -scp path]: upload path to default server target\n'
               '\t * [Qpro -scp-init]: upload all of project to server target\n'
               '\t * [Qpro -get path]: download file from server target\n'
+              '\t * [Qpro -del path]: delete path in project\n'
+              '\t * [Qpro -del-all ]: delete Qpro project\n'
               '\t * [tmpm *        ]: manage your template\n'
               '\t * [run *         ]: run your Qpro project\n'
               '\t * [detector -[p/f][p/f] ]: run beat detector for two source files')

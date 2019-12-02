@@ -14,6 +14,8 @@ try:
         for i in config:
             if i != 'compile_tool':
                 config[i] = config[i][0]
+        if not config['template_root']:
+            exit('You need set template folder first!')
         if not config['template_root'].endswith(dir_char):
             config['template_root'] += dir_char
 except IOError:
@@ -51,7 +53,7 @@ def create():
         if temp_name != 'main':
             with open(config['compile_filename'], 'r') as file:
                 ct = file.read()
-            with open(config['template_root']+temp_name, 'w') as file:
+            with open(config['template_root'] + temp_name, 'w') as file:
                 file.write(ct)
             return
         else:
@@ -69,7 +71,7 @@ def append():
     indx = sys.argv.index('-a')
     try:
         temp_name = sys.argv[indx + 1] + '.md'
-        algorithm_name = sys.argv[indx+2]
+        algorithm_name = sys.argv[indx + 2]
     except IndexError:
         exit('usage: tmpm -a template algorithm')
     if os.path.exists(config['template_root'] + temp_name):
@@ -113,8 +115,8 @@ def h():
           '\t * [tmpm template]: insert algorithm in template')
 
 
-def init(file_name='main'):
-    with open(config['template_root'] + file_name, 'r') as file:
+def init(file_name: str = 'main'):
+    with open(str(config['template_root']) + file_name, 'r') as file:
         content = file.read()
     with open(config['compile_filename'], 'w') as file:
         file.write(content)
@@ -123,25 +125,25 @@ def init(file_name='main'):
 def revert():
     indx = sys.argv.index('-r')
     try:
-        file_name = sys.argv[indx+1]
+        file_name = sys.argv[indx + 1]
     except IndexError:
         ls = os.listdir(config['template_root'])
         rls = []
         cnt = 1
         for i in ls:
             if '.' not in i:
-                print('[%d] %s' % (cnt, i), end='\t' if cnt%8 else '\n')
+                print('[%d] %s' % (cnt, i), end='\t' if cnt % 8 else '\n')
                 rls.append(i)
                 cnt += 1
-        if cnt%8:
+        if cnt % 8:
             print()
         try:
             indx = int(input('选择:'))
-            if indx<0 or indx>len(rls):
+            if indx < 0 or indx > len(rls):
                 raise IndexError
         except:
             exit('ERROR!')
-        file_name = rls[indx-1]
+        file_name = rls[indx - 1]
         return init(file_name)
     if os.path.exists(config['template_root'] + file_name):
         init(file_name)

@@ -18,7 +18,7 @@ try:
         for i in config:
             if i != 'compile_tool':
                 config[i] = config[i][0]
-        if not config['template_root'].endswith(dir_char):
+        if config['template_root'] and not config['template_root'].endswith(dir_char):
             config['template_root'] += dir_char
 except IOError:
     exit("No file named: project_configure.csv\n May you need run:\"Qpro -init\" first!")
@@ -29,8 +29,9 @@ def run(use_txt=False, executable_file=str(config['executable_filename'])):
     cmd = executable_file + ' '
     if argv:
         cmd += ' '.join(argv)
-    cmd += (' < ' + config['input_file'] if use_txt else '')
-    os.system(cmd)
+    if cmd.strip():
+        cmd += (' < ' + config['input_file'] if use_txt else '')
+        os.system(cmd)
 
 
 def red_col(string):
@@ -91,6 +92,7 @@ def main():
                 exit(-1)
             config['input_file'] = __input_file__
     o_file = config['executable_filename']
+    record_file_name = ''
     if config['compile_tool'][0] and to_build:
         clang = ['clang', 'gcc', 'g++']
         use_lang = config['compile_tool'][0].split()[0]

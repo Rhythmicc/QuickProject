@@ -365,7 +365,21 @@ def delete():
             st = os.system("ssh %s 'rm -rf %s'" % (server, target + path))
             if st:
                 return
-        remove(os.getcwd())
+        remove(path)
+
+
+def tele_ls():
+    try:
+        path = sys.argv[sys.argv.index('-ls')+1]
+    except IndexError:
+        path = ''
+    config = get_config()
+    if path:
+        path = path.strip('.' + dir_char)
+        path = path.strip(dir_char)
+    if ':' in config['server_target']:
+        server, target = config['server_target'].split(':')
+        os.system("ssh %s 'ls %s'" % (server, target + path))
 
 
 func = {
@@ -375,7 +389,8 @@ func = {
     '-adjust': adjust,
     '-ssh': ssh,
     '-del-all': delete_all,
-    '-del': delete
+    '-del': delete,
+    '-ls': tele_ls
 }
 
 
@@ -393,6 +408,7 @@ def main():
               '\t * [Qpro -get path]: download file from server target\n'
               '\t * [Qpro -del path]: delete path in project\n'
               '\t * [Qpro -del-all ]: delete Qpro project\n'
+              '\t * [Qpro -ls path ]: list element in path\n'
               '\t * [tmpm *        ]: manage your template\n'
               '\t * [run *         ]: run your Qpro project\n'
               '\t * [detector -[p/f][p/f] ]: run beat detector for two source files')

@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: Qpro
-Version: 0.6.1.1
+Version: 0.6.3
 Summary: Small but powerful command line IDE.
 Home-page: https://github.com/Rhythmicc/QuickProject
 Author: RhythmLian
@@ -8,7 +8,7 @@ License: MIT
 Description: # QuickProject
         ## Project description
         
-        [![](https://img.shields.io/badge/version-0.6.1.1-green)]() [![](https://img.shields.io/badge/Author-RhythmLian-blue)]()
+        [![](https://img.shields.io/badge/version-0.6.3-green)]() [![](https://img.shields.io/badge/Author-RhythmLian-blue)]()
         
         ### 环境
         
@@ -49,6 +49,8 @@ Description: # QuickProject
         | `Qpro -scp path` |将项目内文件夹或文件上传到默认服务器|
         | `Qpro -scp-init` |将整个项目上传到默认服务器|
         | `Qpro -get path` |从服务器上拉取项目内文件|
+        | `Qpro -del path` |从Qpro项目中删除文件(夹)|
+        | `Qpro -del-all` |删除整个项目|
         | `tmpm *` | 调用[模板脚本](#模板脚本)，刷新项目中的默认源文件 |
         | `run *` | 使用[运行脚本](#运行脚本)运行你的项目，Windows(`qrun`) |
         | `detector [-[p/f][p/f]]` | 运行[对拍器](#对拍器)（对拍器只能在`Qpro -init`后的文件夹下运行） |

@@ -333,14 +333,18 @@ def pro_init():
 
 
 def ssh():
-    server, target = get_config()['server_target'].split(':')
+    ls = get_config()['server_target'].split(':')
+    server = ':'.join(ls[:-1])
+    target = ls[-1]
     os.system("ssh -t %s 'cd %s ; exec $SHELL -l'" % (server, target))
 
 
 def delete_all():
     config = get_config()
     if ':' in config['server_target']:
-        server, target = config['server_target'].split(':')
+        ls = get_config()['server_target'].split(':')
+        server = ':'.join(ls[:-1])
+        target = ls[-1]
         st = os.system("ssh %s 'rm -rf %s'" % (server, target))
         if st:
             return
@@ -361,7 +365,9 @@ def delete():
         path = path.strip('.' + dir_char)
         path = path.strip(dir_char)
         if ':' in config['server_target']:
-            server, target = config['server_target'].split(':')
+            ls = get_config()['server_target'].split(':')
+            server = ':'.join(ls[:-1])
+            target = ls[-1]
             st = os.system("ssh %s 'rm -rf %s'" % (server, target + path))
             if st:
                 return
@@ -378,7 +384,9 @@ def tele_ls():
         path = path.strip('.' + dir_char)
         path = path.strip(dir_char)
     if ':' in config['server_target']:
-        server, target = config['server_target'].split(':')
+        ls = get_config()['server_target'].split(':')
+        server = ':'.join(ls[:-1])
+        target = ls[-1]
         os.system("ssh %s 'ls %s'" % (server, target + path))
 
 

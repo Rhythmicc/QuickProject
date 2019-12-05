@@ -1,7 +1,7 @@
 # QuickProject
 ## Project description
 
-[![](https://img.shields.io/badge/version-0.6.3.1-green)]() [![](https://img.shields.io/badge/Author-RhythmLian-blue)]()
+[![](https://img.shields.io/badge/version-0.6.3.3-green)]() [![](https://img.shields.io/badge/Author-RhythmLian-blue)]()
 
 ### 环境
 
@@ -20,9 +20,7 @@
 
 - **Qpro现内置`c`,`cpp`, `java`, `python2@3`的支持。你可以使用`Qpro -c`创建相应项目**
 
-- **`Qpro -init`将同时支持将Python项目或java项目初始化为Qpro项目**
-
-- **一个文件夹可以同时是Qpro项目和其他IDE项目**
+- **Qpro远程映射支持ipv6**
 
 
 ## 安装:

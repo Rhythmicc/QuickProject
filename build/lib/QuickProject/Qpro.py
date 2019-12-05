@@ -156,11 +156,12 @@ def scp():
             exit("%s is not in this Qpro project!" % path)
         if not os.path.exists(path):
             exit('No such file named: ' + path)
-        config = get_config()
+        server, target = get_server_target()
+        user, ip = server.split('@')
         if os.path.isdir(path):
-            os.system('scp -r %s %s' % (path, config['server_target'] + path))
+            os.system('scp -r %s %s' % (path, user+'@\\['+ip+'\\]:' + target + path))
         else:
-            os.system('scp %s %s' % (path, config['server_target'] + path))
+            os.system('scp %s %s' % (path, user+'@\\['+ip+'\\]:' + target + path))
 
 
 def get():
@@ -171,8 +172,9 @@ def get():
     else:
         if not os.path.abspath(path).startswith(work_dir):
             exit("%s is not in this Qpro project!" % path)
-        config = get_config()
-        os.system('scp -r %s %s' % (config['server_target'] + path, path))
+        server, target = get_server_target()
+        user, ip = server.split('@')
+        os.system('scp -r %s %s' % (user+'@\\['+ip+'\\]:' + target + path, path))
 
 
 def adjust():
@@ -332,19 +334,25 @@ def pro_init():
     scp_init(server_target)
 
 
-def ssh():
+def get_server_target():
     ls = get_config()['server_target'].split(':')
-    server = ':'.join(ls[:-1])
-    target = ls[-1]
+    if len(ls) > 2:
+        server = ':'.join(ls[:8])
+        target = ':'.join(ls[8:])
+    else:
+        server, target = ls
+    return server, target
+
+
+def ssh():
+    server, target = get_server_target()
     os.system("ssh -t %s 'cd %s ; exec $SHELL -l'" % (server, target))
 
 
 def delete_all():
     config = get_config()
     if ':' in config['server_target']:
-        ls = get_config()['server_target'].split(':')
-        server = ':'.join(ls[:-1])
-        target = ls[-1]
+        server, target = get_server_target()
         st = os.system("ssh %s 'rm -rf %s'" % (server, target))
         if st:
             return
@@ -365,9 +373,7 @@ def delete():
         path = path.strip('.' + dir_char)
         path = path.strip(dir_char)
         if ':' in config['server_target']:
-            ls = get_config()['server_target'].split(':')
-            server = ':'.join(ls[:-1])
-            target = ls[-1]
+            server, target = get_server_target()
             st = os.system("ssh %s 'rm -rf %s'" % (server, target + path))
             if st:
                 return
@@ -384,9 +390,7 @@ def tele_ls():
         path = path.strip('.' + dir_char)
         path = path.strip(dir_char)
     if ':' in config['server_target']:
-        ls = get_config()['server_target'].split(':')
-        server = ':'.join(ls[:-1])
-        target = ls[-1]
+        server, target = get_server_target()
         os.system("ssh %s 'ls %s'" % (server, target + path))
 
 

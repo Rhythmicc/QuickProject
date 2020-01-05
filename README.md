@@ -42,6 +42,7 @@
 | `Qpro -get path` |从服务器上拉取项目内文件|
 | `Qpro -del path` |从Qpro项目中删除文件(夹)|
 | `Qpro -del-all` |删除整个项目|
+| `Qpro -ls path` |查看远程映射上的文件|
 | `tmpm *` | 调用[模板脚本](#模板脚本)，刷新项目中的默认源文件 |
 | `run *` | 使用[运行脚本](#运行脚本)运行你的项目，Windows(`qrun`) |
 | `detector [-[p/f][p/f]]` | 运行[对拍器](#对拍器)（对拍器只能在`Qpro -init`后的文件夹下运行） |

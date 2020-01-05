@@ -23,6 +23,8 @@ try:
 except IOError:
     exit("No file named: project_configure.csv\n May you need run:\"Qpro -init\" first!")
 argv = []
+retain_arg = ['-br', '-b', '-r', '-h', '-i']
+has_recog = {i: False for i in retain_arg}
 
 
 def run(use_txt=False, executable_file=str(config['executable_filename'])):
@@ -113,10 +115,15 @@ def main():
             if not add_flag:
                 add_flag = True
                 continue
-            if not i.startswith('-'):
-                argv.append(i)
+            if i in retain_arg:
+                if has_recog[i]:
+                    argv.append(i)
+                else:
+                    has_recog[i] = True
             elif i == '-if' or i == '-f':
                 add_flag = False
+            else:
+                argv.append(i)
         run('-i' in sys.argv or '-if' in sys.argv, o_file)
     if config['compile_tool'][0] and flag:
         if config['compile_tool'][0].split()[0] == 'javac':

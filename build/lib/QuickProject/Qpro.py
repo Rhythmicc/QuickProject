@@ -174,7 +174,7 @@ def get():
             exit("%s is not in this Qpro project!" % path)
         server, target = get_server_target()
         user, ip = server.split('@')
-        os.system('scp -r %s %s' % (user+'@\\['+ip+'\\]:' + target + path, path))
+        os.system('scp -c aes192-ctr -r %s %s' % (user+'@\\['+ip+'\\]:' + target + path, path))
 
 
 def adjust():

@@ -1,7 +1,7 @@
 import os
 import re
 import sys
-
+from colorama import Fore, Style
 
 if sys.platform.startswith('win'):
     is_win = True
@@ -38,6 +38,23 @@ int main(int argc, char **argv) {
     'python': """print 'hello world'""",
     'python3': """print('hello world')"""
 }
+
+
+def basic_string_replace(ss):
+    ss = ss.split('\n')
+    ret = ''
+    for i in ss:
+        if '[' in i:
+            replace_list = re.findall('\[(.*?)\]', i)
+            split_list = re.split('\[.*?\]', i)
+            for p in range(len(split_list)):
+                ret += Fore.CYAN + split_list[p] + Style.RESET_ALL
+                if p < len(replace_list):
+                    ret += Fore.RED + '[' + Fore.YELLOW + replace_list[p] + Fore.RED + ']' + Style.RESET_ALL
+        else:
+            ret += i
+        ret += '\n'
+    return ret
 
 
 def remove(path):
@@ -159,9 +176,9 @@ def scp():
         server, target = get_server_target()
         user, ip = server.split('@')
         if os.path.isdir(path):
-            os.system('scp -r %s %s' % (path, user+'@\\['+ip+'\\]:' + target + path))
+            os.system('scp -r %s %s' % (path, user + '@\\[' + ip + '\\]:' + target + path))
         else:
-            os.system('scp %s %s' % (path, user+'@\\['+ip+'\\]:' + target + path))
+            os.system('scp %s %s' % (path, user + '@\\[' + ip + '\\]:' + target + path))
 
 
 def get():
@@ -174,7 +191,7 @@ def get():
             exit("%s is not in this Qpro project!" % path)
         server, target = get_server_target()
         user, ip = server.split('@')
-        os.system('scp -c aes192-ctr -r %s %s' % (user+'@\\['+ip+'\\]:' + target + path, path))
+        os.system('scp -c aes192-ctr -r %s %s' % (user + '@\\[' + ip + '\\]:' + target + path, path))
 
 
 def adjust():
@@ -361,7 +378,7 @@ def delete_all():
 
 def delete():
     try:
-        path = sys.argv[sys.argv.index('-del')+1]
+        path = sys.argv[sys.argv.index('-del') + 1]
     except IndexError:
         exit('usage: Qpro -del path')
     else:
@@ -382,7 +399,7 @@ def delete():
 
 def tele_ls():
     try:
-        path = sys.argv[sys.argv.index('-ls')+1]
+        path = sys.argv[sys.argv.index('-ls') + 1]
     except IndexError:
         path = ''
     config = get_config()
@@ -408,22 +425,22 @@ func = {
 
 def main():
     if len(sys.argv) < 2 or '-h' == sys.argv[1]:
-        print('usage:\n'
-              '\t * [Qpro -init    ]: let dir be a Qpro project!\n'
-              '\t * [Qpro -h       ]: help\n'
-              '\t * [Qpro -c name  ]: create a Qpro project\n'
-              '\t * [Qpro -update  ]: update Qpro\n'
-              '\t * [Qpro -adjust  ]: adjust configure\n'
-              '\t * [Qpro -ssh     ]: login server by ssh\n'
-              '\t * [Qpro -scp path]: upload path to default server target\n'
-              '\t * [Qpro -scp-init]: upload all of project to server target\n'
-              '\t * [Qpro -get path]: download file from server target\n'
-              '\t * [Qpro -del path]: delete path in project\n'
-              '\t * [Qpro -del-all ]: delete Qpro project\n'
-              '\t * [Qpro -ls path ]: list element in path\n'
-              '\t * [tmpm *        ]: manage your template\n'
-              '\t * [run *         ]: run your Qpro project\n'
-              '\t * [detector -[p/f][p/f] ]: run beat detector for two source files')
+        print(basic_string_replace('usage:\n'
+                                   '   * [Qpro -init    ]: let dir be a Qpro project!\n'
+                                   '   * [Qpro -h       ]: help\n'
+                                   '   * [Qpro -c name  ]: create a Qpro project\n'
+                                   '   * [Qpro -update  ]: update Qpro\n'
+                                   '   * [Qpro -adjust  ]: adjust configure\n'
+                                   '   * [Qpro -ssh     ]: login server by ssh\n'
+                                   '   * [Qpro -scp path]: upload path to default server target\n'
+                                   '   * [Qpro -scp-init]: upload all of project to server target\n'
+                                   '   * [Qpro -get path]: download file from server target\n'
+                                   '   * [Qpro -del path]: delete path in project\n'
+                                   '   * [Qpro -del-all ]: delete Qpro project\n'
+                                   '   * [Qpro -ls path ]: list element in path\n'
+                                   '   * [tmpm *        ]: manage your template\n'
+                                   '   * [run *         ]: run your Qpro project\n'
+                                   '   * [detector -(p/f)(p/f)]: run beat detector for two source files'))
     elif '-update' == sys.argv[1]:
         os.system('pip3 install Qpro --upgrade')
         exit(0)

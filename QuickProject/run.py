@@ -1,6 +1,8 @@
 import os
 import sys
 import pyperclip
+from colorama import Fore, Style
+from QuickProject.Qpro import basic_string_replace
 
 if sys.platform.startswith('win'):
     is_win = True
@@ -37,15 +39,7 @@ def run(use_txt=False, executable_file=str(config['executable_filename'])):
 
 
 def red_col(string):
-    if is_win:
-        return string
-    return '\033[1;31m' + string + '\033[0m'
-
-
-def blue_col(string):
-    if is_win:
-        return string
-    return '\033[1;34m' + string + '\033[0m'
+    return Fore.RED + string + Style.RESET_ALL
 
 
 def main():
@@ -56,19 +50,19 @@ def main():
     if '-debug' in sys.argv:
         raise ImportError
     if '-h' in sys.argv:
-        print(blue_col('usage: run.py:\n') +
-              '  * ' + blue_col('build or run:\n') +
-              '    # ' + red_col('[ -b ]') + ' : ' + blue_col('build\n') +
-              '    # ' + red_col('[ -r ]') + ' : ' + blue_col('run\n') +
-              '    # ' + red_col('[ -br]') + ' : ' + blue_col('build and run\n') +
-              blue_col('    (it will run if neither of commands in "build or run")\n') +
-              '  * ' + red_col('[ -i ]') + ' : ' + blue_col('use input.txt as input\n') +
-              '  * ' + red_col('[ -if  *.* ]') + ' : ' + blue_col('set input file(*.*) as input\n') +
-              '  * ' + red_col('[-if -paste]') + ' : ' + blue_col('use Clipboard content as input\n') +
-              '  * ' + red_col('[ -f  *.cpp]') + ' : ' + blue_col('set build file as *.cpp\n') +
-              '  * ' + red_col('[ -h ]') + ' : ' + blue_col('help\n') +
-              '  * ' + red_col('[ *  ]') + ' : ' + blue_col('add parameters for program\n') +
-              '  * ' + blue_col('Modify config to adjust default configuration'))
+        print(basic_string_replace('(run.py) usage:\n'
+                                   '  * build or run:\n'
+                                   '    # [ -b ]: build\n'
+                                   '    # [ -r ]: run\n'
+                                   '    # [ -br]: build and run\n'
+                                   '    (it will run if neither of commands in "build or run")\n'
+                                   '  * [ -i ]: use input.txt as input\n'
+                                   '  * [ -if  *.*  ]: set input file(*.*) as input\n'
+                                   '  * [ -if -paste]: use Clipboard content as input\n'
+                                   '  * [ -f  *.cpp ]: set build file as *.cpp\n'
+                                   '  * [ -h ]: help\n'
+                                   '  * [ *  ]: add parameters for program\n'
+                                   '  * Modify config to adjust default configuration'))
         exit(0)
     if '-f' in sys.argv:
         index = sys.argv.index('-f')

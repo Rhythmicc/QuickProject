@@ -1,5 +1,6 @@
 import sys
 import os
+from QuickProject.Qpro import basic_string_replace
 
 if sys.platform.startswith('win'):
     dir_char = '\\'
@@ -105,14 +106,14 @@ def join():
 
 
 def h():
-    print('usage:\n'
-          '\t * [tmpm -h]: for help\n'
-          '\t * [tmpm -r]: select copy and init\n'
-          '\t * [tmpm -r backup]: init "compile_filename" to template/backup\n'
-          '\t * [tmpm -c backup]: create or cover a backup\n'
-          '\t * [tmpm -c template algorithm]: create template and write algorithm\n'
-          '\t * [tmpm -a template algorithm]: add algorithm to template\n'
-          '\t * [tmpm template]: insert algorithm in template')
+    print(basic_string_replace('(tmpm.py) usage:\n'
+                               '   * [tmpm -h]: for help\n'
+                               '   * [tmpm -r]: select copy and init\n'
+                               '   * [tmpm -r backup]: init "compile_filename" to template/backup\n'
+                               '   * [tmpm -c backup]: create or cover a backup\n'
+                               '   * [tmpm -c template algorithm]: create template and write algorithm\n'
+                               '   * [tmpm -a template algorithm]: add algorithm to template\n'
+                               '   * [tmpm template]: insert algorithm in template'))
 
 
 def init(file_name: str = 'main'):

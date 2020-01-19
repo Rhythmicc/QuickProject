@@ -41,6 +41,8 @@ int main(int argc, char **argv) {
 
 
 def basic_string_replace(ss):
+    if is_win:
+        return ss
     ss = ss.split('\n')
     ret = ''
     for i in ss:

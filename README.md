@@ -44,7 +44,7 @@
 | `Qpro -del-all` |删除整个项目|
 | `Qpro -ls path` |查看远程映射上的文件|
 | `tmpm *` | 调用[模板脚本](#模板脚本)，刷新项目中的默认源文件 |
-| `run *` | 使用[运行脚本](#运行脚本)运行你的项目，Windows(`qrun`) |
+| `qrun *` | 使用[运行脚本](#运行脚本)运行你的项目，Windows(`qrun`) |
 | `detector [-[p/f][p/f]]` | 运行[对拍器](#对拍器)（对拍器只能在`Qpro -init`后的文件夹下运行） |
 
 - 初始化后的项目，可以手动编辑配置表`project_configure.csv`来调整配置。
@@ -66,8 +66,6 @@
   - 运行`Qpro -adjust`修改配置表:
   ![GUI](https://github.com/Rhythmicc/QuickProject/blob/master/img/3.png?raw=true)
 ### 运行脚本:
-
-  - Windows系统使用`qrun`命令。 
   
   - 编译或运行
   
@@ -86,7 +84,7 @@
   - 输入输出:
     
       - 可以编辑 **默认的输入文件** 来设置默认输入
-      - 运行 `run [...] > output.txt` 使程序输出到 `./output.txt`
+      - 运行 `qrun [...] > output.txt` 使程序输出到 `./output.txt`
       
       | 参数 | 效果 |
       | :----- | :----- |
@@ -100,16 +98,16 @@
       
   - 查看帮助
     
-      - `run -h` : 可以查看使用帮助(Windows系统不支持颜色显示)
+      - `qrun -h` : 可以查看使用帮助(Windows系统不支持颜色显示)
         ![help](https://github.com/Rhythmicc/QuickProject/blob/master/img/2.png?raw=true)
   
   - 推荐的命令示例:
     
       | 命令 | 效果 |
       | :----- | :----- |
-      | `run -i` | 使用默认输入文件并运行 |
-      | `run`| 运行 |
-      | `run -br -i` |  编译且使用输入文件运行 |
+      | `qrun -i` | 使用默认输入文件并运行 |
+      | `qrun`| 运行 |
+      | `qrun -br -i` |  编译且使用输入文件运行 |
 
 ### 模板脚本:
 

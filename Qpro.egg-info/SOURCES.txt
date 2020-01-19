@@ -11,5 +11,5 @@ Qpro.egg-info/zip-safe
 QuickProject/Qpro.py
 QuickProject/__init__.py
 QuickProject/detector.py
-QuickProject/run.py
+QuickProject/qrun.py
 QuickProject/tmpm.py

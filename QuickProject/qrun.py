@@ -50,7 +50,7 @@ def main():
     if '-debug' in sys.argv:
         raise ImportError
     if '-h' in sys.argv:
-        print(basic_string_replace('(run.py) usage:\n'
+        print(basic_string_replace('(qrun.py) usage:\n'
                                    '  * build or run:\n'
                                    '    # [ -b ]: build\n'
                                    '    # [ -r ]: run\n'

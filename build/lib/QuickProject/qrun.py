@@ -1,9 +1,13 @@
 import os
 import sys
 import pyperclip
+import colorama
+import QuickProject
 from colorama import Fore, Style
 from QuickProject.Qpro import basic_string_replace
 
+colorama.init()
+QuickProject.Qpro.COLORAMA_INIT_FLAG = False
 if sys.platform.startswith('win'):
     is_win = True
     dir_char = '\\'

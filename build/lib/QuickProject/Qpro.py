@@ -1,8 +1,11 @@
 import os
 import re
 import sys
+import colorama
 from colorama import Fore, Style
 
+
+COLORAMA_INIT_FLAG = True
 if sys.platform.startswith('win'):
     is_win = True
     dir_char = '\\'
@@ -41,8 +44,10 @@ int main(int argc, char **argv) {
 
 
 def basic_string_replace(ss):
-    if is_win:
-        return ss
+    global COLORAMA_INIT_FLAG
+    if COLORAMA_INIT_FLAG:
+        colorama.init()
+        COLORAMA_INIT_FLAG = False
     ss = ss.split('\n')
     ret = ''
     for i in ss:
@@ -85,10 +90,12 @@ def get_config():
 
 def scp_init(server_target, ct=False):
     if server_target:
+        server, target = get_server_target(server_target)
+        user, ip = server.split('@')
         if ct:
-            st = os.system('scp -r %s %s' % (work_project, server_target))
+            st = os.system('scp -r %s %s' % (work_project, user + '@\\[' + ip + '\\]:' + target))
         else:
-            st = os.system('scp -r * %s' % server_target)
+            st = os.system('scp -r * %s' % user + '@\\[' + ip + '\\]:' + target)
         if st:
             exit("upload project failed!")
 
@@ -353,8 +360,11 @@ def pro_init():
     scp_init(server_target)
 
 
-def get_server_target():
-    ls = get_config()['server_target'].split(':')
+def get_server_target(st=None):
+    if not st:
+        ls = get_config()['server_target'].split(':')
+    else:
+        ls = st.split(':')
     if len(ls) > 2:
         server = ':'.join(ls[:8])
         target = ':'.join(ls[8:])
@@ -441,7 +451,7 @@ def main():
                                    '   * [Qpro -del-all ]: delete Qpro project\n'
                                    '   * [Qpro -ls path ]: list element in path\n'
                                    '   * [tmpm *        ]: manage your template\n'
-                                   '   * [run *         ]: run your Qpro project\n'
+                                   '   * [qrun *        ]: run your Qpro project\n'
                                    '   * [detector -(p/f)(p/f)]: run beat detector for two source files'))
     elif '-update' == sys.argv[1]:
         os.system('pip3 install Qpro --upgrade')

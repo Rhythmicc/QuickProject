@@ -1,8 +1,11 @@
 import os
 import re
 import sys
+import colorama
 from colorama import Fore, Style
 
+
+COLORAMA_INIT_FLAG = True
 if sys.platform.startswith('win'):
     is_win = True
     dir_char = '\\'
@@ -41,8 +44,10 @@ int main(int argc, char **argv) {
 
 
 def basic_string_replace(ss):
-    if is_win:
-        return ss
+    global COLORAMA_INIT_FLAG
+    if COLORAMA_INIT_FLAG:
+        colorama.init()
+        COLORAMA_INIT_FLAG = False
     ss = ss.split('\n')
     ret = ''
     for i in ss:

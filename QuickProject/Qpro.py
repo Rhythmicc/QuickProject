@@ -4,7 +4,6 @@ import sys
 import colorama
 from colorama import Fore, Style
 
-
 COLORAMA_INIT_FLAG = True
 if sys.platform.startswith('win'):
     is_win = True
@@ -263,6 +262,8 @@ def adjust():
 
 
 def pro_init():
+    id_lang = -1
+    langs = []
     if not os.path.exists('CMakeLists.txt'):
         ask = input('Not an CLion Project!' + 'You need make configure manually [y/n]:').strip()
         if 'y' not in ask and 'Y' not in ask:
@@ -276,9 +277,9 @@ def pro_init():
             'java': ['javac', '-d dist', 'java -classpath dist ', '.java'],
             'python3': ['', '', 'python3 ', '.py'],
             'python': ['', '', 'python ', '.py'],
+            'empty': ['', '', '', '']
         }
         langs = list(lang_tool_exe.keys())
-        langs.append('other')
         for i, lang in enumerate(langs):
             print('[%d] %-5s' % (i + 1, lang), end='\t' if (i + 1) % 3 else '\n')
         if len(langs) % 3:
@@ -289,29 +290,30 @@ def pro_init():
                 id_lang = int(input('choose one:'))
             except:
                 id_lang = 0
-        if langs[id_lang - 1] == 'other':
-            lang = ['other_compile_tool', 'other_execute_command ', '.other']
-        else:
-            lang = lang_tool_exe[langs[id_lang - 1]]
-        source_file = ('main' + lang[-1]) if lang[0] != 'javac' else work_project + lang[-1]
-        while not os.path.exists(source_file):
-            source_file = input('Not found "%s", set compile_filename:' % source_file).strip()
+        lang = lang_tool_exe[langs[id_lang - 1]]
+        source_file = ''
+        if langs[id_lang - 1] != 'empty':
+            source_file = ('main' + lang[-1]) if lang[0] != 'javac' else work_project + lang[-1]
+            while not os.path.exists(source_file):
+                source_file = input('Not found "%s", set compile_filename:' % source_file).strip()
         server_target = input('input [user@ip:dir_path] if you need scp:').strip().replace('\\', '/')
         if ':' in server_target and not server_target.endswith('/') and not server_target.endswith(':'):
             server_target += '/'
         if lang[0] != 'javac':
             execute = lang[2] + 'dist' + dir_char + work_project if lang[0] else lang[2] + source_file
-        else:
+        elif langs[id_lang - 1] != 'empty':
             work_project = source_file.split(dir_char)[-1].split('.')[0]
             execute = lang[2] + work_project
-        if not os.path.exists('dist') or not os.path.isdir('dist'):
+        else:
+            execute = ''
+        if (not os.path.exists('dist') or not os.path.isdir('dist')) and langs[id_lang - 1] != 'empty':
             os.mkdir('dist')
         info = [
             ['compile_tool', lang[0], lang[1]],
             ['compile_filename', source_file],
             ['executable_filename', execute],
-            ['input_file', 'dist' + dir_char + 'input.txt'],
-            ['template_root', 'template' + dir_char],
+            ['input_file', 'dist' + dir_char + 'input.txt' if langs[id_lang - 1] != 'empty' else ''],
+            ['template_root', 'template' + dir_char if langs[id_lang - 1] != 'empty' else ''],
             ['server_target', server_target]
         ]
     else:
@@ -346,6 +348,9 @@ def pro_init():
     with open('project_configure.csv', 'w') as f:
         for row in info:
             f.write(','.join(row) + '\n')
+    if id_lang >= 0 and langs[id_lang - 1] == 'empty':
+        scp_init(server_target)
+        exit(0)
     with open(info[3][-1], 'w') as f:
         f.write('edit this file to make input')
     if not os.path.exists('template') or not os.path.isdir('template'):

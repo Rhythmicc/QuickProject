@@ -131,8 +131,11 @@ def create():
                 id_lang = 0
         lang = lang_tool_exe[langs[id_lang - 1]]
         server_target = input('input [user@ip:dir_path] if you need scp:')
-        if server_target and not server_target.endswith('/') and not server_target.endswith(':'):
-            server_target += '/'
+        if server_target and not server_target.endswith('/'):
+            if not server_target.endswith(':'):
+                server_target += '/'
+            else:
+                server_target += '~/'
         if not lang[-1]:
             source_file = ''
             execute = ''
@@ -199,7 +202,7 @@ def get():
             exit("%s is not in this Qpro project!" % path)
         server, target = get_server_target()
         user, ip = server.split('@')
-        os.system('scp -c aes192-ctr -r %s %s' % (user + '@\\[' + ip + '\\]:' + target + path, path))
+        os.system('scp -r %s %s' % (user + '@\\[' + ip + '\\]:' + target + path, path))
 
 
 def adjust():
@@ -297,8 +300,11 @@ def pro_init():
             while not os.path.exists(source_file):
                 source_file = input('Not found "%s", set compile_filename:' % source_file).strip()
         server_target = input('input [user@ip:dir_path] if you need scp:').strip().replace('\\', '/')
-        if ':' in server_target and not server_target.endswith('/') and not server_target.endswith(':'):
-            server_target += '/'
+        if ':' in server_target and not server_target.endswith('/'):
+            if not server_target.endswith(':'):
+                server_target += '/'
+            else:
+                server_target += '~/'
         if lang[0] != 'javac':
             execute = lang[2] + 'dist' + dir_char + work_project if lang[0] else lang[2] + source_file
         elif langs[id_lang - 1] != 'empty':

@@ -30,10 +30,10 @@ def match_algorithm():
     with open(config['compile_filename'], 'r') as file:
         import re
         try:
-            content = re.findall('/// __START__(.*?)/// __END__', file.read(), re.S)[0].strip()
+            content = re.findall('__START__(.*?)__END__', file.read(), re.S)[0].strip()
         except IndexError:
-            exit('No template index found! Insert "/// __START__" and "/// __END__" to your code!')
-    content = content.replace('/// __TEMPLATE__', '')
+            exit('No template index found! Insert "__START__" and "__END__" to your code!')
+    content = content.replace('__TEMPLATE__', '')
     return content
 
 
@@ -108,6 +108,7 @@ def join():
 def h():
     print(basic_string_replace('(tmpm.py) usage:\n'
                                '   * [tmpm -h]: for help\n'
+                               '   * [tmpm -i]: init content as template/main\n'
                                '   * [tmpm -r]: select copy and init\n'
                                '   * [tmpm -r backup]: init "compile_filename" to template/backup\n'
                                '   * [tmpm -c backup]: create or cover a backup\n'
@@ -154,7 +155,7 @@ def revert():
 
 def main():
     if len(sys.argv) == 1:
-        init()
+        h()
     elif '-h' in sys.argv:
         h()
     elif '-c' in sys.argv:
@@ -163,6 +164,8 @@ def main():
         append()
     elif '-r' in sys.argv:
         revert()
+    elif '-i' in sys.argv:
+        init()
     else:
         join()
 

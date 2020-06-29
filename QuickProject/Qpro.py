@@ -268,9 +268,6 @@ def pro_init():
     id_lang = -1
     langs = []
     if not os.path.exists('CMakeLists.txt'):
-        ask = input('Not an CLion Project!' + 'You need make configure manually [y/n]:').strip()
-        if 'y' not in ask and 'Y' not in ask:
-            exit(0)
         global work_project
         while not work_project:
             work_project = input('You need to set project name:').strip()

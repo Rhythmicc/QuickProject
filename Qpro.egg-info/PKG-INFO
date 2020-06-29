@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: Qpro
-Version: 0.6.4.9
+Version: 0.6.5
 Summary: Small but powerful command line IDE.
 Home-page: https://github.com/Rhythmicc/QuickProject
 Author: RhythmLian
@@ -9,7 +9,7 @@ Description: ## Docs
         |Location|Url|
         |:---:|:---:|
         |China|[Docs](https://rhythmlian.cn/2020/02/14/QuickProject/)|
-        |Other|[Docs](https://www.rhythmlian.cn/2020/02/14/QuickProject/)|
+        |Other|[Docs](https://rhythmicc.github.io/2020/02/14/QuickProject/)|
 Keywords: script for CLionProjects
 Platform: UNKNOWN
 Classifier: Programming Language :: Python :: 3

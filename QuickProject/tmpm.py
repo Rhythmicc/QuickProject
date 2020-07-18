@@ -30,10 +30,10 @@ def match_algorithm():
     with open(config['compile_filename'], 'r') as file:
         import re
         try:
-            content = re.findall('__START__(.*?)__END__', file.read(), re.S)[0].strip()
+            content = re.findall('__TMPM_START__(.*?)__TMPM_END__', file.read(), re.S)[0].strip()
         except IndexError:
-            exit('No template index found! Insert "__START__" and "__END__" to your code!')
-    content = content.replace('__TEMPLATE__', '')
+            exit('No template index found! Insert "__TMPM_START__" and "__TMPM_END__" to your code!')
+    content = content.replace('__TMPM__', '')
     return content
 
 
@@ -98,7 +98,7 @@ def join():
             indx = int(input('%s选择:' % ('\n' if len(content) % 10 else ''))) - 1
             content = content[indx]
         with open(config['compile_filename'], 'r') as file:
-            content = file.read().replace('/// __TEMPLATE__', content[1].strip() + '\n/// __TEMPLATE__')
+            content = file.read().replace('__TMPM__', content[1].strip())
         with open(config['compile_filename'], 'w') as file:
             file.write(content)
     else:

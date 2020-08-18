@@ -4,8 +4,8 @@ import shutil
 import webbrowser as wb
 import sys
 import tkinter as tk
-from tkinter import filedialog
-from tkinter import messagebox
+from tkinter import filedialog, messagebox
+from QuickProject import get_config
 
 if sys.platform.startswith('win'):
     dir_char = '\\'
@@ -110,7 +110,7 @@ ll = tk.Label(win, textvariable=path3, width=width, fg='red')
 
 
 def main():
-    if not os.path.exists('project_configure.csv') and sys.argv[1] != '-ff':
+    if not get_config(False) and sys.argv[1] != '-ff':
         exit("You must run \"Qpro -init\" first")
     tk.Label(win, text='%12s' % "文件1路径:").grid(row=0, column=0)
     tk.Label(win, textvariable=path1, width=width).grid(row=0, column=1)

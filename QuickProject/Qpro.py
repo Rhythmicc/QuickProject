@@ -1,10 +1,6 @@
-import os
-import re
 import sys
-import colorama
-from colorama import Fore, Style
+from QuickProject import *
 
-colorama.init()
 if sys.platform.startswith('win'):
     is_win = True
     dir_char = '\\'
@@ -41,23 +37,6 @@ int main(int argc, char **argv) {
 }
 
 
-def basic_string_replace(ss):
-    ss = ss.split('\n')
-    ret = ''
-    for i in ss:
-        if '[' in i:
-            replace_list = re.findall('\[(.*?)]', i)
-            split_list = re.split('\[.*?]', i)
-            for p in range(len(split_list)):
-                ret += Fore.CYAN + split_list[p] + Style.RESET_ALL
-                if p < len(replace_list):
-                    ret += Fore.RED + '[' + Fore.YELLOW + replace_list[p] + Fore.RED + ']' + Style.RESET_ALL
-        else:
-            ret += i
-        ret += '\n'
-    return ret
-
-
 def remove(path):
     import shutil
     if os.path.exists(path):
@@ -67,29 +46,14 @@ def remove(path):
             os.remove(path)
 
 
-def get_config():
-    config = {}
-    try:
-        with open('project_configure.csv', 'r') as f:
-            for row in f.readlines():
-                row = row.split(',')
-                config[row[0]] = [i.strip() for i in row[1:]]
-            for i in config:
-                if i != 'compile_tool' and i != 'server_target':
-                    config[i] = config[i][0]
-    except IOError:
-        exit("No file named: project_configure.csv\n May you need run:\"Qpro -init\" first!")
-    return config
-
-
 def scp_init(server_target: list, ct=False):
     if server_target:
         server, target, port = get_server_target(server_target)
         user, ip = server.split('@')
         if ct:
-            st = os.system('scp -P %s -r %s %s' % (port, work_project, user + '@\\[' + ip + '\\]:' + target))
+            st = SshProtocol.post_folder(user, ip, target, port, '')
         else:
-            st = os.system('scp -P %s -r * %s' % (port, user + '@\\[' + ip + '\\]:' + target))
+            st = SshProtocol.post_all_in_folder(user, ip, target, port)
         if st:
             exit("upload project failed!")
 
@@ -182,9 +146,9 @@ def scp():
         server, target, port = get_server_target()
         user, ip = server.split('@')
         if os.path.isdir(path):
-            os.system('scp -P %s -r %s %s' % (port, path, user + '@\\[' + ip + '\\]:' + target + path))
+            SshProtocol.post_folder(user, ip, target, port, path)
         else:
-            os.system('scp -P %s %s %s' % (port, path, user + '@\\[' + ip + '\\]:' + target + path))
+            SshProtocol.post_file(user, ip, target, port, path)
 
 
 def get():
@@ -197,7 +161,7 @@ def get():
             exit("%s is not in this Qpro project!" % path)
         server, target, port = get_server_target()
         user, ip = server.split('@')
-        os.system('scp -p %s -r %s %s' % (port, user + '@\\[' + ip + '\\]:' + target + path, path))
+        SshProtocol.get_file_or_folder(user, ip, target, port, path)
 
 
 def adjust():
@@ -216,7 +180,7 @@ def adjust():
     all_dt = {}
     for i, v in enumerate(config):
         tk.Label(win, text='%12s' % key_to_name[v]).grid(row=i, column=0)
-        if v == 'compile_tool':
+        if v == 'compile_tool' or v == 'server_target':
             stringvar1 = tk.Variable()
             stringvar1.set(config[v][0])
             stringvar2 = tk.Variable()
@@ -235,14 +199,21 @@ def adjust():
             if dt == 'compile_tool':
                 config[dt] = [all_dt[dt][0].get(), all_dt[dt][1].get()]
             elif dt == 'server_target':
-                config[dt] = all_dt[dt].get()
-                if config[dt]:
-                    if ':' in config[dt] and not config[dt].endswith('/') and not config[dt].endswith(':'):
-                        config[dt] += '/'
-                    elif ':' not in config[dt]:
-                        print('Not a legal server target!\n'
-                              'You can run "Qpro -adjust" to adjust target\n'
-                              'and run "Qpro -scp-init" to upload project.')
+                config[dt] = [all_dt[dt][0].get(), all_dt[dt][1].get()]
+                if config[dt][0]:
+                    try:
+                        if ':' in config[dt][0]:
+                            if config[dt][0].count(':') not in [1, 8]:
+                                raise Exception('%s: not a legal server target')
+                            if not (config[dt][0].endswith('/') and config[dt][0].endswith(':')):
+                                config[dt][0] += '/'
+                        else:
+                            raise Exception('%s: not a legal server target')
+                    except Exception as e:
+                        print(repr(e))
+                        print('Legal server target:\n'
+                              '  addr: <username>@<ipv4 | ipv6 | domain>:</path/to/project/>'
+                              '  port: <ssh port>, default 22')
             else:
                 config[dt] = all_dt[dt].get()
         if not config['template_root'].endswith(dir_char):
@@ -250,7 +221,7 @@ def adjust():
         win.destroy()
         with open('project_configure.csv', 'w') as file:
             for line in config:
-                if line == 'compile_tool':
+                if line == 'compile_tool' or line == 'server_target':
                     file.write('%s,%s\n' % (line, ','.join(config[line])))
                 else:
                     file.write('%s,%s\n' % (line, config[line]))
@@ -361,20 +332,6 @@ def pro_init():
     except Exception as e:
         print("make backup failed with error: %s, you need backup code by yourself!" % e)
     scp_init(info[-1][1:] if server_target else None)
-
-
-def get_server_target(st=None):
-    if not st:
-        config = get_config()['server_target']
-        ls, port = config[0].split(':'), config[1]
-    else:
-        ls, port = st[0].split(':'), st[1]
-    if len(ls) > 2:
-        server = ':'.join(ls[:8])
-        target = ':'.join(ls[8:])
-    else:
-        server, target = ls
-    return server, target, port
 
 
 def ssh():

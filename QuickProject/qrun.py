@@ -3,7 +3,7 @@ import sys
 import pyperclip
 import colorama
 from colorama import Fore, Style
-from QuickProject.Qpro import basic_string_replace, get_config
+from QuickProject import basic_string_replace, get_config
 
 colorama.init()
 if sys.platform.startswith('win'):

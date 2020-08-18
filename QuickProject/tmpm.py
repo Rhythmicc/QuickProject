@@ -1,6 +1,6 @@
 import sys
 import os
-from QuickProject.Qpro import basic_string_replace, get_config
+from QuickProject import basic_string_replace, get_config
 
 if sys.platform.startswith('win'):
     dir_char = '\\'

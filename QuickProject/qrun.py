@@ -2,12 +2,10 @@ import os
 import sys
 import pyperclip
 import colorama
-import QuickProject
 from colorama import Fore, Style
-from QuickProject.Qpro import basic_string_replace
+from QuickProject.Qpro import basic_string_replace, get_config
 
 colorama.init()
-QuickProject.Qpro.COLORAMA_INIT_FLAG = False
 if sys.platform.startswith('win'):
     is_win = True
     dir_char = '\\'
@@ -15,19 +13,7 @@ else:
     is_win = False
     dir_char = '/'
 
-config = {}
-try:
-    with open('project_configure.csv', 'r') as f:
-        for row in f.readlines():
-            row = row.split(',')
-            config[row[0]] = [i.strip() for i in row[1:]]
-        for i in config:
-            if i != 'compile_tool':
-                config[i] = config[i][0]
-        if config['template_root'] and not config['template_root'].endswith(dir_char):
-            config['template_root'] += dir_char
-except IOError:
-    exit("No file named: project_configure.csv\n May you need run:\"Qpro -init\" first!")
+config = get_config()
 argv = []
 retain_arg = ['-br', '-b', '-r', '-h', '-i']
 has_recog = {i: False for i in retain_arg}

@@ -1,26 +1,12 @@
 import sys
 import os
-from QuickProject.Qpro import basic_string_replace
+from QuickProject.Qpro import basic_string_replace, get_config
 
 if sys.platform.startswith('win'):
     dir_char = '\\'
 else:
     dir_char = '/'
-config = {}
-try:
-    with open('project_configure.csv', 'r') as f:
-        for row in f.readlines():
-            row = row.split(',')
-            config[row[0]] = [i.strip() for i in row[1:]]
-        for i in config:
-            if i != 'compile_tool':
-                config[i] = config[i][0]
-        if not config['template_root']:
-            exit('You need set template folder first!')
-        if not config['template_root'].endswith(dir_char):
-            config['template_root'] += dir_char
-except IOError:
-    exit("No file named: project_configure.csv\n May you need run:\"Qpro -init\" first!")
+config = get_config()
 is_cpp = config['compile_filename'].endswith('cpp')
 algorithm_name = 'main'
 temp_name = 'main'

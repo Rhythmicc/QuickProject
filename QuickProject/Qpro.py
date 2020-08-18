@@ -4,7 +4,7 @@ import sys
 import colorama
 from colorama import Fore, Style
 
-COLORAMA_INIT_FLAG = True
+colorama.init()
 if sys.platform.startswith('win'):
     is_win = True
     dir_char = '\\'
@@ -14,7 +14,6 @@ else:
 work_dir = os.getcwd()
 work_project = work_dir.split(dir_char)[-1]
 work_dir += dir_char
-
 lang_template = {
     'cpp': """#include <iostream>
 using namespace std;
@@ -43,16 +42,12 @@ int main(int argc, char **argv) {
 
 
 def basic_string_replace(ss):
-    global COLORAMA_INIT_FLAG
-    if COLORAMA_INIT_FLAG:
-        colorama.init()
-        COLORAMA_INIT_FLAG = False
     ss = ss.split('\n')
     ret = ''
     for i in ss:
         if '[' in i:
-            replace_list = re.findall('\[(.*?)\]', i)
-            split_list = re.split('\[.*?\]', i)
+            replace_list = re.findall('\[(.*?)]', i)
+            split_list = re.split('\[.*?]', i)
             for p in range(len(split_list)):
                 ret += Fore.CYAN + split_list[p] + Style.RESET_ALL
                 if p < len(replace_list):
@@ -80,21 +75,21 @@ def get_config():
                 row = row.split(',')
                 config[row[0]] = [i.strip() for i in row[1:]]
             for i in config:
-                if i != 'compile_tool':
+                if i != 'compile_tool' and i != 'server_target':
                     config[i] = config[i][0]
     except IOError:
         exit("No file named: project_configure.csv\n May you need run:\"Qpro -init\" first!")
     return config
 
 
-def scp_init(server_target, ct=False):
+def scp_init(server_target: list, ct=False):
     if server_target:
-        server, target = get_server_target(server_target)
+        server, target, port = get_server_target(server_target)
         user, ip = server.split('@')
         if ct:
-            st = os.system('scp -r %s %s' % (work_project, user + '@\\[' + ip + '\\]:' + target))
+            st = os.system('scp -P %s -r %s %s' % (port, work_project, user + '@\\[' + ip + '\\]:' + target))
         else:
-            st = os.system('scp -r * %s' % user + '@\\[' + ip + '\\]:' + target)
+            st = os.system('scp -P %s -r * %s' % (port, user + '@\\[' + ip + '\\]:' + target))
         if st:
             exit("upload project failed!")
 
@@ -159,7 +154,7 @@ def create():
             ['executable_filename', execute],
             ['input_file', 'dist' + dir_char + 'input.txt' if lang[-1] else ''],
             ['template_root', 'template' + dir_char if lang[-1] else ''],
-            ['server_target', server_target]
+            ['server_target', server_target, '22' if server_target else '']
         ]
         with open(project_name + dir_char + 'project_configure.csv', 'w') as f:
             for row in info:
@@ -171,7 +166,7 @@ def create():
                 main_cont = f.read()
             with open(project_name + dir_char + 'template' + dir_char + 'main', 'w') as f:
                 f.write(main_cont)
-        scp_init(server_target, True)
+        scp_init(info[-1][1:] if server_target else None, True)
 
 
 def scp():
@@ -184,12 +179,12 @@ def scp():
             exit("%s is not in this Qpro project!" % path)
         if not os.path.exists(path):
             exit('No such file named: ' + path)
-        server, target = get_server_target()
+        server, target, port = get_server_target()
         user, ip = server.split('@')
         if os.path.isdir(path):
-            os.system('scp -r %s %s' % (path, user + '@\\[' + ip + '\\]:' + target + path))
+            os.system('scp -P %s -r %s %s' % (port, path, user + '@\\[' + ip + '\\]:' + target + path))
         else:
-            os.system('scp %s %s' % (path, user + '@\\[' + ip + '\\]:' + target + path))
+            os.system('scp -P %s %s %s' % (port, path, user + '@\\[' + ip + '\\]:' + target + path))
 
 
 def get():
@@ -200,9 +195,9 @@ def get():
     else:
         if not os.path.abspath(path).startswith(work_dir):
             exit("%s is not in this Qpro project!" % path)
-        server, target = get_server_target()
+        server, target, port = get_server_target()
         user, ip = server.split('@')
-        os.system('scp -r %s %s' % (user + '@\\[' + ip + '\\]:' + target + path, path))
+        os.system('scp -p %s -r %s %s' % (port, user + '@\\[' + ip + '\\]:' + target + path, path))
 
 
 def adjust():
@@ -317,7 +312,7 @@ def pro_init():
             ['executable_filename', execute],
             ['input_file', 'dist' + dir_char + 'input.txt' if langs[id_lang - 1] != 'empty' else ''],
             ['template_root', 'template' + dir_char if langs[id_lang - 1] != 'empty' else ''],
-            ['server_target', server_target]
+            ['server_target', server_target, '22' if server_target else '']
         ]
     else:
         with open("CMakeLists.txt", 'r') as f:
@@ -346,13 +341,13 @@ def pro_init():
             ['executable_filename', project_name],
             ['input_file', default_input],
             ['template_root', 'template' + dir_char],
-            ['server_target', server_target]
+            ['server_target', server_target, '22' if server_target else '']
         ]
     with open('project_configure.csv', 'w') as f:
         for row in info:
             f.write(','.join(row) + '\n')
     if id_lang >= 0 and langs[id_lang - 1] == 'empty':
-        scp_init(server_target)
+        scp_init(info[-1][1:] if server_target else None)
         exit(0)
     with open(info[3][-1], 'w') as f:
         f.write('edit this file to make input')
@@ -365,32 +360,33 @@ def pro_init():
             f.write(main_cont)
     except Exception as e:
         print("make backup failed with error: %s, you need backup code by yourself!" % e)
-    scp_init(server_target)
+    scp_init(info[-1][1:] if server_target else None)
 
 
 def get_server_target(st=None):
     if not st:
-        ls = get_config()['server_target'].split(':')
+        config = get_config()['server_target']
+        ls, port = config[0].split(':'), config[1]
     else:
-        ls = st.split(':')
+        ls, port = st[0].split(':'), st[1]
     if len(ls) > 2:
         server = ':'.join(ls[:8])
         target = ':'.join(ls[8:])
     else:
         server, target = ls
-    return server, target
+    return server, target, port
 
 
 def ssh():
-    server, target = get_server_target()
-    os.system("ssh -t %s 'cd %s ; exec $SHELL -l'" % (server, target))
+    server, target, port = get_server_target()
+    os.system("ssh -p %s -t %s 'cd %s ; exec $SHELL -l'" % (port, server, target))
 
 
 def delete_all():
     config = get_config()
     if ':' in config['server_target']:
-        server, target = get_server_target()
-        st = os.system("ssh %s 'rm -rf %s'" % (server, target))
+        server, target, port = get_server_target()
+        st = os.system("ssh -p %s %s 'rm -rf %s'" % (port, server, target))
         if st:
             return
     remove(os.getcwd())
@@ -410,8 +406,8 @@ def delete():
         path = path.strip('.' + dir_char)
         path = path.strip(dir_char)
         if ':' in config['server_target']:
-            server, target = get_server_target()
-            st = os.system("ssh %s 'rm -rf %s'" % (server, target + path))
+            server, target, port = get_server_target()
+            st = os.system("ssh -p %s %s 'rm -rf %s'" % (port, server, target + path))
             if st:
                 return
         remove(path)
@@ -427,8 +423,8 @@ def tele_ls():
         path = path.strip('.' + dir_char)
         path = path.strip(dir_char)
     if ':' in config['server_target']:
-        server, target = get_server_target()
-        os.system("ssh %s 'ls %s'" % (server, target + path))
+        server, target, port = get_server_target()
+        os.system("ssh -p %s %s 'ls %s'" % (port, server, target + path))
 
 
 func = {
@@ -467,7 +463,7 @@ def main():
     elif sys.argv[1] in func:
         func[sys.argv[1]]()
     elif sys.argv[1] == '-scp-init':
-        scp_init(get_config()['server_target'])
+        scp_init(get_config()['server_target'][1:])
     elif '-init' not in sys.argv:
         exit('wrong usage! Run "Qpro -h" for help!')
     elif not os.path.exists('project_configure.csv'):

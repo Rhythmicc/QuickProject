@@ -81,9 +81,9 @@ def main():
                 exit(-1)
             config['input_file'] = __input_file__
     o_file = config['executable_filename']
-    record_file_name = ''
+    record_file_name = os.path.basename(filename).split('.')[0]
     if config['compile_tool'] and to_build:
-        os.system(config['compile_tool'])
+        os.system(config['compile_tool'].replace(config['compile_filename'], filename))
     if to_run:
         add_flag = True
         for i in sys.argv[1:]:

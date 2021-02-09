@@ -101,9 +101,9 @@ def create():
         else:
             source_file = ('main' + lang[-1]) if lang[0] != 'javac' else project_name + lang[-1]
             if lang[0] != 'javac':
-                execute = lang[2] + 'dist' + dir_char + project_name if lang[0] else lang[2] + source_file
+                execute = lang[1] + 'dist' + dir_char + project_name if lang[0] else lang[1] + source_file
             else:
-                execute = lang[2] + project_name
+                execute = lang[1] + project_name
             with open(project_name + dir_char + source_file, 'w') as f:
                 if lang[-1] != '.other':
                     content = lang_template[langs[id_lang - 1]]
@@ -267,7 +267,7 @@ def pro_init():
             else:
                 server_target += '~/'
         if lang[0] != 'javac':
-            execute = lang[1] + 'dist' + dir_char + work_project if lang[0] else lang[2] + source_file
+            execute = lang[1] + 'dist' + dir_char + work_project if lang[0] else lang[1] + source_file
         elif langs[id_lang - 1] != 'empty':
             work_project = source_file.split(dir_char)[-1].split('.')[0]
             execute = lang[1] + work_project

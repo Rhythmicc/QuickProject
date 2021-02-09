@@ -57,7 +57,10 @@ def get_config(exit_if_failed: bool = True):
                 row = row.replace('\,', '--QPRO-IS-SPLIT--')
                 row = [i.replace('--QPRO-IS-SPLIT--', ',') for i in row.split(',')]
                 config[row[0]] = [i.strip() for i in row[1:]]
-            config['server_target'] = config['server_target'][0]
+            for i in config:
+                if i in ['server_target']:
+                    continue
+                config[i] = config[i][0]
     except IOError:
         if exit_if_failed:
             exit("No file named: project_configure.csv\n May you need run:\"Qpro -init\" first!")

@@ -119,10 +119,9 @@ def revert():
         rls = []
         cnt = 1
         for i in ls:
-            if '.' not in i:
-                print('[%d] %s' % (cnt, i), end='\t' if cnt % 8 else '\n')
-                rls.append(i)
-                cnt += 1
+            print('[%d] %s' % (cnt, i), end='\t' if cnt % 8 else '\n')
+            rls.append(i)
+            cnt += 1
         if cnt % 8:
             print()
         try:

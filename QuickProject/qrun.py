@@ -20,11 +20,14 @@ has_recog = {i: False for i in retain_arg}
 
 
 def run(use_txt=False, executable_file=str(config['executable_filename'])):
-    cmd = executable_file + ' '
+    if os.path.exists(executable_file):
+        cmd = executable_file.replace(' ', '\ ') + ' '
+    else:
+        cmd = executable_file + ' '
     if argv:
         cmd += ' '.join(argv)
     if cmd.strip():
-        cmd += (' < ' + config['input_file'] if use_txt else '')
+        cmd += (' < "' + config['input_file'] + '"' if use_txt else '')
         os.system(cmd)
 
 
@@ -79,20 +82,8 @@ def main():
             config['input_file'] = __input_file__
     o_file = config['executable_filename']
     record_file_name = ''
-    if config['compile_tool'][0] and to_build:
-        clang = ['clang', 'gcc', 'g++']
-        use_lang = config['compile_tool'][0].split()[0]
-        if any(use_lang.startswith(i) for i in clang):
-            if flag:
-                o_file = filename.split(dir_char)[-1].split('.')[0]
-                o_file = os.path.abspath(o_file)
-            os.system(config['compile_tool'][0] + ' ' + filename + ' -o ' + o_file + ' ' + config['compile_tool'][1])
-        else:  # java
-            if flag:
-                o_file = filename.split(dir_char)[-1].split('.')[0]
-                record_file_name = o_file
-                o_file = ' '.join(config['executable_filename'].split()[:-1]) + ' ' + o_file
-            os.system(config['compile_tool'][0] + ' ' + filename + ' ' + config['compile_tool'][1])
+    if config['compile_tool'] and to_build:
+        os.system(config['compile_tool'])
     if to_run:
         add_flag = True
         for i in sys.argv[1:]:
@@ -109,8 +100,8 @@ def main():
             else:
                 argv.append(i)
         run('-i' in sys.argv or '-if' in sys.argv, o_file)
-    if config['compile_tool'][0] and flag:
-        if config['compile_tool'][0].split()[0] == 'javac':
+    if config['compile_tool'] and flag:
+        if config['compile_tool'].split()[0] == 'javac':
             os.remove('dist' + dir_char + record_file_name + '.class')
         else:
             os.remove(o_file)

@@ -69,12 +69,12 @@ def create():
         if os.path.exists(project_name) and os.path.isdir(project_name):
             exit('"%s" is exist!' % (work_dir + project_name + dir_char))
         lang_tool_exe = {
-            'c': ['gcc -std=c11', '', '', '.c'],
-            'cpp': ['g++ -std=c++11', '', '', '.cpp'],
-            'java': ['javac', '-d dist', 'java -classpath dist ', '.java'],
-            'python3': ['', '', 'python3 ', '.py'],
-            'python': ['', '', 'python ', '.py'],
-            'empty': ['', '', '', '']
+            'c': ['gcc -std=c11 --source_file-- -o --execute--', '', '.c'],
+            'cpp': ['g++ -std=c++11 --source_file-- -o --execute--', '', '.cpp'],
+            'java': ['javac -d dist --source_file--', 'java -classpath dist ', '.java'],
+            'python3': ['', 'python3 ', '.py'],
+            'python': ['', 'python ', '.py'],
+            'empty': ['', '', '']
         }
         os.mkdir(project_name)
         langs = list(lang_tool_exe.keys())
@@ -113,7 +113,7 @@ def create():
             os.mkdir(project_name + dir_char + 'dist')
             os.mkdir(project_name + dir_char + 'template')
         info = [
-            ['compile_tool', lang[0], lang[1]],
+            ['compile_tool', lang[0].replace('--source_file--', source_file).replace('--execute--', execute)],
             ['compile_filename', source_file],
             ['executable_filename', execute],
             ['input_file', 'dist' + dir_char + 'input.txt' if lang[-1] else ''],
@@ -180,7 +180,7 @@ def adjust():
     all_dt = {}
     for i, v in enumerate(config):
         tk.Label(win, text='%12s' % key_to_name[v]).grid(row=i, column=0)
-        if v == 'compile_tool' or v == 'server_target':
+        if v == 'server_target':
             stringvar1 = tk.Variable()
             stringvar1.set(config[v][0])
             stringvar2 = tk.Variable()
@@ -196,9 +196,7 @@ def adjust():
 
     def deal_config():
         for dt in all_dt:
-            if dt == 'compile_tool':
-                config[dt] = [all_dt[dt][0].get(), all_dt[dt][1].get()]
-            elif dt == 'server_target':
+            if dt == 'server_target':
                 config[dt] = [all_dt[dt][0].get(), all_dt[dt][1].get()]
                 if config[dt][0]:
                     try:
@@ -221,7 +219,7 @@ def adjust():
         win.destroy()
         with open('project_configure.csv', 'w') as file:
             for line in config:
-                if line == 'compile_tool' or line == 'server_target':
+                if line == 'server_target':
                     file.write('%s,%s\n' % (line, ','.join(config[line])))
                 else:
                     file.write('%s,%s\n' % (line, config[line]))
@@ -238,12 +236,12 @@ def pro_init():
         while not work_project:
             work_project = input('You need to set project name:').strip()
         lang_tool_exe = {
-            'c': ['gcc -std=c11', '', '', '.c'],
-            'cpp': ['g++ -std=c++11', '', '', '.cpp'],
-            'java': ['javac', '-d dist', 'java -classpath dist ', '.java'],
-            'python3': ['', '', 'python3 ', '.py'],
-            'python': ['', '', 'python ', '.py'],
-            'empty': ['', '', '', '']
+            'c': ['gcc -std=c11 --source_file-- -o --execute--', '', '.c'],
+            'cpp': ['g++ -std=c++11 --source_file-- -o --execute--', '', '.cpp'],
+            'java': ['javac -d dist --source_file--', 'java -classpath dist ', '.java'],
+            'python3': ['', 'python3 ', '.py'],
+            'python': ['', 'python ', '.py'],
+            'empty': ['', '', '']
         }
         langs = list(lang_tool_exe.keys())
         for i, lang in enumerate(langs):
@@ -269,16 +267,16 @@ def pro_init():
             else:
                 server_target += '~/'
         if lang[0] != 'javac':
-            execute = lang[2] + 'dist' + dir_char + work_project if lang[0] else lang[2] + source_file
+            execute = lang[1] + 'dist' + dir_char + work_project if lang[0] else lang[2] + source_file
         elif langs[id_lang - 1] != 'empty':
             work_project = source_file.split(dir_char)[-1].split('.')[0]
-            execute = lang[2] + work_project
+            execute = lang[1] + work_project
         else:
             execute = ''
         if (not os.path.exists('dist') or not os.path.isdir('dist')) and langs[id_lang - 1] != 'empty':
             os.mkdir('dist')
         info = [
-            ['compile_tool', lang[0], lang[1]],
+            ['compile_tool', lang[0].replace('--source_file--', source_file).replace('--execute--', execute)],
             ['compile_filename', source_file],
             ['executable_filename', execute],
             ['input_file', 'dist' + dir_char + 'input.txt' if langs[id_lang - 1] != 'empty' else ''],
@@ -307,7 +305,7 @@ def pro_init():
                   'and run "Qpro -scp-init" to upload project.')
         print('adding project_configure')
         info = [
-            ['compile_tool', 'g++ -std=c++11' if is_cpp else 'gcc -std=c11', ''],
+            ['compile_tool', 'cmake cmake-build-debug && cd cmake-build-debug && make'],
             ['compile_filename', source_file],
             ['executable_filename', project_name],
             ['input_file', default_input],

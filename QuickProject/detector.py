@@ -15,7 +15,7 @@ else:
 
 def read_file(filename):
     try:
-        with open(filename, 'r') as f:
+        with open(filename.replace('\ ', ' '), 'r') as f:
             return f.readlines()
     except IOError:
         messagebox.showerror("ERROR:", "没有找到文件:%s" % filename)
@@ -68,20 +68,20 @@ def cmp():
     file_path2 = 'content2'
     if file3 == '使用默认输入文件':
         if cp1:
-            os.system('qrun -br -i -f %s > content1' % file1)
+            os.system('qrun -br -i -f %s > content1' % file1.replace(' ', '\ '))
         else:
             file_path1 = file1
         if cp2:
-            os.system('qrun -br -i -f %s > content2' % file2)
+            os.system('qrun -br -i -f %s > content2' % file2.replace(' ', '\ '))
         else:
             file_path2 = file2
     else:
         if cp1:
-            os.system('qrun -br -if %s -f %s > content1' % (file3, file1))
+            os.system('qrun -br -if %s -f %s > content1' % (file3.replace(' ', '\ '), file1.replace(' ', '\ ')))
         else:
             file_path1 = file1
         if cp2:
-            os.system('qrun -br -if %s -f %s > content2' % (file3, file2))
+            os.system('qrun -br -if %s -f %s > content2' % (file3.replace(' ', '\ '), file2.replace(' ', '\ ')))
         else:
             file_path2 = file2
     compare_file(file_path1, file_path2, './res.html')

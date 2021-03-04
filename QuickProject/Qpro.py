@@ -1,12 +1,6 @@
-import sys
 from QuickProject import *
+from rich.prompt import Prompt
 
-if sys.platform.startswith('win'):
-    is_win = True
-    dir_char = '\\'
-else:
-    is_win = False
-    dir_char = '/'
 work_dir = os.getcwd()
 work_project = work_dir.split(dir_char)[-1]
 work_dir += dir_char
@@ -55,7 +49,7 @@ def scp_init(server_target: list, ct=False):
         else:
             st = SshProtocol.post_all_in_folder(user, ip, target, port)
         if st:
-            exit("upload project failed!")
+            QproDefaultConsole.print(QproErrorString, "upload project failed!")
 
 
 def create():
@@ -64,10 +58,10 @@ def create():
         global work_project
         work_project = project_name
     except IndexError:
-        exit('usage: Qpro -c project')
+        return QproDefaultConsole.print(QproWarnString, 'usage: Qpro -c project')
     else:
         if os.path.exists(project_name) and os.path.isdir(project_name):
-            exit('"%s" is exist!' % (work_dir + project_name + dir_char))
+            return QproDefaultConsole.print(QproErrorString,'"%s" is exist!' % (work_dir + project_name + dir_char))
         lang_tool_exe = {
             'c': ['gcc -std=c11 --source_file-- -o --execute--', '', '.c'],
             'cpp': ['g++ -std=c++11 --source_file-- -o --execute--', '', '.cpp'],
@@ -79,17 +73,17 @@ def create():
         os.mkdir(project_name)
         langs = list(lang_tool_exe.keys())
         for i, lang in enumerate(langs):
-            print('[%d] %-5s' % (i + 1, lang), end='\t' if (i + 1) % 3 else '\n')
+            QproDefaultConsole.print('[%d] %-5s' % (i + 1, lang), end='\t' if (i + 1) % 3 else '\n')
         if len(langs) % 3:
-            print()
+            QproDefaultConsole.print()
         id_lang = 0
         while id_lang <= 0 or id_lang > len(langs):
             try:
-                id_lang = int(input('choose one:'))
+                id_lang = int(Prompt.ask('choose one', default='6'))
             except:
                 id_lang = 0
         lang = lang_tool_exe[langs[id_lang - 1]]
-        server_target = input('input [user@ip:dir_path] if you need scp:')
+        server_target = Prompt.ask('input user@ip:dir_path if you need scp').strip().replace(dir_char, '/')
         if server_target and not server_target.endswith('/'):
             if not server_target.endswith(':'):
                 server_target += '/'
@@ -137,12 +131,12 @@ def scp():
     try:
         path = sys.argv[sys.argv.index('-scp') + 1]
     except IndexError:
-        exit('usage: Qpro -scp file')
+        return QproDefaultConsole.print(QproWarnString, 'usage: Qpro -scp <file>')
     else:
         if not os.path.abspath(path).startswith(work_dir):
-            exit("%s is not in this Qpro project!" % path)
+            return QproDefaultConsole.print(QproErrorString, f"{path} is not in this Qpro project!")
         if not os.path.exists(path):
-            exit('No such file named: ' + path)
+            return QproDefaultConsole.print(QproErrorString, f'No such file named: {path}')
         server, target, port = get_server_target()
         user, ip = server.split('@')
         if os.path.isdir(path):
@@ -155,10 +149,10 @@ def get():
     try:
         path = sys.argv[sys.argv.index('-get') + 1]
     except IndexError:
-        exit('usage: Qpro -get file')
+        return QproDefaultConsole.print(QproWarnString, 'usage: Qpro -get <file>')
     else:
         if not os.path.abspath(path).startswith(work_dir):
-            exit("%s is not in this Qpro project!" % path)
+            return QproDefaultConsole.print(QproErrorString, f"{path} is not in this Qpro project!")
         server, target, port = get_server_target()
         user, ip = server.split('@')
         SshProtocol.get_file_or_folder(user, ip, target, port, path)
@@ -166,6 +160,9 @@ def get():
 
 def adjust():
     config = get_config()
+    if not config:
+        return QproDefaultConsole.print(QproErrorString, 'Get Qpro config failed!')
+
     import tkinter as tk
     win = tk.Tk()
     win.title('Qpro项目调整器')
@@ -208,10 +205,11 @@ def adjust():
                         else:
                             raise Exception('%s: not a legal server target')
                     except Exception as e:
-                        print(repr(e))
-                        print('Legal server target:\n'
-                              '  addr: <username>@<ipv4 | ipv6 | domain>:</path/to/project/>'
-                              '  port: <ssh port>, default 22')
+                        QproDefaultConsole.print(QproErrorString, repr(e))
+                        QproDefaultConsole.print(
+                            QproWarnString, 'Legal server target:\n'
+                                            '        addr: <username>@<ipv4 | ipv6 | domain>:</path/to/project/>\n'
+                                            '        port: <ssh port>, default 22')
             else:
                 config[dt] = all_dt[dt].get()
         if not config['template_root'].endswith(dir_char):
@@ -234,7 +232,7 @@ def pro_init():
     if not os.path.exists('CMakeLists.txt'):
         global work_project
         while not work_project:
-            work_project = input('You need to set project name:').strip()
+            work_project = Prompt.ask('You need to set project name').strip()
         lang_tool_exe = {
             'c': ['gcc -std=c11 --source_file-- -o --execute--', '', '.c'],
             'cpp': ['g++ -std=c++11 --source_file-- -o --execute--', '', '.cpp'],
@@ -245,13 +243,13 @@ def pro_init():
         }
         langs = list(lang_tool_exe.keys())
         for i, lang in enumerate(langs):
-            print('[%d] %-5s' % (i + 1, lang), end='\t' if (i + 1) % 3 else '\n')
+            QproDefaultConsole.print('[%d] %-5s' % (i + 1, lang), end='\t' if (i + 1) % 3 else '\n')
         if len(langs) % 3:
-            print()
+            QproDefaultConsole.print()
         id_lang = 0
         while id_lang <= 0 or id_lang > len(langs):
             try:
-                id_lang = int(input('choose one:'))
+                id_lang = int(Prompt.ask('choose one', default='6'))
             except:
                 id_lang = 0
         lang = lang_tool_exe[langs[id_lang - 1]]
@@ -259,8 +257,8 @@ def pro_init():
         if langs[id_lang - 1] != 'empty':
             source_file = ('main' + lang[-1]) if lang[0] != 'javac' else work_project + lang[-1]
             while not os.path.exists(source_file):
-                source_file = input('Not found "%s", set compile_filename:' % source_file).strip()
-        server_target = input('input [user@ip:dir_path] if you need scp:').strip().replace('\\', '/')
+                source_file = Prompt.ask('Not found "%s", set compile_filename' % source_file).strip()
+        server_target = Prompt.ask('input user@ip:dir_path if you need scp').strip().replace(dir_char, '/')
         if ':' in server_target and not server_target.endswith('/'):
             if not server_target.endswith(':'):
                 server_target += '/'
@@ -284,6 +282,8 @@ def pro_init():
             ['server_target', server_target, '22' if server_target else '']
         ]
     else:
+        import re
+
         with open("CMakeLists.txt", 'r') as f:
             content = f.read()
         project_name = re.findall('project\((.*?)\)', content)[0].split()[0]
@@ -291,19 +291,19 @@ def pro_init():
             is_cpp = True
         else:
             is_cpp = False
-        print('Project name:%s(%s)' % (project_name, 'CPP' if is_cpp else 'C'))
+        QproDefaultConsole.print(QproInfoString, 'Project name:%s(%s)' % (project_name, 'CPP' if is_cpp else 'C'))
         project_name = 'cmake-build-debug' + dir_char + project_name
         source_file = 'main.c' + ('pp' if is_cpp else '')
         pro_root = dir_char.join(project_name.split(dir_char)[:-1])
         default_input = pro_root + dir_char + 'input.txt'
-        server_target = input('input [user@ip:dir_path] if you need scp:').strip().replace('\\', '/')
+        server_target = Prompt.ask('input user@ip:dir_path if you need scp').strip().replace(dir_char, '/')
         if ':' in server_target and not server_target.endswith('/') and not server_target.endswith(':'):
             server_target += '/'
         elif server_target:
-            print('Not a legal server target!\n'
-                  'You can run "Qpro -adjust" to adjust target\n'
-                  'and run "Qpro -scp-init" to upload project.')
-        print('adding project_configure')
+            QproDefaultConsole.print(QproDefaultConsole, 'Not a legal server target!\n'
+                                                         'You can run "Qpro -adjust" to adjust target\n'
+                                                         'and run "Qpro -scp-init" to upload project.')
+        QproDefaultConsole.print(QproInfoString, 'create project_configure')
         info = [
             ['compile_tool', 'cmake cmake-build-debug && cd cmake-build-debug && make'],
             ['compile_filename', source_file],
@@ -317,7 +317,7 @@ def pro_init():
             f.write(','.join(row) + '\n')
     if id_lang >= 0 and langs[id_lang - 1] == 'empty':
         scp_init(info[-1][1:] if server_target else None)
-        exit(0)
+        return
     with open(info[3][-1], 'w') as f:
         f.write('edit this file to make input')
     if not os.path.exists('template') or not os.path.isdir('template'):
@@ -328,7 +328,8 @@ def pro_init():
         with open('template' + dir_char + 'main', 'w') as f:
             f.write(main_cont)
     except Exception as e:
-        print("make backup failed with error: %s, you need backup code by yourself!" % e)
+        QproDefaultConsole.print(
+            QproErrorString, "make backup failed with error: %s, you need backup code by yourself!" % e)
     scp_init(info[-1][1:] if server_target else None)
 
 
@@ -351,12 +352,12 @@ def delete():
     try:
         path = sys.argv[sys.argv.index('-del') + 1]
     except IndexError:
-        exit('usage: Qpro -del path')
+        return QproDefaultConsole.print(QproWarnString, 'usage: Qpro -del <path>')
     else:
         if not os.path.abspath(path).startswith(work_dir):
-            exit("%s is not in this Qpro project!" % path)
+            return QproDefaultConsole.print(QproErrorString, f"{path} is not in this Qpro project!")
         if not os.path.exists(path):
-            exit('No such file named: ' + path)
+            return QproDefaultConsole.print(QproErrorString, f'No such file named: {path}')
         config = get_config()
         path = path.strip('.' + dir_char)
         path = path.strip(dir_char)
@@ -378,8 +379,9 @@ def tele_ls():
         path = path.strip('.' + dir_char)
         path = path.strip(dir_char)
     if ':' in config['server_target']:
+        from . import SshProtocol
         server, target, port = get_server_target()
-        os.system("ssh -p %s %s 'ls %s'" % (port, server, target + path))
+        os.system(f"ssh -p {port} {server} 'ls {target + path}'")
 
 
 func = {
@@ -396,35 +398,36 @@ func = {
 
 def main():
     if len(sys.argv) < 2 or '-h' == sys.argv[1]:
-        print(basic_string_replace('usage:\n'
-                                   '   * [Qpro -init    ]: let dir be a Qpro project!\n'
-                                   '   * [Qpro -h       ]: help\n'
-                                   '   * [Qpro -c name  ]: create a Qpro project\n'
-                                   '   * [Qpro -update  ]: update Qpro\n'
-                                   '   * [Qpro -adjust  ]: adjust configure\n'
-                                   '   * [Qpro -ssh     ]: login server by ssh\n'
-                                   '   * [Qpro -scp path]: upload path to default server target\n'
-                                   '   * [Qpro -scp-init]: upload all of project to server target\n'
-                                   '   * [Qpro -get path]: download file from server target\n'
-                                   '   * [Qpro -del path]: delete path in project\n'
-                                   '   * [Qpro -del-all ]: delete Qpro project\n'
-                                   '   * [Qpro -ls path ]: list element in path\n'
-                                   '   * [tmpm *        ]: manage your template\n'
-                                   '   * [qrun *        ]: run your Qpro project\n'
-                                   '   * [detector -(p/f)(p/f)]: run beat detector for two source files'))
+        menu_output({'title': 'Qpro usage\n',
+                     'lines': [
+                        ('-init', 'let current dir be a Qpro project!'),
+                        ('-h', 'help'),
+                        ('-c   [bold magenta]<name>', 'create a Qpro project'),
+                        ('-update', 'update Qpro'),
+                        ('-adjust', 'adjust configure'),
+                        ('-ssh', 'login server by ssh'),
+                        ('-scp [bold magenta]<path>', 'upload path to default server target'),
+                        ('-scp-init', 'upload all of project to server target'),
+                        ('-get [bold magenta]<path>', 'download file from server target'),
+                        ('-del [bold magenta]<path>', 'delete path in project'),
+                        ('-del-all', 'delete Qpro project'),
+                        ('-ls  [bold magenta]<path>', 'list element in path'),
+                        ('tmpm *', 'manage your template'),
+                        ('qrun *', 'run your Qpro project'),
+                        ('detector -<p/f><p/f>', 'run beat detector for two source files')],
+                     'prefix': 'Qpro'})
     elif '-update' == sys.argv[1]:
         os.system('pip3 install Qpro --upgrade')
-        exit(0)
     elif sys.argv[1] in func:
         func[sys.argv[1]]()
     elif sys.argv[1] == '-scp-init':
-        scp_init(get_config()['server_target'][1:])
+        scp_init(get_config()['server_target'])
     elif '-init' not in sys.argv:
-        exit('wrong usage! Run "Qpro -h" for help!')
+        QproDefaultConsole.print(QproErrorString, 'wrong usage! Run "Qpro -h" for help!')
     elif not os.path.exists('project_configure.csv'):
         pro_init()
     else:
-        exit("You have configured your project, see project_configure to adjust your configure!")
+        QproDefaultConsole.print("You have configured your project, see project_configure to adjust your configure!")
 
 
 if __name__ == '__main__':

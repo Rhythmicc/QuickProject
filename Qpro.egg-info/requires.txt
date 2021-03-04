@@ -1,2 +1,2 @@
 pyperclip
-colorama
+rich

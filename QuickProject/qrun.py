@@ -1,17 +1,7 @@
 import os
 import sys
 import pyperclip
-import colorama
-from colorama import Fore, Style
-from QuickProject import basic_string_replace, get_config
-
-colorama.init()
-if sys.platform.startswith('win'):
-    is_win = True
-    dir_char = '\\'
-else:
-    is_win = False
-    dir_char = '/'
+from QuickProject import menu_output, get_config, dir_char, QproDefaultConsole, QproErrorString
 
 config = get_config()
 argv = []
@@ -31,10 +21,6 @@ def run(use_txt=False, executable_file=str(config['executable_filename'])):
         os.system(cmd)
 
 
-def red_col(string):
-    return Fore.RED + string + Style.RESET_ALL
-
-
 def main():
     to_build = '-b' in sys.argv or '-br' in sys.argv
     to_run = '-r' in sys.argv or '-b' not in sys.argv
@@ -43,33 +29,30 @@ def main():
     if '-debug' in sys.argv:
         raise ImportError
     if '-h' in sys.argv:
-        print(basic_string_replace('(qrun.py) usage:\n'
-                                   '  * build or run:\n'
-                                   '    # [ -b ]: build\n'
-                                   '    # [ -r ]: run\n'
-                                   '    # [ -br]: build and run\n'
-                                   '    (it will run if neither of commands in "build or run")\n'
-                                   '  * [ -i ]: use input.txt as input\n'
-                                   '  * [ -if  *.*  ]: set input file(*.*) as input\n'
-                                   '  * [ -if -paste]: use Clipboard content as input\n'
-                                   '  * [ -f  *.cpp ]: set build file as *.cpp\n'
-                                   '  * [ -h ]: help\n'
-                                   '  * [ *  ]: add parameters for program\n'
-                                   '  * Modify config to adjust default configuration'))
-        exit(0)
+        return menu_output({'title': 'qrun usage\n',
+                            'lines': [
+                                ('-b', 'build'),
+                                ('qrun [bold green][-r]', 'run'),
+                                ('-br', 'build and run'),
+                                ('-h', 'help'),
+                                ('-i', 'use input.txt as input'),
+                                ('-if [bold magenta]<file>', 'set file as input'),
+                                ('-if [bold magenta]-paste', 'use Clipboard content as input'),
+                                ('-f  [bold magenta]<file>', 'set file as build file'),
+                                ('*', 'add parameters for program')],
+                            'prefix': 'qrun '})
     if '-f' in sys.argv:
         index = sys.argv.index('-f')
         if index == len(sys.argv) - 1:
-            print(red_col('ERROR: No file with -f'))
+            return QproDefaultConsole.print(QproErrorString, 'No file with -f')
         filename = sys.argv[index + 1]
         if not os.path.exists(filename):
-            print(red_col('ERROR: No such file:%s' % filename))
-            exit(-1)
+            return QproDefaultConsole.print(QproErrorString, f'No such file: {filename}')
         flag = True
     if '-if' in sys.argv:
         index = sys.argv.index('-if')
         if index == len(sys.argv) - 1:
-            print(red_col('ERROR: No file with -if'))
+            QproDefaultConsole.print(QproErrorString, 'No file with -if')
         tmp_file = sys.argv[index + 1]
         if tmp_file == '-paste':
             with open('cmake-build-debug' + dir_char + 'input.txt', 'w') as file:
@@ -77,8 +60,7 @@ def main():
         else:
             __input_file__ = tmp_file
             if not os.path.exists(__input_file__):
-                print(red_col('ERROR: No such file:%s' % __input_file__))
-                exit(-1)
+                return QproDefaultConsole.print(QproErrorString, f'No such file: {__input_file__}')
             config['input_file'] = __input_file__
     o_file = config['executable_filename']
     record_file_name = os.path.basename(filename).split('.')[0]
@@ -95,7 +77,7 @@ def main():
                     argv.append(i)
                 else:
                     has_recog[i] = True
-            elif i == '-if' or i == '-f':
+            elif i in ['-if', '-f']:
                 add_flag = False
             else:
                 argv.append(i)

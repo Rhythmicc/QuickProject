@@ -1,11 +1,7 @@
 import sys
 import os
-from QuickProject import basic_string_replace, get_config
+from QuickProject import menu_output, get_config, QproDefaultConsole, QproErrorString, QproWarnString
 
-if sys.platform.startswith('win'):
-    dir_char = '\\'
-else:
-    dir_char = '/'
 config = get_config()
 is_cpp = config['compile_filename'].endswith('cpp')
 algorithm_name = 'main'
@@ -18,7 +14,8 @@ def match_algorithm():
         try:
             content = re.findall('__TMPM_START__(.*?)__TMPM_END__', file.read(), re.S)[0].strip()
         except IndexError:
-            exit('No template index found! Insert "__TMPM_START__" and "__TMPM_END__" to your code!')
+            return QproDefaultConsole.print(
+                QproErrorString, 'No template index found! Insert "__TMPM_START__" and "__TMPM_END__" to your code!')
     content = content.replace('__TMPM__', '')
     return content
 
@@ -44,10 +41,11 @@ def create():
                 file.write(ct)
             return
         else:
-            exit('usage: tmpm -c template (algorithm)')
+            return QproDefaultConsole.print(QproWarnString, 'usage: tmpm -c <template> [algorithm]')
     temp_name += '.md'
     if os.path.exists(config['template_root'] + temp_name):
-        if input('Template %s is already exist, would you cover it?[y/n]:' % temp_name) == 'n':
+        from rich.prompt import Prompt
+        if Prompt.ask(f'Template {temp_name} is already exist, would you cover it?[y/n]', default='n') == 'n':
             exit(0)
     content = match_algorithm()
     write_algorithm(temp_name, algorithm_name, content, 'w')
@@ -60,7 +58,7 @@ def append():
         temp_name = sys.argv[indx + 1] + '.md'
         algorithm_name = sys.argv[indx + 2]
     except IndexError:
-        exit('usage: tmpm -a template algorithm')
+        return QproDefaultConsole.print(QproWarnString, 'usage: tmpm -a <template> [algorithm]')
     if os.path.exists(config['template_root'] + temp_name):
         content = match_algorithm()
         write_algorithm(temp_name, algorithm_name, content, 'a')
@@ -78,29 +76,33 @@ def join():
     if os.path.exists(config['template_root'] + temp_name):
         with open(config['template_root'] + temp_name, 'r') as file:
             import re
+            from rich.prompt import Prompt
+
             content = re.findall('##(.*?)\n.*?```.*?\n(.*?)```', file.read(), re.S)
             for i, v in enumerate(content):
-                print('[%d] %s' % (i + 1, v[0].strip()), end=' ' if i + 1 % 10 else '\n')
-            indx = int(input('%s选择:' % ('\n' if len(content) % 10 else ''))) - 1
+                QproDefaultConsole.print('[%d] %s' % (i + 1, v[0].strip()), end=' ' if i + 1 % 10 else '\n')
+            indx = int(Prompt.ask('%s选择' % ('\n' if len(content) % 10 else ''))) - 1
             content = content[indx]
         with open(config['compile_filename'], 'r') as file:
             content = file.read().replace('__TMPM__', content[1].strip())
         with open(config['compile_filename'], 'w') as file:
             file.write(content)
     else:
-        exit('No template named: %s' % temp_name)
+        return QproDefaultConsole.print(QproErrorString, f'No template named: {temp_name}')
 
 
 def h():
-    print(basic_string_replace('(tmpm.py) usage:\n'
-                               '   * [tmpm -h]: for help\n'
-                               '   * [tmpm -i]: init content as template/main\n'
-                               '   * [tmpm -r]: select copy and init\n'
-                               '   * [tmpm -r backup]: init "compile_filename" to template/backup\n'
-                               '   * [tmpm -c backup]: create or cover a backup\n'
-                               '   * [tmpm -c template algorithm]: create template and write algorithm\n'
-                               '   * [tmpm -a template algorithm]: add algorithm to template\n'
-                               '   * [tmpm template]: insert algorithm in template'))
+    menu_output({'title': 'tmpm usage\n',
+                 'lines': [
+                     ('-h', 'for help'),
+                     ('-i', 'init content as template/main'),
+                     ('-r', 'select copy and init'),
+                     ('-r [bold magenta]<backup>', 'revert "compile_filename" from template/<backup>'),
+                     ('-c [bold magenta]<backup>', 'create or cover a <backup> of "compile_filename"'),
+                     ('-c [bold magenta]<template> [bold green]\[algorithm]', 'create template and write algorithm'),
+                     ('-a [bold magenta]<template> [bold magenta]<algorithm>', 'add algorithm to template'),
+                     ('tmpm    [bold magenta]<template>', 'insert algorithm in <template>')],
+                 'prefix': 'tmpm'})
 
 
 def init(file_name: str = 'main'):
@@ -115,27 +117,29 @@ def revert():
     try:
         file_name = sys.argv[indx + 1]
     except IndexError:
+        from rich.prompt import Prompt
+
         ls = os.listdir(config['template_root'])
         rls = []
         cnt = 1
         for i in ls:
-            print('[%d] %s' % (cnt, i), end='\t' if cnt % 8 else '\n')
+            QproDefaultConsole.print('[%d] %s' % (cnt, i), end='\t' if cnt % 8 else '\n')
             rls.append(i)
             cnt += 1
         if cnt % 8:
-            print()
+            QproDefaultConsole.print()
         try:
-            indx = int(input('选择:'))
+            indx = int(Prompt.ask('选择'))
             if indx < 0 or indx > len(rls):
                 raise IndexError
         except:
-            exit('ERROR!')
+            return QproDefaultConsole.print(QproErrorString, 'Choose out of index')
         file_name = rls[indx - 1]
         return init(file_name)
     if os.path.exists(config['template_root'] + file_name):
         init(file_name)
     else:
-        exit('No such backup')
+        return QproDefaultConsole.print(QproErrorString, 'No such backup')
 
 
 def main():

@@ -105,7 +105,7 @@ ll = tk.Label(win, textvariable=path3, width=width, fg='red')
 
 
 def main():
-    if not get_config(False) and sys.argv[1] != '-ff':
+    if not get_config() and sys.argv[1] != '-ff':
         from QuickProject import QproDefaultConsole, QproErrorString
         return QproDefaultConsole.print(QproErrorString, "You must run \"Qpro -init\" first")
     tk.Label(win, text='%12s' % "文件1路径:").grid(row=0, column=0)

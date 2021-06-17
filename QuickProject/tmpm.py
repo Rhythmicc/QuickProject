@@ -1,6 +1,6 @@
 import sys
 import os
-from QuickProject import menu_output, get_config, QproDefaultConsole, QproErrorString, QproWarnString
+from QuickProject import menu_output, get_config, QproDefaultConsole, QproErrorString, QproWarnString, rt_dir
 
 config = get_config()
 is_cpp = config['compile_filename'].endswith('cpp')
@@ -122,7 +122,11 @@ def revert():
         ls = os.listdir(config['template_root'])
         rls = []
         cnt = 1
+        stdSuffix = config['compile_filename'].strip().split('.')[-1]
         for i in ls:
+            iSuffix = i.split('.')[-1]
+            if iSuffix != stdSuffix and '.' in i:
+                continue
             QproDefaultConsole.print('[%d] %s' % (cnt, i), end='\t' if cnt % 8 else '\n')
             rls.append(i)
             cnt += 1
@@ -143,6 +147,8 @@ def revert():
 
 
 def main():
+    os.chdir(rt_dir)
+
     if len(sys.argv) == 1:
         h()
     elif '-h' in sys.argv:

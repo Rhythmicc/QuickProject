@@ -16,33 +16,59 @@ QproWarnString = '[bold yellow][WARN]'
 name = 'QuickProject'
 
 
+def __latest_filename(name):
+    import os
+    from . import dir_char
+
+    cur = os.getcwd()
+    rec = cur
+    while cur != dir_char:
+        if os.path.exists(name):
+            os.chdir(rec)
+            return os.path.abspath(cur + dir_char + name)
+        os.chdir('..')
+        cur = os.getcwd()
+    os.chdir(rec)
+    return ''
+
+
+rt_dir = os.path.dirname(__latest_filename('project_configure.csv')) + dir_char
+
+
+def __sub_path(path, isExist=True):
+    if not os.path.exists(path) and isExist:
+        return ''
+    abs_path = os.path.abspath(path)
+    return abs_path.replace(rt_dir, '') if abs_path.startswith(rt_dir) else ''
+
+
 class SshProtocol:
     @staticmethod
-    def post_folder(user, domain, target, port, path):
-        status = os.system('scp -P %s -r %s %s' % (port, path, user + '@\\[' + domain + '\\]:' + target + path))
+    def post_folder(user, domain, target, port, srcPath, dstPath):
+        status = os.system('scp -P %s -r %s %s' % (port, srcPath, user + '@\\[' + domain + '\\]:' + target + dstPath))
         return status
 
     @staticmethod
-    def post_file(user, domain, target, port, path):
-        status = os.system('scp -P %s %s %s' % (port, path, user + '@\\[' + domain + '\\]:' + target + path))
+    def post_file(user, domain, target, port, srcPath, dstPath):
+        status = os.system('scp -P %s %s %s' % (port, srcPath, user + '@\\[' + domain + '\\]:' + target + dstPath))
         return status
 
     @staticmethod
-    def post_all_in_folder(user, domain, target, port):
-        status = os.system('scp -P %s -r * %s' % (port, user + '@\\[' + domain + '\\]:' + target))
+    def post_all_in_folder(user, domain, target, port, dstPath):
+        status = os.system('scp -P %s -r * %s' % (port, user + '@\\[' + domain + '\\]:' + target + dstPath))
         return status
 
     @staticmethod
-    def get_file_or_folder(user, domain, target, port, path):
-        return os.system('scp -P %s -r %s %s' % (port, user + '@\\[' + domain + '\\]:' + target + path, path))
+    def get_file_or_folder(user, domain, target, port, srcPath, dstPath):
+        return os.system('scp -P %s -r %s %s' % (port, user + '@\\[' + domain + '\\]:' + target + srcPath, dstPath))
 
     @staticmethod
-    def ls(user, domain, target, port, path):
-        return os.system(f"ssh -P {port} {user + '@' + domain} 'ls {target + path}'")
+    def ls(user, domain, target, port, dstPath):
+        return os.system(f"ssh -P {port} {user + '@' + domain} 'ls {target + dstPath}'")
 
     @staticmethod
-    def ssh(user, domain, target, port):
-        return os.system(f"ssh -P {port} -t {user + '@' + domain} 'cd {target} ; exec $SHELL -l'")
+    def ssh(user, domain, target, port, dstPath):
+        return os.system(f"ssh -P {port} -t {user + '@' + domain} 'cd {target + dstPath} ; exec $SHELL -l'")
 
 
 def menu_output(menu):
@@ -59,10 +85,11 @@ def menu_output(menu):
     QproDefaultConsole.print('\nDOC: https://rhythmlian.cn/2020/02/14/QuickProject/', justify='center')
 
 
-def get_config(exit_if_failed: bool = True):
+def get_config():
+    config_path = __latest_filename('project_configure.csv')
     config = {}
-    try:
-        with open('project_configure.csv', 'r') as f:
+    if config_path:
+        with open(config_path, 'r') as f:
             for row in f.read().strip().split('\n'):
                 row = row.replace('\,', '--QPRO-IS-SPLIT--')
                 row = [i.replace('--QPRO-IS-SPLIT--', ',') for i in row.split(',')]
@@ -71,13 +98,10 @@ def get_config(exit_if_failed: bool = True):
                 if i in ['server_target']:
                     continue
                 config[i] = config[i][0]
-    except IOError:
-        if exit_if_failed:
-            QproDefaultConsole.print(
-                QproErrorString, "No file named: project_configure.csv\n May you need run:\"Qpro -init\" first!")
-            exit(0)
-        else:
-            return False
+    else:
+        QproDefaultConsole.print(
+            QproErrorString, "No file named: project_configure.csv\n May you need run:\"Qpro -init\" first!")
+        exit(0)
     return config
 
 

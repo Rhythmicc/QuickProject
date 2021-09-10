@@ -1,6 +1,13 @@
 import os
 import sys
 from rich.console import Console
+try:
+    import QuickStart_Rhy
+    user_lang = QuickStart_Rhy.user_lang
+    qs_flag = True
+except:
+    user_lang = 'en'
+    qs_flag = False
 
 
 if sys.platform.startswith('win'):
@@ -10,24 +17,26 @@ else:
     is_win = False
     dir_char = '/'
 QproDefaultConsole = Console()
-QproErrorString = '[bold red][ERRO]'
-QproInfoString = '[bold cyan][INFO]'
-QproWarnString = '[bold yellow][WARN]'
+QproErrorString = '[bold red][ERRO]' if user_lang != 'zh' else '[bold red][错误]'
+QproInfoString = '[bold cyan][INFO]' if user_lang != 'zh' else '[bold cyan][提示]'
+QproWarnString = '[bold yellow][WARN]' if user_lang != 'zh' else '[bold yellow][警告]'
 name = 'QuickProject'
 
 
-def __latest_filename(name):
+def __latest_filename(filename):
     import os
-    from . import dir_char
 
     cur = os.getcwd()
     rec = cur
     while cur != dir_char:
-        if os.path.exists(name):
+        if os.path.exists(filename):
             os.chdir(rec)
-            return os.path.abspath(cur + dir_char + name)
+            return os.path.abspath(cur + dir_char + filename)
         os.chdir('..')
+        last = cur
         cur = os.getcwd()
+        if cur == last:
+            break
     os.chdir(rec)
     return ''
 
@@ -45,30 +54,63 @@ def __sub_path(path, isExist=True):
 class SshProtocol:
     @staticmethod
     def post_folder(user, domain, target, port, srcPath, dstPath):
-        status = os.system('scp -P %s -r %s %s' % (port, srcPath, user + '@\\[' + domain + '\\]:' + target + dstPath))
+        if user:
+            status = os.system('scp -P %s -r %s %s' % (port, srcPath, user + '@\\[' + domain + '\\]:' + target + dstPath))
+        else:
+            status = os.system('scp -P %s -r %s %s' % (port, srcPath, '\\[' + domain + '\\]:' + target + dstPath))
         return status
 
     @staticmethod
     def post_file(user, domain, target, port, srcPath, dstPath):
-        status = os.system('scp -P %s %s %s' % (port, srcPath, user + '@\\[' + domain + '\\]:' + target + dstPath))
+        if user:
+            status = os.system('scp -P %s %s %s' % (port, srcPath, user + '@\\[' + domain + '\\]:' + target + dstPath))
+        else:
+            status = os.system('scp -P %s %s %s' % (port, srcPath, '\\[' + domain + '\\]:' + target + dstPath))
         return status
 
     @staticmethod
     def post_all_in_folder(user, domain, target, port, dstPath):
-        status = os.system('scp -P %s -r * %s' % (port, user + '@\\[' + domain + '\\]:' + target + dstPath))
+        if user:
+            status = os.system('scp -P %s -r * %s' % (port, user + '@\\[' + domain + '\\]:' + target + dstPath))
+        else:
+            status = os.system('scp -P %s -r * %s' % (port, '\\[' + domain + '\\]:' + target + dstPath))
         return status
 
     @staticmethod
     def get_file_or_folder(user, domain, target, port, srcPath, dstPath):
-        return os.system('scp -P %s -r %s %s' % (port, user + '@\\[' + domain + '\\]:' + target + srcPath, dstPath))
+        if user:
+            return os.system('scp -P %s -r %s %s' % (port, user + '@\\[' + domain + '\\]:' + target + srcPath, dstPath))
+        else:
+            return os.system('scp -P %s -r %s %s' % (port, '\\[' + domain + '\\]:' + target + srcPath, dstPath))
 
     @staticmethod
     def ls(user, domain, target, port, dstPath):
-        return os.system(f"ssh -P {port} {user + '@' + domain} 'ls {target + dstPath}'")
+        if user:
+            return os.system(
+                "ssh -P {port} {user}@{domain} 'ls {aim}'".format(
+                    port=port, user=user, domain=domain, aim=target + dstPath
+                ))
+        else:
+            return os.system(
+                "ssh -P {port} {domain} 'ls {aim}'".format(
+                    port=port, domain=domain, aim=target + dstPath
+                )
+            )
 
     @staticmethod
     def ssh(user, domain, target, port, dstPath):
-        return os.system(f"ssh -P {port} -t {user + '@' + domain} 'cd {target + dstPath} ; exec $SHELL -l'")
+        if user:
+            return os.system(
+                "ssh -P {port} -t {user}@{domain} 'cd {aim} ; exec $SHELL -l'".format(
+                    port=port, user=user, domain=domain, aim=target + dstPath
+                )
+            )
+        else:
+            return os.system(
+                "ssh -P {port} -t {domain} 'cd {aim} ; exec $SHELL -l'".format(
+                    port=port, domain=domain, aim=target + dstPath
+                )
+            )
 
 
 def menu_output(menu):
@@ -78,11 +120,13 @@ def menu_output(menu):
     tb = Table(*[Column('Parameter', justify='full', style='bold yellow'),
                  Column('Description', justify='right', style='bold cyan')],
                show_edge=False, show_header=False, row_styles=['none', 'dim'], box=SIMPLE, pad_edge=False,
-               title=f'[bold underline] {menu["title"]}[dim]Author: RhythmLian\n')
+               title='[bold underline] {title}[dim]Author: RhythmLian\n'.format(title=menu['title']))
     for line in menu['lines']:
         tb.add_row((menu['prefix'] + ' ' if line[0].startswith('-') else '') + line[0], line[1])
     QproDefaultConsole.print(tb, justify='center')
-    QproDefaultConsole.print('\nDOC: https://rhythmlian.cn/2020/02/14/QuickProject/', justify='center')
+    QproDefaultConsole.print(
+        '\nDOC:' if user_lang != 'zh' else '\n文档:', 'https://rhythmlian.cn/2020/02/14/QuickProject/', justify='center'
+    )
 
 
 def get_config():
@@ -100,7 +144,11 @@ def get_config():
                 config[i] = config[i][0]
     else:
         QproDefaultConsole.print(
-            QproErrorString, "No file named: project_configure.csv\n May you need run:\"Qpro -init\" first!")
+            QproErrorString,
+            "No file named: project_configure.csv\n May you need run:\"Qpro -init\" first!"
+            if user_lang != 'zh' else
+            "没有文件: project_configure.csv\n可能你需要先运行: \"Qpro -init\"!"
+        )
         exit(0)
     return config
 

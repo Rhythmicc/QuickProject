@@ -1,7 +1,5 @@
-import os
-import sys
 import pyperclip
-from QuickProject import menu_output, get_config, dir_char, QproDefaultConsole, QproErrorString, rt_dir
+from QuickProject import *
 
 config = get_config()
 retain_arg = ['-br', '-b', '-r', '-h', '-i']
@@ -57,32 +55,35 @@ def main():
     if has_recog['-h']:
         menu_output({'title': 'qrun usage\n',
                      'lines': [
-                            ('-b', 'build'),
-                            ('qrun [bold green][-r]', 'run'),
-                            ('-br', 'build and run'),
-                            ('-h', 'help'),
-                            ('-i', 'use input.txt as input'),
-                            ('-if [bold magenta]<file>', 'set file as input'),
-                            ('-if [bold magenta]-paste', 'use Clipboard content as input'),
-                            ('-f  [bold magenta]<file>', 'set file as build file'),
-                            ('*', 'add parameters for program'),
-                            ('--path *.*', 'add *.* as program path parameter')],
+                            ('-b', 'build' if user_lang != 'zh' else '编译'),
+                            ('qrun [bold green][-r]', 'run' if user_lang != 'zh' else '运行'),
+                            ('-br', 'build and run' if user_lang != 'zh' else '编译且运行'),
+                            ('-h', 'help' if user_lang != 'zh' else '帮助'),
+                            ('-i', 'use input.txt as input' if user_lang != 'zh' else '使用默认输入文件作为输入'),
+                            ('-if [bold magenta]<file>', 'set file as input' if user_lang != 'zh' else '输入重定向'),
+                            ('-if [bold magenta]-paste', 'use Clipboard content as input' if user_lang != 'zh' else '输入重定向到粘贴板'),
+                            ('-f  [bold magenta]<file>', 'set file as build file' if user_lang != 'zh' else '指定源文件'),
+                            ('*', 'add parameters for program' if user_lang != 'zh' else '程序的任何其他参数')],
                      'prefix': 'qrun '})
         if '-h' not in argv:
             return
     if '-f' in qrun_argv:
         index = qrun_argv.index('-f')
         if index == len(qrun_argv) - 1:
-            return QproDefaultConsole.print(QproErrorString, 'No file with -f')
+            return QproDefaultConsole.print(QproErrorString, 'No file with -f' if user_lang != 'zh' else '-f后没有指定文件')
         filename = qrun_argv[index + 1] if qrun_argv[index + 1] != '__ignore__' else config['compile_filename']
         if not os.path.exists(filename):
-            return QproDefaultConsole.print(QproErrorString, f'No such file: "{filename}"')
+            return QproDefaultConsole.print(
+                QproErrorString, (
+                    'No such file: "{filename}"' if user_lang != 'zh' else '没有这个文件: "{filename}"'
+                ).format(filename=filename)
+            )
         filename = os.path.abspath(filename)
         flag = filename != config['compile_filename']
     if '-if' in qrun_argv:
         index = qrun_argv.index('-if')
         if index == len(qrun_argv) - 1:
-            QproDefaultConsole.print(QproErrorString, 'No file with -if')
+            QproDefaultConsole.print(QproErrorString, 'No file with -if' if user_lang != 'zh' else '-if后没有指定文件')
         tmp_file = qrun_argv[index + 1]
         if tmp_file == '-paste':
             with open(rt_dir + config['input_file'], 'w') as file:
@@ -92,7 +93,11 @@ def main():
         else:
             __input_file__ = tmp_file
             if not os.path.exists(__input_file__):
-                return QproDefaultConsole.print(QproErrorString, f'No such file: "{__input_file__}"')
+                return QproDefaultConsole.print(
+                    QproErrorString, (
+                        'No such file: "{input_file}"' if user_lang != 'zh' else '没有这个文件: "{input_file}"'
+                    ).format(input_file=__input_file__)
+                )
             config['input_file'] = os.path.abspath(__input_file__)
     o_file = config['executable_filename']
     record_file_name = os.path.basename(filename).split('.')[0]

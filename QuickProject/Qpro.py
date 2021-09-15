@@ -2,22 +2,22 @@ from QuickProject import *
 from QuickProject import __sub_path
 from rich.prompt import Prompt
 
-if not is_CN:
-    templateProjectUrls = {
-        'c': ['https://github.com/Rhythmicc/QproCTemplate.git', 'QproCTemplate'],
-        'cpp': ['https://github.com/Rhythmicc/QproCppTemplate.git', 'QproCppTemplate'],
-        'java': ['https://github.com/Rhythmicc/QproJavaTemplate.git', 'QproJavaTemplate'],
-        'python3': ['https://github.com/Rhythmicc/QproPython3Template.git', 'QproPython3Template'],
-        'python': ['https://github.com/Rhythmicc/QproPythonTemplate.git', 'QproPythonTemplate']
-    }
-else:
-    templateProjectUrls = {
-        'c': ['https://gitee.com/RhythmLian/QproCTemplate.git', 'QproCTemplate'],
-        'cpp': ['https://gitee.com/RhythmLian/QproCppTemplate.git', 'QproCppTemplate'],
-        'java': ['https://gitee.com/RhythmLian/QproJavaTemplate.git', 'QproJavaTemplate'],
-        'python3': ['https://gitee.com/RhythmLian/QproPython3Template.git', 'QproPython3Template'],
-        'python': ['https://gitee.com/RhythmLian/QproPythonTemplate.git', 'QproPythonTemplate']
-    }
+
+templateProjectUrls_not_CN = {
+    'c': ['https://github.com/Rhythmicc/QproCTemplate.git', 'QproCTemplate'],
+    'cpp': ['https://github.com/Rhythmicc/QproCppTemplate.git', 'QproCppTemplate'],
+    'java': ['https://github.com/Rhythmicc/QproJavaTemplate.git', 'QproJavaTemplate'],
+    'python3': ['https://github.com/Rhythmicc/QproPython3Template.git', 'QproPython3Template'],
+    'python': ['https://github.com/Rhythmicc/QproPythonTemplate.git', 'QproPythonTemplate']
+}
+
+templateProjectUrls_is_CN = {
+    'c': ['https://gitee.com/RhythmLian/QproCTemplate.git', 'QproCTemplate'],
+    'cpp': ['https://gitee.com/RhythmLian/QproCppTemplate.git', 'QproCppTemplate'],
+    'java': ['https://gitee.com/RhythmLian/QproJavaTemplate.git', 'QproJavaTemplate'],
+    'python3': ['https://gitee.com/RhythmLian/QproPython3Template.git', 'QproPython3Template'],
+    'python': ['https://gitee.com/RhythmLian/QproPythonTemplate.git', 'QproPythonTemplate']
+}
 
 
 def __findAndReplace(dirPath, fo, to):
@@ -64,7 +64,7 @@ def create():
         id_lang = 0
         while id_lang <= 0 or id_lang > len(langs):
             try:
-                id_lang = int(Prompt.ask('choose one', default='6'))
+                id_lang = int(Prompt.ask('choose one' if user_lang != 'zh' else '选择一个', default='6'))
             except:
                 id_lang = 0
         lang = langs[id_lang - 1]
@@ -93,6 +93,12 @@ def create():
             with QproDefaultConsole.status((
                 'Cloning QPro {} Template to {}' if user_lang != 'zh' else '正在克隆Qpro {} 模板为 {}'
             ).format(lang, project_name)):
+                try:
+                    from QuickStart_Rhy.API.alapi import ip_info
+                    is_CN = ip_info('')['ad_info']['nation'].startswith('中国')
+                except:
+                    is_CN = False
+                templateProjectUrls = templateProjectUrls_is_CN if is_CN else templateProjectUrls_not_CN
                 Repo.clone_from(templateProjectUrls[lang][0], project_name)
 
                 os.chdir(project_name)

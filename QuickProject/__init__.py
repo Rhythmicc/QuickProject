@@ -4,6 +4,11 @@ from rich.console import Console
 try:
     import QuickStart_Rhy
     user_lang = QuickStart_Rhy.user_lang
+    from QuickStart_Rhy.API.alapi import ip_info
+    try:
+        is_CN = ip_info('')['ad_info']['nation'].startswith('中国')
+    except KeyError:
+        is_CN = False
     qs_flag = True
 except:
     user_lang = 'en'

@@ -2,13 +2,22 @@ from QuickProject import *
 from QuickProject import __sub_path
 from rich.prompt import Prompt
 
-templateProjectUrls = {
-    'c': ['https://github.com/Rhythmicc/QproCTemplate.git', 'QproCTemplate'],
-    'cpp': ['https://github.com/Rhythmicc/QproCppTemplate.git', 'QproCppTemplate'],
-    'java': ['https://github.com/Rhythmicc/QproJavaTemplate.git', 'QproJavaTemplate'],
-    'python3': ['https://github.com/Rhythmicc/QproPython3Template.git', 'QproPython3Template'],
-    'python': ['https://github.com/Rhythmicc/QproPythonTemplate.git', 'QproPythonTemplate']
-}
+if not is_CN:
+    templateProjectUrls = {
+        'c': ['https://github.com/Rhythmicc/QproCTemplate.git', 'QproCTemplate'],
+        'cpp': ['https://github.com/Rhythmicc/QproCppTemplate.git', 'QproCppTemplate'],
+        'java': ['https://github.com/Rhythmicc/QproJavaTemplate.git', 'QproJavaTemplate'],
+        'python3': ['https://github.com/Rhythmicc/QproPython3Template.git', 'QproPython3Template'],
+        'python': ['https://github.com/Rhythmicc/QproPythonTemplate.git', 'QproPythonTemplate']
+    }
+else:
+    templateProjectUrls = {
+        'c': ['https://gitee.com/RhythmLian/QproCTemplate.git', 'QproCTemplate'],
+        'cpp': ['https://gitee.com/RhythmLian/QproCppTemplate.git', 'QproCppTemplate'],
+        'java': ['https://gitee.com/RhythmLian/QproJavaTemplate.git', 'QproJavaTemplate'],
+        'python3': ['https://gitee.com/RhythmLian/QproPython3Template.git', 'QproPython3Template'],
+        'python': ['https://gitee.com/RhythmLian/QproPythonTemplate.git', 'QproPythonTemplate']
+    }
 
 
 def __findAndReplace(dirPath, fo, to):

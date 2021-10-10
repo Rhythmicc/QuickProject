@@ -102,8 +102,20 @@ def create():
                 Repo.clone_from(templateProjectUrls[lang][0], project_name)
 
                 os.chdir(project_name)
-                remove('.git')
+                try:
+                    remove('.git')
+                except Exception as e:
+                    QproDefaultConsole.print(QproErrorString, repr(e))
                 __findAndReplace(os.getcwd(), templateProjectUrls[lang][1], project_name)
+            if sys.platform == 'darwin':
+                from PyInquirer import prompt
+                if prompt({
+                    'type': 'confirm',
+                    'message': 'Open it with VS Code?' if user_lang != 'zh' else '是否现在使用VS Code打开?',
+                    'name': 'open',
+                    'default': True
+                })['open']:
+                    os.system(f'open -a "Visual Studio Code" .')
 
 
 def scp():
@@ -234,9 +246,10 @@ def pro_init():
     id_lang = -1
     langs = []
     if not os.path.exists('cmake-build-debug'):
-        global work_project
+        # global work_project
+        work_project = ''
         while not work_project:
-            work_project = Prompt.ask('You need to set project name').strip()
+            work_project = Prompt.ask('You need to set project name' if user_lang != 'zh' else '请设置项目名').strip()
         lang_tool_exe = {
             'c': ['gcc -std=c11 --source_file-- -o --execute--', '', '.c'],
             'cpp': ['g++ -std=c++11 --source_file-- -o --execute--', '', '.cpp'],
@@ -478,3 +491,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+

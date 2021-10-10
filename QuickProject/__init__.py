@@ -1,14 +1,15 @@
 import os
 import sys
 from rich.console import Console
+
 try:
     import QuickStart_Rhy
+
     user_lang = QuickStart_Rhy.user_lang
     qs_flag = True
 except:
     user_lang = 'en'
     qs_flag = False
-
 
 if sys.platform.startswith('win'):
     is_win = True
@@ -41,7 +42,10 @@ def __latest_filename(filename):
     return ''
 
 
-rt_dir = os.path.dirname(__latest_filename('project_configure.csv')) + dir_char
+if ' '.join(sys.argv[:2]) != 'Qpro -init':
+    rt_dir = os.path.dirname(__latest_filename('project_configure.csv')) + dir_char
+else:
+    rt_dir = os.path.abspath('.')
 
 
 def __sub_path(path, isExist=True):
@@ -55,7 +59,8 @@ class SshProtocol:
     @staticmethod
     def post_folder(user, domain, target, port, srcPath, dstPath):
         if user:
-            status = os.system('scp -P %s -r %s %s' % (port, srcPath, user + '@\\[' + domain + '\\]:' + target + dstPath))
+            status = os.system(
+                'scp -P %s -r %s %s' % (port, srcPath, user + '@\\[' + domain + '\\]:' + target + dstPath))
         else:
             status = os.system('scp -P %s -r %s %s' % (port, srcPath, '\\[' + domain + '\\]:' + target + dstPath))
         return status

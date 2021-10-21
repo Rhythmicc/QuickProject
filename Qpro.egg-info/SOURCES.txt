@@ -8,6 +8,7 @@ Qpro.egg-info/entry_points.txt
 Qpro.egg-info/requires.txt
 Qpro.egg-info/top_level.txt
 Qpro.egg-info/zip-safe
+QuickProject/Commander.py
 QuickProject/Qpro.py
 QuickProject/__init__.py
 QuickProject/detector.py

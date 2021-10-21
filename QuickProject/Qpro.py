@@ -22,7 +22,7 @@ templateProjectUrls_is_CN = {
 }
 
 
-def __format_json(info: Optional[list, dict], path: str):
+def __format_json(info, path: str):
     import json
     with open(path, 'w') as f:
         if isinstance(info, list):

@@ -44,6 +44,8 @@ def __latest_filename(filename):
 
 if ' '.join(sys.argv[:2]) != 'Qpro -init':
     rt_dir = os.path.dirname(__latest_filename('project_configure.json')) + dir_char
+    if rt_dir == dir_char:
+        rt_dir = os.path.abspath('.') + dir_char
 else:
     rt_dir = os.path.abspath('.')
 project_configure_path = rt_dir + 'project_configure.json'

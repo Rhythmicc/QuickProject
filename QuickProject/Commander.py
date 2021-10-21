@@ -61,7 +61,15 @@ class Commander:
             table.add_row(*cur_line)
         QproDefaultConsole.print(table, justify='center')
 
+    def __command_complete__(self):
+        ls = [i for i in self.command_table]
+        return ' '.join((ls if len(ls) > 1 else []) + ['--help'])
+
     def __call__(self):
+        if len(sys.argv) < 2:
+            return
+        if sys.argv[1] == '--qrun-commander-complete':
+            return print(self.__command_complete__())
         if sys.argv[1] == '--help':
             return self.help()
         if len(self.command_table) <= 1:

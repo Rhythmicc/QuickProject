@@ -40,6 +40,12 @@ def run(use_txt=False, executable_file=str(config['executable_filename'])):
         cmd = executable_file.replace(' ', '\ ') + ' '
     else:
         cmd = executable_file + ' '
+    if '--qrun-commander-complete' in argv:
+        if config['enable_complete']:
+            os.system(cmd + ' '.join(argv))
+        else:
+            print()
+        return
     if argv:
         cmd += ' '.join(argv)
     if cmd.strip():

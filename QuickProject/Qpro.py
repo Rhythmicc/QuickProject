@@ -1,3 +1,5 @@
+from typing import Optional
+
 from QuickProject import *
 from QuickProject import __sub_path
 from rich.prompt import Prompt
@@ -18,6 +20,18 @@ templateProjectUrls_is_CN = {
     'python3': ['https://gitee.com/RhythmLian/QproPython3Template.git', 'QproPython3Template'],
     'python': ['https://gitee.com/RhythmLian/QproPythonTemplate.git', 'QproPythonTemplate']
 }
+
+
+def __format_json(info: Optional[list, dict], path: str):
+    import json
+    with open(path, 'w') as f:
+        if isinstance(info, list):
+            config = {}
+            for line in info:
+                config[line[0]] = line[1] if line[0] != 'server_target' else line[1:]
+            json.dump(config, f)
+        elif isinstance(info, dict):
+            json.dump(info, f)
 
 
 def __findAndReplace(dirPath, fo, to):
@@ -77,21 +91,19 @@ def create():
             else:
                 server_target += '~/'
         if lang == 'empty':
-            with open(project_name + dir_char + 'project_configure.csv', 'w') as f:
-                for row in [
+            __format_json([
                     ['compile_tool', ''],
                     ['compile_filename', ''],
                     ['executable_filename', ''],
                     ['input_file', ''],
                     ['template_root', ''],
                     ['server_target', '', '']
-                ]:
-                    f.write(','.join(row) + '\n')
+                ], project_name + dir_char + 'project_configure.json')
         else:
             from git import Repo
 
             with QproDefaultConsole.status((
-                'Cloning QPro {} Template to {}' if user_lang != 'zh' else '正在克隆Qpro {} 模板为 {}'
+                'Cloning Qpro {} Template to {}' if user_lang != 'zh' else '正在克隆Qpro {} 模板为 {}'
             ).format(lang, project_name)):
                 try:
                     from QuickStart_Rhy.API.alapi import ip_info
@@ -231,12 +243,7 @@ def adjust():
         if not config['template_root'].endswith(dir_char):
             config['template_root'] += dir_char
         win.destroy()
-        with open('project_configure.csv', 'w') as file:
-            for line in config:
-                if line == 'server_target':
-                    file.write('%s,%s\n' % (line, ','.join(config[line])))
-                else:
-                    file.write('%s,%s\n' % (line, config[line]))
+        __format_json(config, project_configure_path)
 
     tk.Button(win, text='确认', command=deal_config, width=10).grid(row=6, column=0, columnspan=3)
     tk.mainloop()
@@ -347,9 +354,7 @@ def pro_init():
             ['template_root', 'template' + dir_char],
             ['server_target', server_target, '22' if server_target else '']
         ]
-    with open('project_configure.csv', 'w') as f:
-        for row in info:
-            f.write(','.join(row) + '\n')
+    __format_json(info, project_configure_path)
     if id_lang >= 0 and langs[id_lang - 1] == 'empty':
         scp_init(info[-1][1:] if server_target else None)
         return
@@ -375,9 +380,11 @@ def ssh():
 
 def delete_all():
     config = get_config()
-    if ':' in config['server_target']:
+    if ':' in config['server_target'][0]:
         server, target, port = get_server_target()
-        st = os.system("ssh -p %s %s 'rm -rf %s'" % (port, server, target))
+        user, ip = server.split('@') if '@' in server else [None, server]
+        st = SshProtocol.command(user, ip, target, port, 'rm -rf .')
+        # st = os.system("ssh -p %s %s 'rm -rf %s'" % (port, server, target))
         if st:
             return
     remove(os.getcwd())
@@ -401,9 +408,11 @@ def delete():
                     (f"{path} 不在当前 Qpro 项目中!" if os.path.exists(path) else f'该路径不存在: {path}')
                 )
         config = get_config()
-        if ':' in config['server_target']:
+        if ':' in config['server_target'][0]:
             server, target, port = get_server_target()
-            st = os.system("ssh -p %s %s 'rm -rf %s'" % (port, server, target + sub_path))
+            user, ip = server.split('@') if '@' in server else [None, server]
+            st = SshProtocol.command(user, ip, target, port, f'rm -rf {sub_path}')
+            # st = os.system("ssh -p %s %s 'rm -rf %s'" % (port, server, target + sub_path))
             if st:
                 return
         remove(path)
@@ -416,10 +425,26 @@ def tele_ls():
     except IndexError:
         sub_path = ''
     config = get_config()
-    if ':' in config['server_target']:
+    if ':' in config['server_target'][0]:
         from . import SshProtocol
         server, target, port = get_server_target()
-        os.system(f"ssh -p {port} {server} 'ls {target + sub_path}'")
+        user, ip = server.split('@') if '@' in server else [None, server]
+        SshProtocol.command(user, ip, target, port, f'ls {sub_path}')
+
+
+def template_format():
+    config = {}
+    with open('project_configure.csv', 'r') as f:
+        for row in f.read().strip().split('\n'):
+            row = row.replace('\,', '--QPRO-IS-SPLIT--')
+            row = [i.replace('--QPRO-IS-SPLIT--', ',') for i in row.split(',')]
+            config[row[0]] = [i.strip() for i in row[1:]]
+        for i in config:
+            if i in ['server_target']:
+                continue
+            config[i] = config[i][0]
+    __format_json(config, project_configure_path)
+    remove('project_configure.csv')
 
 
 func = {
@@ -430,7 +455,8 @@ func = {
     '-ssh': ssh,
     '-del-all': delete_all,
     '-del': delete,
-    '-ls': tele_ls
+    '-ls': tele_ls,
+    '-csv': template_format
 }
 
 
@@ -479,13 +505,13 @@ def main():
         QproDefaultConsole.print(
             QproErrorString, 'wrong usage! Run "Qpro -h" for help!' if user_lang != 'zh' else '请运行 "Qpro -h" 查看帮助!'
         )
-    elif not os.path.exists('project_configure.csv'):
+    elif not os.path.exists(project_configure_path):
         pro_init()
     else:
         QproDefaultConsole.print(
-            "You have configured your project, see project_configure.csv to adjust your configure!"
+            f"You have configured your project, see {project_configure_path} to adjust your configure!"
             if user_lang != 'zh' else
-            "你已经配置过这个项目啦, 查看配置表(project_configure.csv)来调整它吧!"
+            f"你已经配置过这个项目啦, 查看配置表({project_configure_path})来调整它吧!"
         )
 
 

@@ -43,9 +43,10 @@ def __latest_filename(filename):
 
 
 if ' '.join(sys.argv[:2]) != 'Qpro -init':
-    rt_dir = os.path.dirname(__latest_filename('project_configure.csv')) + dir_char
+    rt_dir = os.path.dirname(__latest_filename('project_configure.json')) + dir_char
 else:
     rt_dir = os.path.abspath('.')
+project_configure_path = rt_dir + 'project_configure.json'
 
 
 def __sub_path(path, isExist=True):
@@ -89,16 +90,17 @@ class SshProtocol:
             return os.system('scp -P %s -r %s %s' % (port, '\\[' + domain + '\\]:' + target + srcPath, dstPath))
 
     @staticmethod
-    def ls(user, domain, target, port, dstPath):
+    def command(user, domain, target, port, command):
         if user:
             return os.system(
-                "ssh -P {port} {user}@{domain} 'ls {aim}'".format(
-                    port=port, user=user, domain=domain, aim=target + dstPath
-                ))
+                'ssh -p {port} {user}@{domain} "cd {target} ; {command}"'.format(
+                    port=port, user=user, domain=domain, target=target, command=command
+                )
+            )
         else:
             return os.system(
-                "ssh -P {port} {domain} 'ls {aim}'".format(
-                    port=port, domain=domain, aim=target + dstPath
+                'ssh -p {port} {domain} "cd {target} ; {command}"'.format(
+                    port=port, domain=domain, target=target, command=command
                 )
             )
 
@@ -106,13 +108,13 @@ class SshProtocol:
     def ssh(user, domain, target, port, dstPath):
         if user:
             return os.system(
-                "ssh -P {port} -t {user}@{domain} 'cd {aim} ; exec $SHELL -l'".format(
+                "ssh -p {port} -t {user}@{domain} 'cd {aim} ; exec $SHELL -l'".format(
                     port=port, user=user, domain=domain, aim=target + dstPath
                 )
             )
         else:
             return os.system(
-                "ssh -P {port} -t {domain} 'cd {aim} ; exec $SHELL -l'".format(
+                "ssh -p {port} -t {domain} 'cd {aim} ; exec $SHELL -l'".format(
                     port=port, domain=domain, aim=target + dstPath
                 )
             )
@@ -135,24 +137,18 @@ def menu_output(menu):
 
 
 def get_config():
-    config_path = __latest_filename('project_configure.csv')
+    config_path = __latest_filename('project_configure.json')
     config = {}
     if config_path:
-        with open(config_path, 'r') as f:
-            for row in f.read().strip().split('\n'):
-                row = row.replace('\,', '--QPRO-IS-SPLIT--')
-                row = [i.replace('--QPRO-IS-SPLIT--', ',') for i in row.split(',')]
-                config[row[0]] = [i.strip() for i in row[1:]]
-            for i in config:
-                if i in ['server_target']:
-                    continue
-                config[i] = config[i][0]
+        import json
+        with open('project_configure.json', 'r') as f:
+            config = json.load(f)
     else:
         QproDefaultConsole.print(
             QproErrorString,
-            "No file named: project_configure.csv\n May you need run:\"Qpro -init\" first!"
+            "No file named: project_configure.json\n May you need run:\"Qpro -init\" first!"
             if user_lang != 'zh' else
-            "没有文件: project_configure.csv\n可能你需要先运行: \"Qpro -init\"!"
+            "没有文件: project_configure.json\n可能你需要先运行: \"Qpro -init\"!"
         )
         exit(0)
     return config

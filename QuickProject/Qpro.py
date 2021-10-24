@@ -29,9 +29,9 @@ def __format_json(info, path: str):
             config = {}
             for line in info:
                 config[line[0]] = line[1] if line[0] != 'server_target' else line[1:]
-            json.dump(config, f)
+            json.dump(config, f, indent=1)
         elif isinstance(info, dict):
-            json.dump(info, f)
+            json.dump(info, f, indent=1)
 
 
 def __findAndReplace(dirPath, fo, to):
@@ -443,8 +443,14 @@ def template_format():
             if i in ['server_target']:
                 continue
             config[i] = config[i][0]
-    __format_json(config, project_configure_path)
+    __format_json(config, 'project_configure.json')
     remove('project_configure.csv')
+
+
+def enable_complete():
+    config = get_config()
+    config['enable_complete'] = True
+    __format_json(config, project_configure_path)
 
 
 func = {
@@ -456,7 +462,8 @@ func = {
     '-del-all': delete_all,
     '-del': delete,
     '-ls': tele_ls,
-    '-csv': template_format
+    '-csv': template_format,
+    '-enable-complete': enable_complete
 }
 
 

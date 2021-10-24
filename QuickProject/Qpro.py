@@ -180,13 +180,15 @@ def adjust():
     win = tk.Tk()
     win.title('Qpro项目调整器')
     key_to_name = {
-        'compile_tool': '编译指令:' if user_lang == 'zh' else 'Compile:',
-        'compile_filename': '源程序:' if user_lang == 'zh' else 'Source:',
-        'executable_filename': '运行指令:' if user_lang == 'zh' else 'Run:',
+        'compile_tool': '编译指令:' if user_lang == 'zh' else 'Compile',
+        'compile_filename': '源程序:' if user_lang == 'zh' else 'Source',
+        'executable_filename': '运行指令:' if user_lang == 'zh' else 'Run',
         'input_file': '输入文件:' if user_lang == 'zh' else 'Input',
         'template_root': '模板目录:' if user_lang == 'zh' else 'Template',
         'server_target': '远程映射:' if user_lang == 'zh' else 'Server'
     }
+    if 'enable_complete' in config:
+        key_to_name.update({'enable_complete': '自动补全:' if user_lang == 'zh' else 'Complete'})
     all_dt = {}
     for i, v in enumerate(config):
         tk.Label(win, text='%12s' % key_to_name[v]).grid(row=i, column=0)
@@ -217,7 +219,7 @@ def adjust():
                                     if user_lang != 'zh' else
                                     '%s: 不是合法的远程映射' % config[dt][0]
                                 )
-                            if not (config[dt][0].endswith('/') and config[dt][0].endswith(':')):
+                            if not config[dt][0].endswith(dir_char) and config[dt][0].endswith(':'):
                                 config[dt][0] += '/'
                         else:
                             raise Exception(
@@ -242,10 +244,12 @@ def adjust():
                 config[dt] = all_dt[dt].get()
         if not config['template_root'].endswith(dir_char):
             config['template_root'] += dir_char
+        if 'enable_complete' in config:
+            config['enable_complete'] = True if config['enable_complete'] not in ['0', 'false', 'False'] else False
         win.destroy()
         __format_json(config, project_configure_path)
 
-    tk.Button(win, text='确认', command=deal_config, width=10).grid(row=6, column=0, columnspan=3)
+    tk.Button(win, text='确认', command=deal_config, width=10).grid(row=7 if 'enable_complete' in config else 6, column=0, columnspan=3)
     tk.mainloop()
 
 

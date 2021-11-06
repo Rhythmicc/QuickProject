@@ -1,0 +1,47 @@
+#compdef Qpro
+
+local cur prev lang
+cur=${words[CURRENT]}
+prev=${words[CURRENT-1]}
+
+(( $+functions[_qpro_args_comp_zh] )) ||
+_qpro_args_comp_zh() {
+    local -a opt_args
+    if [[ ${prev} == -scp ]] || [[ ${prev} == -get ]] || [[ ${prev} == -del ]] || [[ ${prev} == -ls ]]; then
+        _arguments -S -s '*:filename:_files'
+        return
+    elif [[ ${prev} == -c ]]; then
+        _describe '输入项目名'
+    else
+        opt_args=()
+    fi
+    _describe subcommand opt_args
+}
+
+(( $+functions[_qpro_main_zh] )) ||
+_qpro_main_zh() {
+    local -a args
+    args=(
+        -init:'初始化当前目录为Qpro项目',
+        -h:'帮助'
+        -c:'创建Qpro项目'
+        -update:'更新Qpro'
+        -adjust:'调整配置表'
+        -ssh:'通过SSH登录远程映射'
+        -scp:'上传<路径>到远程映射对应位置'
+        -scp-init:'上传当前全部内容到远程映射'
+        -get:'从远程映射下载<路径>'
+        -del:'同时删除本地及远程映射<文件或目录>'
+        -del-all:'销毁当前Qpro项目(本地+远程)'
+        -ls:'展示<路径>中的子项'
+    )
+
+    _describe -t common-commands 'common commands' args && _ret=0
+}
+
+if (( ${#words} == 3 )); then
+    _qpro_args_comp_zh
+else
+    _qpro_main_zh
+fi
+

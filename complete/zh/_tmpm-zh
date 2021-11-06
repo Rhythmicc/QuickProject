@@ -1,0 +1,26 @@
+#compdef tmpm
+
+(( $+functions[_tmpm_args_comp_zh] )) ||
+_tmpm_args_comp_zh() {
+    _arguments -S -s '*:filename:_files'
+}
+
+(( $+functions[_tmpm_main_zh] )) ||
+_tmpm_main_zh() {
+    local -a args
+    args=(
+        -i:'恢复源文件内容为template/main',
+        -h:'帮助'
+        -c:'创建或覆盖<备份> | 创建<模板>并写入<算法>'
+        -r:'恢复源文件为[备份]'
+        -a:'将<算法>添加入<模板>'
+    )
+
+    _describe -t common-commands 'common commands' args && _ret=0
+}
+
+if (( ${#words} == 3 )); then
+    _tmpm_args_comp_zh
+else
+    _tmpm_main_zh
+fi

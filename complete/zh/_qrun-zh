@@ -1,0 +1,43 @@
+#compdef qrun
+
+local cur prev
+cur=${words[CURRENT]}
+prev=${words[CURRENT-1]}
+
+(( $+functions[_qrun_args_comp_zh] )) ||
+_qrun_args_comp_zh() {
+    local -a opt_args
+    if [[ ${prev} == -if ]] || [[ ${prev} == -f ]]; then
+        _arguments -S -s '*:filename:_files'
+        return
+    else
+        opt_args=(
+            $(qrun --qrun-commander-complete ${words})
+        )
+    fi
+
+    _describe subcommand opt_args
+}
+
+(( $+functions[_qrun_main_zh] )) ||
+_qrun_main_zh() {
+    local -a args
+    args=(
+        -b:'编译',
+        -r:'运行'
+        -br:'编译且运行'
+        -h:'运行器帮助'
+        -i:'使用默认输入文件作为输入'
+        -if:'输入重定向至指定<文件>'
+        -f:'指定<源文件>'
+        $(qrun --qrun-commander-complete)
+    )
+
+    _describe -t common-commands 'common commands' args && _ret=0
+}
+
+if (( ${#words} == 3 )); then
+    _qrun_args_comp_zh
+else
+    _qrun_main_zh
+fi

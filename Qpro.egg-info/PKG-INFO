@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: Qpro
-Version: 0.8.1
+Version: 0.8.2
 Summary: Small but powerful command line IDE.
 Home-page: https://github.com/Rhythmicc/QuickProject
 Author: RhythmLian
@@ -10,6 +10,15 @@ Description: ## Docs
         |:---:|:---:|
         |China|[Docs](https://rhythmlian.cn/2020/02/14/QuickProject/)|
         |Other|[Docs](https://rhythmicc.github.io/2020/02/14/QuickProject/)|
+        
+        ## Tab Completion
+        
+        ```shell
+        cp complete/<your language>/* /path/in/$fpath
+        ```
+        
+        then add `compinit` to the end of `.zshrc`
+        
 Keywords: script for CLionProjects
 Platform: UNKNOWN
 Classifier: Programming Language :: Python :: 3

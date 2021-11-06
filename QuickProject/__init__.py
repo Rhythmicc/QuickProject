@@ -143,7 +143,7 @@ def get_config():
     config = {}
     if config_path:
         import json
-        with open('project_configure.json', 'r') as f:
+        with open(config_path, 'r') as f:
             config = json.load(f)
     else:
         QproDefaultConsole.print(

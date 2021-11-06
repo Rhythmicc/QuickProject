@@ -65,8 +65,12 @@ class Commander:
         if not route_path:
             ls = [f"{i}:{self.command_table[i]['func'].__doc__.strip().split()[0] if self.command_table[i]['func'].__doc__ else 'NONE'}" for i in self.command_table]
             return '\n'.join((ls if len(ls) > 1 else []) + ["--help:应用帮助"])
-        call_func = route_path[1]
-        has_args = [i.strip().strip('--') for i in route_path[2:]]
+        if len(self.command_table) > 1:
+            call_func = route_path[1]
+            has_args = [i.strip().strip('--') for i in route_path[2:]]
+        else:
+            call_func = list(self.command_table.keys())[0]
+            has_args = [i.strip().strip('--') for i in route_path[1:]]
         if call_func not in self.command_table:
             return 'ERROR:无该命令'
         call_analyser = self.command_table[call_func]['analyser']
@@ -82,8 +86,6 @@ class Commander:
                 continue
             if arg.default != arg.empty:
                 res.append(f'--{arg.name}:{prama_doc[arg.name]}')
-        with open('debug-log', 'w') as f:
-            f.write('\n'.join(res))
         return '\n'.join(res)
 
     def __call__(self):

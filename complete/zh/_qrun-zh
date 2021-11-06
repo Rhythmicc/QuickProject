@@ -7,13 +7,16 @@ prev=${words[CURRENT-1]}
 (( $+functions[_qrun_args_comp_zh] )) ||
 _qrun_args_comp_zh() {
     local -a opt_args
-    if [[ ${prev} == -if ]] || [[ ${prev} == -f ]]; then
+    if [[ ${prev} == -if ]] || [[ ${prev} == -f ]] || [[ ${prev} == --* ]]; then
         _arguments -S -s '*:filename:_files'
         return
-    else
+    elif (( ${#words} == 3 )) && [[ ${cur} == -* ]] || [[ ${cur} == -* ]]; then
         opt_args=(
             $(qrun --qrun-commander-complete ${words})
         )
+    else
+        _arguments -S -s '*:filename:_files'
+        return
     fi
 
     _describe subcommand opt_args
@@ -36,7 +39,7 @@ _qrun_main_zh() {
     _describe -t common-commands 'common commands' args && _ret=0
 }
 
-if (( ${#words} == 3 )); then
+if (( ${#words} >= 3 )); then
     _qrun_args_comp_zh
 else
     _qrun_main_zh

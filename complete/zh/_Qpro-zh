@@ -37,7 +37,7 @@ _qpro_main_zh() {
     _describe -t common-commands 'common commands' args && _ret=0
 }
 
-if (( ${#words} == 3 )); then
+if (( ${#words} >= 3 )); then
     _qpro_args_comp_zh
 else
     _qpro_main_zh

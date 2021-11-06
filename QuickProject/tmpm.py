@@ -131,7 +131,7 @@ def h():
                          'create or cover a <backup> of "compile_filename"' if user_lang != 'zh' else '创建或覆盖备份'
                      ),
                      (
-                         '-c [bold magenta]<template> [bold green]\[algorithm]',
+                         '-c [bold magenta]<template> [bold magenta]<algorithm>',
                          'create template and write algorithm' if user_lang != 'zh' else '创建模板然后写入算法'
                      ),
                      (
@@ -186,6 +186,12 @@ def revert():
         return QproDefaultConsole.print(QproErrorString, 'No such backup' if user_lang != 'zh' else '没有这个备份')
 
 
+def complete():
+    if rt_dir == os.path.abspath('.') + dir_char and not os.path.exists(project_configure_path):
+        return print()
+    print(' '.join(os.listdir(rt_dir + config['template_root'])))
+
+
 def main():
     os.chdir(rt_dir)
 
@@ -201,6 +207,8 @@ def main():
         revert()
     elif '-i' in sys.argv:
         init()
+    elif '-complete' in sys.argv:
+        complete()
     else:
         join()
 

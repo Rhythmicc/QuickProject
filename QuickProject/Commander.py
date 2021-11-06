@@ -61,15 +61,36 @@ class Commander:
             table.add_row(*cur_line)
         QproDefaultConsole.print(table, justify='center')
 
-    def __command_complete__(self):
-        ls = [i for i in self.command_table]
-        return ' '.join((ls if len(ls) > 1 else []) + ['--help'])
+    def __command_complete__(self, route_path: list):
+        if not route_path:
+            ls = [f"{i}:{self.command_table[i]['func'].__doc__.strip().split()[0] if self.command_table[i]['func'].__doc__ else 'NONE'}" for i in self.command_table]
+            return '\n'.join((ls if len(ls) > 1 else []) + ["--help:应用帮助"])
+        call_func = route_path[1]
+        has_args = [i.strip().strip('--') for i in route_path[2:]]
+        if call_func not in self.command_table:
+            return 'ERROR:无该命令'
+        call_analyser = self.command_table[call_func]['analyser']
+        call_func = self.command_table[call_func]['func']
+        call_doc = call_func.__doc__
+        if not call_doc:
+            return ''
+        import re
+        prama_doc = {i[0].strip(): i[1].strip() for i in re.findall(':param(.*?):(.*?)\n', call_doc, re.S)}
+        res = []
+        for arg in call_analyser.parameters.values():
+            if arg.name in has_args:
+                continue
+            if arg.default != arg.empty:
+                res.append(f'--{arg.name}:{prama_doc[arg.name]}')
+        with open('debug-log', 'w') as f:
+            f.write('\n'.join(res))
+        return '\n'.join(res)
 
     def __call__(self):
         if len(sys.argv) < 2:
             return
         if sys.argv[1] == '--qrun-commander-complete':
-            return print(self.__command_complete__())
+            return print(self.__command_complete__(sys.argv[2:]))
         if sys.argv[1] == '--help':
             return self.help()
         if len(self.command_table) <= 1:

@@ -41,7 +41,7 @@ def run(use_txt=False, executable_file=str(config['executable_filename'])):
     else:
         cmd = executable_file + ' '
     if '--qrun-commander-complete' in argv:
-        if config['enable_complete']:
+        if 'enable_complete' in config and config['enable_complete']:
             os.system(cmd + ' '.join(argv))
         else:
             print()

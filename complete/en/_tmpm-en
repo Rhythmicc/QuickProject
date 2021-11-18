@@ -1,0 +1,26 @@
+#compdef tmpm
+
+(( $+functions[_tmpm_args_comp_zh] )) ||
+_tmpm_args_comp_zh() {
+    _arguments -S -s '*:filename:_files'
+}
+
+(( $+functions[_tmpm_main_zh] )) ||
+_tmpm_main_zh() {
+    local -a args
+    args=(
+        -i:'revert source file to template/main',
+        -h:'help'
+        -c:'create or cover <backup> | create <template> and write <algorithm> in it'
+        -r:'revert source file to [backup]'
+        -a:'add <algorithm> to <template>'
+    )
+
+    _describe -t common-commands 'common commands' args && _ret=0
+}
+
+if (( ${#words} >= 3 )); then
+    _tmpm_args_comp_zh
+else
+    _tmpm_main_zh
+fi

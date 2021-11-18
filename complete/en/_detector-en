@@ -1,0 +1,22 @@
+#compdef detector
+
+local cur prev
+cur=${words[CURRENT]}
+prev=${words[CURRENT-1]}
+
+(( $+functions[_detector_main_zh] )) ||
+_detector_main_zh() {
+    local -a args
+    args=(
+        -ff:'diff two files',
+        -pf:'diff program output and file'
+        -fp:'diff file and program output'
+        -pp:'diff two program outputs'
+    )
+
+    _describe -t common-commands 'common commands' args && _ret=0
+}
+
+if (( ${#words} < 3 )); then
+    _detector_main_zh
+fi

@@ -1,0 +1,46 @@
+#compdef qrun
+
+local cur prev
+cur=${words[CURRENT]}
+prev=${words[CURRENT-1]}
+
+(( $+functions[_qrun_args_comp_zh] )) ||
+_qrun_args_comp_zh() {
+    local -a opt_args
+    if [[ ${prev} == -if ]] || [[ ${prev} == -f ]] || [[ ${prev} == --* ]]; then
+        _arguments -S -s '*:filename:_files'
+        return
+    elif (( ${#words} == 3 )) && [[ ${cur} == -* ]] || [[ ${cur} == -* ]]; then
+        opt_args=(
+            $(qrun --qrun-commander-complete ${words})
+        )
+    else
+        _arguments -S -s '*:filename:_files'
+        return
+    fi
+
+    _describe subcommand opt_args
+}
+
+(( $+functions[_qrun_main_zh] )) ||
+_qrun_main_zh() {
+    local -a args
+    args=(
+        -b:'compile',
+        -r:'run'
+        -br:'compile and run'
+        -h:'help'
+        -i:'using default input file as input'
+        -if:'redirect input stream to <path>'
+        -f:'set source file'
+        $(qrun --qrun-commander-complete)
+    )
+
+    _describe -t common-commands 'common commands' args && _ret=0
+}
+
+if (( ${#words} >= 3 )); then
+    _qrun_args_comp_zh
+else
+    _qrun_main_zh
+fi

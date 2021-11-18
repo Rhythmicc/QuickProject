@@ -1,0 +1,44 @@
+#compdef Qpro
+
+local cur prev
+cur=${words[CURRENT]}
+prev=${words[CURRENT-1]}
+
+(( $+functions[_qpro_args_comp_zh] )) ||
+_qpro_args_comp_zh() {
+    local -a opt_args
+    if [[ ${prev} == -scp ]] || [[ ${prev} == -get ]] || [[ ${prev} == -del ]] || [[ ${prev} == -ls ]]; then
+        _arguments -S -s '*:filename:_files'
+        return
+    else
+        opt_args=()
+    fi
+    _describe subcommand opt_args
+}
+
+(( $+functions[_qpro_main_zh] )) ||
+_qpro_main_zh() {
+    local -a args
+    args=(
+        -init:'Initial the current directory as Qpro project',
+        -h:'help'
+        -c:'create Qpro project'
+        -update:'update Qpro'
+        -adjust:'adjust configuration'
+        -ssh:'login server by ssh'
+        -scp:'upload <path> to default server target'
+        -scp-init:'upload all of project to server target'
+        -get:'download <file> from server target'
+        -del:'delete <path> in project'
+        -del-all:'delete Qpro project'
+        -ls:'list element in <path>'
+    )
+
+    _describe -t common-commands 'common commands' args && _ret=0
+}
+
+if (( ${#words} >= 3 )); then
+    _qpro_args_comp_zh
+else
+    _qpro_main_zh
+fi

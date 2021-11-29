@@ -32,6 +32,7 @@ _qpro_main_zh() {
         -del:'delete <path> in project'
         -del-all:'delete Qpro project'
         -ls:'list element in <path>'
+        -enable-complete:'Support Commander Tab Complete (slow)'
     )
 
     _describe -t common-commands 'common commands' args && _ret=0

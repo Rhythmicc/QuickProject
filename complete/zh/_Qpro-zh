@@ -32,6 +32,7 @@ _qpro_main_zh() {
         -del:'同时删除本地及远程映射<文件或目录>'
         -del-all:'销毁当前Qpro项目(本地+远程)'
         -ls:'展示<路径>中的子项'
+        -enable-complete:'支持Commander的Tab补全(这会导致Tab补全变慢一些)'
     )
 
     _describe -t common-commands 'common commands' args && _ret=0

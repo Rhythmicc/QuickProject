@@ -22,6 +22,7 @@ QproErrorString = '[bold red][ERRO]' if user_lang != 'zh' else '[bold red][错�
 QproInfoString = '[bold cyan][INFO]' if user_lang != 'zh' else '[bold cyan][提示]'
 QproWarnString = '[bold yellow][WARN]' if user_lang != 'zh' else '[bold yellow][警告]'
 name = 'QuickProject'
+configure_name = 'project_configure.json'
 
 
 def __latest_filename(filename):
@@ -43,12 +44,12 @@ def __latest_filename(filename):
 
 
 if ' '.join(sys.argv[:2]) != 'Qpro -init':
-    rt_dir = os.path.dirname(__latest_filename('project_configure.json')) + dir_char
+    rt_dir = os.path.dirname(__latest_filename(configure_name)) + dir_char
     if rt_dir == dir_char:
         rt_dir = os.path.abspath('.') + dir_char
 else:
     rt_dir = os.path.abspath('.')
-project_configure_path = rt_dir + 'project_configure.json'
+project_configure_path = rt_dir + configure_name
 
 
 def __sub_path(path, isExist=True):

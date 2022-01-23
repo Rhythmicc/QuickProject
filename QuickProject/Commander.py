@@ -2,7 +2,7 @@ import sys
 import inspect
 import argparse
 from inspect import isfunction
-from . import QproDefaultConsole, QproErrorString
+from . import QproDefaultConsole, QproErrorString, user_lang
 
 
 class Commander:
@@ -62,9 +62,17 @@ class Commander:
         QproDefaultConsole.print(table, justify='center')
 
     def __command_complete__(self, route_path: list):
-        if not route_path:
-            ls = [f"{i}:{self.command_table[i]['func'].__doc__.strip().split()[0] if self.command_table[i]['func'].__doc__ else 'NONE'}" for i in self.command_table]
-            return '\n'.join((ls if len(ls) > 1 else []) + ["--help:应用帮助"])
+        """
+
+        :param route_path:
+        :return:
+        """
+        if not route_path and len(self.command_table) > 1:
+            ls = [
+                f"{i}:{self.command_table[i]['func'].__doc__.strip().split(':param')[0] if self.command_table[i]['func'].__doc__ else 'NONE'}"
+                for i in self.command_table
+            ]
+            return '\n'.join((ls if len(ls) > 1 else []) + ["--help:应用帮助" if user_lang == 'zh' else '--help:Application help'])
         if len(self.command_table) > 1:
             call_func = route_path[1]
             has_args = [i.strip().strip('--') for i in route_path[2:]]
@@ -72,21 +80,21 @@ class Commander:
             call_func = list(self.command_table.keys())[0]
             has_args = [i.strip().strip('--') for i in route_path[1:]]
         if call_func not in self.command_table:
-            return 'ERROR:无该命令'
+            return '错误:无该命令' if user_lang != 'zh' else 'ERROR:No such command'
         call_analyser = self.command_table[call_func]['analyser']
         call_func = self.command_table[call_func]['func']
         call_doc = call_func.__doc__
         if not call_doc:
             return ''
         import re
-        prama_doc = {i[0].strip(): i[1].strip() for i in re.findall(':param(.*?):(.*?)\n', call_doc, re.S)}
+        param_doc = {i[0].strip(): i[1].strip() for i in re.findall(':param(.*?):(.*?)\n', call_doc, re.S)}
         res = []
         for arg in call_analyser.parameters.values():
             if arg.name in has_args:
                 continue
             if arg.default != arg.empty:
-                res.append(f'--{arg.name}:{prama_doc[arg.name]}')
-        return '\n'.join(res)
+                res.append(f'--{arg.name}:{param_doc[arg.name].replace(" ", "_") if arg.name in param_doc else "No Description" if user_lang != "zh" else "无参数描述"}')
+        return '\n'.join(res + ["--help:应用帮助" if user_lang == 'zh' else '--help:Application help'])
 
     def __call__(self):
         if len(sys.argv) < 2:
@@ -104,7 +112,7 @@ class Commander:
                 func_name = sys.argv[1]
                 sys.argv = sys.argv[:1] + sys.argv[2:]
             except IndexError:
-                QproDefaultConsole.print(QproErrorString, '至少输入一个子命令!')
+                QproDefaultConsole.print(QproErrorString, '至少输入一个子命令!' if user_lang == 'zh' else 'Input at least one sub command!')
             else:
                 func_info = self.command_table[func_name]
                 args = func_info['parser'].parse_args()

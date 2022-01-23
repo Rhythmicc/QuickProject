@@ -1,5 +1,3 @@
-from typing import Optional
-
 from QuickProject import *
 from QuickProject import __sub_path
 from rich.prompt import Prompt
@@ -528,4 +526,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

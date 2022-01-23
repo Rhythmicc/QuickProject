@@ -1,27 +1,30 @@
 Metadata-Version: 2.1
 Name: Qpro
-Version: 0.8.3
+Version: 0.8.4
 Summary: Small but powerful command line IDE.
 Home-page: https://github.com/Rhythmicc/QuickProject
 Author: RhythmLian
 License: MIT
-Description: ## Docs
-        |Location|Url|
-        |:---:|:---:|
-        |China|[Docs](https://rhythmlian.cn/2020/02/14/QuickProject/)|
-        |Other|[Docs](https://rhythmicc.github.io/2020/02/14/QuickProject/)|
-        
-        ## Tab Completion
-        
-        ```shell
-        cp complete/<your language>/* /path/in/$fpath
-        ```
-        
-        then add `compinit` to the end of `.zshrc`
-        
 Keywords: script for CLionProjects
 Platform: UNKNOWN
 Classifier: Programming Language :: Python :: 3
 Classifier: License :: OSI Approved :: MIT License
 Classifier: Operating System :: OS Independent
 Description-Content-Type: text/markdown
+License-File: LICENSE
+
+## Docs
+|Location|Url|
+|:---:|:---:|
+|China|[Docs](https://rhythmlian.cn/2020/02/14/QuickProject/)|
+|Other|[Docs](https://rhythmicc.github.io/2020/02/14/QuickProject/)|
+
+## Tab Completion
+
+```shell
+cp complete/<your language>/* /path/in/$fpath
+```
+
+then add `compinit` to the end of `.zshrc`
+
+

@@ -123,6 +123,14 @@ class SshProtocol:
             )
 
 
+def _ask(question):
+    from PyInquirer import prompt
+    try:
+        return prompt(question)[question['name']]
+    except:
+        exit(0)
+
+
 def menu_output(menu):
     from rich.table import Table, Column
     from rich.box import SIMPLE

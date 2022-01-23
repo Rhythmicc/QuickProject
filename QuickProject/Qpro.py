@@ -1,4 +1,5 @@
-from QuickProject import *
+from . import *
+from . import _ask
 from QuickProject import __sub_path
 from rich.prompt import Prompt
 
@@ -59,6 +60,45 @@ def scp_init(server_target: list):
             QproDefaultConsole.print(QproErrorString, "upload project failed!" if user_lang != 'zh' else '上传项目失败!')
 
 
+def _external_create(project_name: str, key: str = ''):
+    from git import Repo
+    if key:
+        if key in ['empty', '空项目']:
+            __format_json([
+                ['compile_tool', ''],
+                ['compile_filename', ''],
+                ['executable_filename', ''],
+                ['input_file', ''],
+                ['template_root', ''],
+                ['server_target', '', '']
+            ], project_name + dir_char + configure_name)
+            return
+
+        with QproDefaultConsole.status(('Cloning Qpro {} Template to {}' if user_lang != 'zh' else '正在克隆Qpro {} 模板为 {}').format(key, project_name)):
+            try:
+                from QuickStart_Rhy.API.alapi import ip_info
+                is_CN = ip_info('')['ad_info']['nation'].startswith('中国')
+            except:
+                is_CN = False
+            templateProjectUrls = templateProjectUrls_is_CN if is_CN else templateProjectUrls_not_CN
+            Repo.clone_from(templateProjectUrls[key][0], project_name)
+    else:
+        templateProjectUrls = _ask({
+            'type': 'input',
+            'message': 'GIT ' + ('URL' if user_lang != 'zh' else '链接') + ':',
+            'name': 'url'
+        })
+        with QproDefaultConsole.status(('Cloning External Template to {}' if user_lang != 'zh' else '正在克隆Qpro 外部模板为 {}').format(project_name)):
+            Repo.clone_from(templateProjectUrls, project_name)
+    os.chdir(project_name)
+    try:
+        remove('.git')
+    except Exception as e:
+        QproDefaultConsole.print(QproErrorString, repr(e))
+    if key:
+        __findAndReplace(os.getcwd(), templateProjectUrls[key][1], project_name)
+
+
 def create():
     try:
         project_name = sys.argv[sys.argv.index('-c') + 1]
@@ -67,19 +107,23 @@ def create():
     else:
         if os.path.exists(project_name) and os.path.isdir(project_name):
             return QproDefaultConsole.print(QproErrorString, '"%s" is exist!' % (os.path.abspath(project_name)))
-        os.mkdir(project_name)
-        langs = ['c', 'cpp', 'java', 'python3', 'python', 'empty']
-        for i, lang in enumerate(langs):
-            QproDefaultConsole.print('[%d] %-5s' % (i + 1, lang), end='\t' if (i + 1) % 3 else '\n')
-        if len(langs) % 3:
-            QproDefaultConsole.print()
-        id_lang = 0
-        while id_lang <= 0 or id_lang > len(langs):
-            try:
-                id_lang = int(Prompt.ask('choose one' if user_lang != 'zh' else '选择一个', default='6'))
-            except:
-                id_lang = 0
-        lang = langs[id_lang - 1]
+
+        lang = _ask({
+            'type': 'list',
+            'name': 'lang_name',
+            'message': 'Choose Lang | 选择语言:',
+            'choices': [
+                'c', 'cpp', 'java', 'python3', 'python',
+                'empty' if user_lang != 'zh' else '空项目',
+                'external' if user_lang != 'zh' else '外部项目'
+            ]
+        })
+
+        if lang in ['external', '外部项目']:
+            _external_create(project_name)
+        else:
+            _external_create(project_name, lang)
+
         server_target = Prompt.ask(
             'input user@ip:dir_path if you need scp' if user_lang != 'zh' else '输入 用户@IP:路径 如果你打算使用SSH'
         ).strip().replace(dir_char, '/')
@@ -88,44 +132,20 @@ def create():
                 server_target += '/'
             else:
                 server_target += '~/'
-        if lang == 'empty':
-            __format_json([
-                    ['compile_tool', ''],
-                    ['compile_filename', ''],
-                    ['executable_filename', ''],
-                    ['input_file', ''],
-                    ['template_root', ''],
-                    ['server_target', '', '']
-                ], project_name + dir_char + 'project_configure.json')
-        else:
-            from git import Repo
+        config = get_config()
+        config['server_target'] = [server_target, '22']
+        __format_json(config, configure_name)
 
-            with QproDefaultConsole.status((
-                'Cloning Qpro {} Template to {}' if user_lang != 'zh' else '正在克隆Qpro {} 模板为 {}'
-            ).format(lang, project_name)):
-                try:
-                    from QuickStart_Rhy.API.alapi import ip_info
-                    is_CN = ip_info('')['ad_info']['nation'].startswith('中国')
-                except:
-                    is_CN = False
-                templateProjectUrls = templateProjectUrls_is_CN if is_CN else templateProjectUrls_not_CN
-                Repo.clone_from(templateProjectUrls[lang][0], project_name)
-
-                os.chdir(project_name)
-                try:
-                    remove('.git')
-                except Exception as e:
-                    QproDefaultConsole.print(QproErrorString, repr(e))
-                __findAndReplace(os.getcwd(), templateProjectUrls[lang][1], project_name)
+        if _ask({
+            'type': 'confirm',
+            'message': 'Open it with VS Code?' if user_lang != 'zh' else '是否现在使用VS Code打开?',
+            'name': 'open',
+            'default': True
+        }):
             if sys.platform == 'darwin':
-                from PyInquirer import prompt
-                if prompt({
-                    'type': 'confirm',
-                    'message': 'Open it with VS Code?' if user_lang != 'zh' else '是否现在使用VS Code打开?',
-                    'name': 'open',
-                    'default': True
-                })['open']:
-                    os.system(f'open -a "Visual Studio Code" .')
+                os.system(f'open -a "Visual Studio Code" .')
+            else:
+                os.system('code .')
 
 
 def scp():
@@ -252,112 +272,62 @@ def adjust():
 
 
 def pro_init():
-    id_lang = -1
-    langs = []
-    if not os.path.exists('cmake-build-debug'):
-        # global work_project
-        work_project = ''
-        while not work_project:
-            work_project = Prompt.ask('You need to set project name' if user_lang != 'zh' else '请设置项目名').strip()
-        lang_tool_exe = {
-            'c': ['gcc -std=c11 --source_file-- -o --execute--', '', '.c'],
-            'cpp': ['g++ -std=c++11 --source_file-- -o --execute--', '', '.cpp'],
-            'java': ['javac -d dist --source_file--', 'java -classpath dist ', '.java'],
-            'python3': ['', 'python3 ', '.py'],
-            'python': ['', 'python ', '.py'],
-            'empty': ['', '', '']
-        }
-        langs = list(lang_tool_exe.keys())
-        for i, lang in enumerate(langs):
-            QproDefaultConsole.print('[%d] %-5s' % (i + 1, lang), end='\t' if (i + 1) % 3 else '\n')
-        if len(langs) % 3:
-            QproDefaultConsole.print()
-        id_lang = 0
-        while id_lang <= 0 or id_lang > len(langs):
-            try:
-                id_lang = int(Prompt.ask('choose one' if user_lang != 'zh' else '请选择一个', default='6'))
-            except:
-                id_lang = 0
-        lang = lang_tool_exe[langs[id_lang - 1]]
-        source_file = ''
-        if langs[id_lang - 1] != 'empty':
-            source_file = ('main' + lang[-1]) if lang[0] != 'javac' else work_project + lang[-1]
-            while not os.path.exists(source_file):
-                source_file = Prompt.ask((
-                                'Not found "%s", set compile_filename'
-                                if user_lang != 'zh' else
-                                '没有找到 "%s", 请设置源文件'
-                              ) % source_file).strip()
-        server_target = Prompt.ask(
-            'input user@ip:dir_path if you need scp' if user_lang != 'zh' else '输入 用户@IP:路径 如果你打算使用SSH'
-        ).strip().replace(dir_char, '/')
-        if ':' in server_target and not server_target.endswith('/'):
-            if not server_target.endswith(':'):
-                server_target += '/'
-            else:
-                server_target += '~/'
-        if lang[0] != 'javac':
-            execute = lang[1] + 'dist' + dir_char + work_project if lang[0] else lang[1] + source_file
-        elif langs[id_lang - 1] != 'empty':
-            work_project = source_file.split(dir_char)[-1].split('.')[0]
-            execute = lang[1] + work_project
-        else:
-            execute = ''
-        if (not os.path.exists('dist') or not os.path.isdir('dist')) and langs[id_lang - 1] != 'empty':
-            os.mkdir('dist')
-        info = [
-            ['compile_tool', lang[0].replace('--source_file--', source_file).replace('--execute--', execute)],
-            ['compile_filename', source_file],
-            ['executable_filename', execute],
-            ['input_file', 'dist' + dir_char + 'input.txt' if langs[id_lang - 1] != 'empty' else ''],
-            ['template_root', 'template' + dir_char if langs[id_lang - 1] != 'empty' else ''],
-            ['server_target', server_target, '22' if server_target else '']
-        ]
-    else:
-        import re
+    work_project = ''
+    while not work_project:
+        work_project = Prompt.ask('You need to set project name' if user_lang != 'zh' else '请设置项目名').strip()
+    lang_tool_exe = {
+        'c': ['gcc -std=c11 --source_file-- -o --execute--', '', '.c'],
+        'cpp': ['g++ -std=c++11 --source_file-- -o --execute--', '', '.cpp'],
+        'java': ['javac -d dist --source_file--', 'java -classpath dist ', '.java'],
+        'python3': ['', 'python3 ', '.py'],
+        'python': ['', 'python ', '.py'],
+        'empty': ['', '', '']
+    }
 
-        with open("CMakeLists.txt", 'r') as f:
-            content = f.read()
-        project_name = re.findall('project\((.*?)\)', content)[0].split()[0]
-        if '.cpp' in content or '.CPP' in content:
-            is_cpp = True
-        else:
-            is_cpp = False
-        QproDefaultConsole.print(
-            QproInfoString, (
-                'Project name:%s(%s)' if user_lang != 'zh' else '项目名: %s(%s)'
-            ) % (project_name, 'CPP' if is_cpp else 'C')
-        )
-        project_name = 'cmake-build-debug' + dir_char + project_name
-        source_file = 'main.c' + ('pp' if is_cpp else '')
-        pro_root = dir_char.join(project_name.split(dir_char)[:-1])
-        default_input = pro_root + dir_char + 'input.txt'
-        server_target = Prompt.ask('input user@ip:dir_path if you need scp').strip().replace(dir_char, '/')
-        if ':' in server_target and not server_target.endswith('/') and not server_target.endswith(':'):
+    lang_name = _ask({
+        'type': 'list',
+        'name': 'lang_name',
+        'message': 'Choose Lang | 选择语言:',
+        'choices': lang_tool_exe.keys()
+    })
+
+    lang = lang_tool_exe[lang_name]
+    source_file = ''
+    if lang_name != 'empty':
+        source_file = ('main' + lang[-1]) if lang[0] != 'javac' else work_project + lang[-1]
+        while not os.path.exists(source_file):
+            source_file = Prompt.ask((
+                            'Not found "%s", set compile_filename'
+                            if user_lang != 'zh' else
+                            '没有找到 "%s", 请设置源文件'
+                            ) % source_file).strip()
+    server_target = Prompt.ask(
+        'input user@ip:dir_path if you need scp' if user_lang != 'zh' else '输入 用户@IP:路径 如果你打算使用SSH'
+    ).strip().replace(dir_char, '/')
+    if ':' in server_target and not server_target.endswith('/'):
+        if not server_target.endswith(':'):
             server_target += '/'
-        elif server_target:
-            QproDefaultConsole.print(
-                QproWarnString, 'Legal server target:\n'
-                                '        addr1: <username>@<ipv4 | ipv6 | domain>:</path/to/project/>\n'
-                                '        addr2: <configured name>:</path/to/project/>\n'
-                                '        port : <ssh port>, default 22') \
-                if user_lang != 'zh' else \
-                QproDefaultConsole.print(
-                    QproWarnString, '合法的远程映射:\n'
-                                    '        地址1: <用户名>@<ipv4 | ipv6 | 域名>:</项目/路径/>\n'
-                                    '        地址2: <SSH配置表中项目>:</项目/路径/>\n'
-                                    '        端口 : <SSH 端口>, 默认 22')
-        QproDefaultConsole.print(QproInfoString, 'create project_configure' if user_lang != 'zh' else '创建配置表')
-        info = [
-            ['compile_tool', 'cmake cmake-build-debug && cd cmake-build-debug && make'],
-            ['compile_filename', source_file],
-            ['executable_filename', project_name],
-            ['input_file', default_input],
-            ['template_root', 'template' + dir_char],
-            ['server_target', server_target, '22' if server_target else '']
-        ]
-    __format_json(info, project_configure_path)
-    if id_lang >= 0 and langs[id_lang - 1] == 'empty':
+        else:
+            server_target += '~/'
+    if lang[0] != 'javac':
+        execute = lang[1] + 'dist' + dir_char + work_project if lang[0] else lang[1] + source_file
+    elif lang_name != 'empty':
+        work_project = source_file.split(dir_char)[-1].split('.')[0]
+        execute = lang[1] + work_project
+    else:
+        execute = ''
+    if (not os.path.exists('dist') or not os.path.isdir('dist')) and lang_name != 'empty':
+        os.mkdir('dist')
+    info = [
+        ['compile_tool', lang[0].replace('--source_file--', source_file).replace('--execute--', execute)],
+        ['compile_filename', source_file],
+        ['executable_filename', execute],
+        ['input_file', 'dist' + dir_char + 'input.txt' if lang_name != 'empty' else ''],
+        ['template_root', 'template' + dir_char if lang_name != 'empty' else ''],
+        ['server_target', server_target, '22' if server_target else '']
+    ]
+    __format_json(info, configure_name)
+    if lang_name and lang_name == 'empty':
         scp_init(info[-1][1:] if server_target else None)
         return
     with open(info[3][-1], 'w') as f:
@@ -514,7 +484,7 @@ def main():
         QproDefaultConsole.print(
             QproErrorString, 'wrong usage! Run "Qpro -h" for help!' if user_lang != 'zh' else '请运行 "Qpro -h" 查看帮助!'
         )
-    elif not os.path.exists(project_configure_path):
+    elif not os.path.exists(configure_name):
         pro_init()
     else:
         QproDefaultConsole.print(

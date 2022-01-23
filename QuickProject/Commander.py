@@ -116,4 +116,7 @@ class Commander:
             else:
                 func_info = self.command_table[func_name]
                 args = func_info['parser'].parse_args()
-                func_info['func'](**{i[0]: i[1] for i in args._get_kwargs()})
+                try:
+                    func_info['func'](**{i[0]: i[1] for i in args._get_kwargs()})
+                except Exception as e:
+                    QproDefaultConsole.print_exception()

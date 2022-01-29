@@ -7,7 +7,7 @@ prev=${words[CURRENT-1]}
 (( $+functions[_qpro_args_comp_zh] )) ||
 _qpro_args_comp_zh() {
     local -a opt_args
-    if [[ ${prev} == -scp ]] || [[ ${prev} == -get ]] || [[ ${prev} == -del ]] || [[ ${prev} == -ls ]]; then
+    if [[ ${prev} == -scp ]] || [[ ${prev} == -smv ]] || [[ ${prev} == -get ]] || [[ ${prev} == -del ]] || [[ ${prev} == -ls ]]; then
         _arguments -S -s '*:filename:_files'
         return
     else
@@ -27,6 +27,7 @@ _qpro_main_zh() {
         -adjust:'adjust configuration'
         -ssh:'login server by ssh'
         -scp:'upload <path> to default server target'
+        -smv:'delete <path> after scp'
         -scp-init:'upload all of project to server target'
         -get:'download <file> from server target'
         -del:'delete <path> in project'

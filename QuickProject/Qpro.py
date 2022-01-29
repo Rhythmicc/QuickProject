@@ -169,13 +169,14 @@ def create():
                 os.system('code .')
 
 
-def scp():
+def scp(smv_flag: bool = False):
+    kw = '-scp' if not smv_flag else '-smv'
     try:
-        path = sys.argv[sys.argv.index('-scp') + 1]
+        path = sys.argv[sys.argv.index(kw) + 1]
         sub_path = __sub_path(path)
     except IndexError:
         return QproDefaultConsole.print(
-            QproWarnString, 'usage: Qpro -scp <path>' if user_lang != 'zh' else '使用: Qpro -scp <路径>'
+            QproWarnString, f'usage: Qpro {kw} <path>' if user_lang != 'zh' else f'使用: Qpro {kw} <路径>'
         )
     else:
         if not sub_path:
@@ -189,9 +190,22 @@ def scp():
         server, target, port = get_server_target()
         user, ip = server.split('@') if '@' in server else [None, server]
         if os.path.isdir(path):
-            SshProtocol.post_folder(user, ip, target, port, path, sub_path)
+            status = SshProtocol.post_folder(user, ip, target, port, path, sub_path)
         else:
-            SshProtocol.post_file(user, ip, target, port, path, sub_path)
+            status = SshProtocol.post_file(user, ip, target, port, path, sub_path)
+        if smv_flag and not status:
+            remove(path)
+
+
+def smv():
+    from PyInquirer import prompt
+    if prompt({
+        'type': 'confirm',
+        'message': 'Confirm delete after transform | 确认传输后删除',
+        'default': True,
+        'name': 'confirm'
+    })['confirm']:
+        scp(True)
 
 
 def get():
@@ -449,6 +463,7 @@ def enable_complete():
 func = {
     '-c': create,
     '-scp': scp,
+    '-smv': smv,
     '-get': get,
     '-adjust': adjust,
     '-ssh': ssh,
@@ -473,6 +488,10 @@ def main():
                         (
                             '-scp [bold magenta]<path>',
                             'upload path to default server target' if user_lang != 'zh' else '上传路径到默认的远程映射对应位置'
+                        ),
+                        (
+                            '-smv [bold magenta]<path>',
+                            'delete after scp' if user_lang != 'zh' else '上传完成后删除文件或目录'
                         ),
                         (
                             '-scp-init',

@@ -7,7 +7,7 @@ prev=${words[CURRENT-1]}
 (( $+functions[_qpro_args_comp_zh] )) ||
 _qpro_args_comp_zh() {
     local -a opt_args
-    if [[ ${prev} == -scp ]] || [[ ${prev} == -get ]] || [[ ${prev} == -del ]] || [[ ${prev} == -ls ]]; then
+    if [[ ${prev} == -scp ]] || [[ ${prev} == -smv ]] || [[ ${prev} == -get ]] || [[ ${prev} == -del ]] || [[ ${prev} == -ls ]]; then
         _arguments -S -s '*:filename:_files'
         return
     else
@@ -27,6 +27,7 @@ _qpro_main_zh() {
         -adjust:'调整配置表'
         -ssh:'通过SSH登录远程映射'
         -scp:'上传<路径>到远程映射对应位置'
+        -smv:'上传完成后删除文件或目录'
         -scp-init:'上传当前全部内容到远程映射'
         -get:'从远程映射下载<路径>'
         -del:'同时删除本地及远程映射<文件或目录>'

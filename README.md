@@ -11,3 +11,11 @@ cp complete/<your language>/* /path/in/$fpath
 ```
 
 then add `compinit` to the end of `.zshrc`
+
+
+## Manual Install
+```shell
+git clone https://github.com/Rhythmicc/QuickProject.git
+cd QuickProject
+python setup.py install
+```

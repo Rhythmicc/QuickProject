@@ -22,6 +22,13 @@ templateProjectUrls_is_CN = {
 
 
 def __format_json(info, path: str):
+    """
+    回写配置表
+
+    :param info: 列表格式或字典格式
+    :param path: 路径
+    :return:
+    """
     import json
     with open(path, 'w') as f:
         if isinstance(info, list):
@@ -34,6 +41,14 @@ def __format_json(info, path: str):
 
 
 def __findAndReplace(dirPath, fo, to):
+    """
+    替换模板项目中的指定字段
+
+    :param dirPath: 项目路径
+    :param fo: 识别
+    :param to: 替换
+    :return:
+    """
     for rt, son_dir, son_files in os.walk(dirPath):
         for file in son_files:
             with open(rt + dir_char + file, 'r') as f:
@@ -43,6 +58,12 @@ def __findAndReplace(dirPath, fo, to):
 
 
 def remove(path):
+    """
+    删除文件或目录
+
+    :param path: 路径
+    :return:
+    """
     import shutil
     if os.path.exists(path):
         if os.path.isdir(path):

@@ -97,16 +97,18 @@ class Commander:
         return '\n'.join(res + ["--help:应用帮助" if user_lang == 'zh' else '--help:Application help'])
 
     def __call__(self):
-        if len(sys.argv) < 2:
-            return
-        if sys.argv[1] == '--qrun-commander-complete':
-            return print(self.__command_complete__(sys.argv[2:]))
-        if sys.argv[1] == '--help':
-            return self.help()
+        if len(sys.argv) >= 2:
+            if sys.argv[1] == '--qrun-commander-complete':
+                return print(self.__command_complete__(sys.argv[2:]))
+            if sys.argv[1] == '--help':
+                return self.help()
         if len(self.command_table) <= 1:
             func_info = self.command_table[list(self.command_table.keys())[0]]
             args = func_info['parser'].parse_args()
-            func_info['func'](**{i[0]: i[1] for i in args._get_kwargs()})
+            try:
+                func_info['func'](**{i[0]: i[1] for i in args._get_kwargs()})
+            except:
+                QproDefaultConsole.print_exception()
         else:
             try:
                 func_name = sys.argv[1]
@@ -118,5 +120,5 @@ class Commander:
                 args = func_info['parser'].parse_args()
                 try:
                     func_info['func'](**{i[0]: i[1] for i in args._get_kwargs()})
-                except Exception as e:
+                except:
                     QproDefaultConsole.print_exception()

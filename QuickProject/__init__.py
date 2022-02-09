@@ -166,14 +166,19 @@ def get_config():
 
 
 def get_server_target(st=None):
-    if not st:
-        config = get_config()['server_target']
-        ls, port = config[0].split(':'), config[1]
+    try:
+        if not st:
+            config = get_config()['server_target']
+            ls, port = config[0].split(':'), config[1]
+        else:
+            ls, port = st[0].split(':'), st[1]
+    except IndexError:
+        QproDefaultConsole.print(QproErrorString, 'Didn\'t set server_target!' if user_lang != 'zh' else '未配置远程映射!')
+        exit(0)
     else:
-        ls, port = st[0].split(':'), st[1]
-    if len(ls) > 2:
-        server = ':'.join(ls[:8])
-        target = ':'.join(ls[8:])
-    else:
-        server, target = ls
-    return server, target, port
+        if len(ls) > 2:
+            server = ':'.join(ls[:8])
+            target = ':'.join(ls[8:])
+        else:
+            server, target = ls
+        return server, target, port

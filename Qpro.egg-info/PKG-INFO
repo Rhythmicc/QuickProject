@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: Qpro
-Version: 0.8.5
+Version: 0.8.6
 Summary: Small but powerful command line IDE.
 Home-page: https://github.com/Rhythmicc/QuickProject
 Author: RhythmLian
@@ -26,5 +26,13 @@ cp complete/<your language>/* /path/in/$fpath
 ```
 
 then add `compinit` to the end of `.zshrc`
+
+
+## Manual Install
+```shell
+git clone https://github.com/Rhythmicc/QuickProject.git
+cd QuickProject
+python setup.py install
+```
 
 

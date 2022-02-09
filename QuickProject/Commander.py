@@ -106,9 +106,10 @@ class Commander:
             func_info = self.command_table[list(self.command_table.keys())[0]]
             args = func_info['parser'].parse_args()
             try:
-                func_info['func'](**{i[0]: i[1] for i in args._get_kwargs()})
+                return func_info['func'](**{i[0]: i[1] for i in args._get_kwargs()})
             except:
                 QproDefaultConsole.print_exception()
+                return None
         else:
             try:
                 func_name = sys.argv[1]
@@ -119,6 +120,7 @@ class Commander:
                 func_info = self.command_table[func_name]
                 args = func_info['parser'].parse_args()
                 try:
-                    func_info['func'](**{i[0]: i[1] for i in args._get_kwargs()})
+                    return func_info['func'](**{i[0]: i[1] for i in args._get_kwargs()})
                 except:
                     QproDefaultConsole.print_exception()
+                    return None

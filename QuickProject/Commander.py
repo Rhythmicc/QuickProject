@@ -124,3 +124,16 @@ class Commander:
                 except:
                     QproDefaultConsole.print_exception()
                     return None
+
+    def real_call(self, func_name: str, *args, **kwargs):
+        """
+        调用被装饰为命令的函数
+
+        :param func_name: 注册的函数名
+        :param args: 参数
+        :param kwargs: 参数
+        :return:
+        """
+        if func_name not in self.command_table:
+            return QproDefaultConsole.print(QproErrorString,  f'{func_name} 未被注册!' if user_lang == 'zh' else f'{func_name} not registered!')
+        return self.command_table[func_name]['func'](*args, **kwargs)

@@ -108,22 +108,20 @@ class Commander:
             try:
                 return func_info['func'](**{i[0]: i[1] for i in args._get_kwargs()})
             except:
-                QproDefaultConsole.print_exception()
-                return None
+                return QproDefaultConsole.print_exception()
         else:
             try:
                 func_name = sys.argv[1]
                 sys.argv = sys.argv[:1] + sys.argv[2:]
             except IndexError:
-                QproDefaultConsole.print(QproErrorString, '至少输入一个子命令!' if user_lang == 'zh' else 'Input at least one sub command!')
+                return QproDefaultConsole.print(QproErrorString, '至少输入一个子命令!' if user_lang == 'zh' else 'Input at least one sub command!')
             else:
                 func_info = self.command_table[func_name]
                 args = func_info['parser'].parse_args()
                 try:
                     return func_info['func'](**{i[0]: i[1] for i in args._get_kwargs()})
                 except:
-                    QproDefaultConsole.print_exception()
-                    return None
+                    return QproDefaultConsole.print_exception()
 
     def real_call(self, func_name: str, *args, **kwargs):
         """

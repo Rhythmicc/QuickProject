@@ -4,23 +4,6 @@ from QuickProject import __sub_path
 from rich.prompt import Prompt
 
 
-templateProjectUrls_not_CN = {
-    'c': ['https://github.com/Rhythmicc/QproCTemplate.git', 'QproCTemplate'],
-    'cpp': ['https://github.com/Rhythmicc/QproCppTemplate.git', 'QproCppTemplate'],
-    'java': ['https://github.com/Rhythmicc/QproJavaTemplate.git', 'QproJavaTemplate'],
-    'python3': ['https://github.com/Rhythmicc/QproPython3Template.git', 'QproPython3Template'],
-    'python': ['https://github.com/Rhythmicc/QproPythonTemplate.git', 'QproPythonTemplate']
-}
-
-templateProjectUrls_is_CN = {
-    'c': ['https://gitee.com/RhythmLian/QproCTemplate.git', 'QproCTemplate'],
-    'cpp': ['https://gitee.com/RhythmLian/QproCppTemplate.git', 'QproCppTemplate'],
-    'java': ['https://gitee.com/RhythmLian/QproJavaTemplate.git', 'QproJavaTemplate'],
-    'python3': ['https://gitee.com/RhythmLian/QproPython3Template.git', 'QproPython3Template'],
-    'python': ['https://gitee.com/RhythmLian/QproPythonTemplate.git', 'QproPythonTemplate']
-}
-
-
 def __format_json(info, path: str):
     """
     回写配置表
@@ -81,28 +64,73 @@ def scp_init(server_target: list):
             QproDefaultConsole.print(QproErrorString, "upload project failed!" if user_lang != 'zh' else '上传项目失败!')
 
 
+def _create_empty_project(project_name):
+    if os.path.exists(project_name):
+        return QproDefaultConsole.print(
+            QproErrorString,
+            f'{project_name} already exists!' if user_lang != 'zh' else f'{project_name} 已存在'
+        )
+    os.mkdir(project_name)
+    __format_json([
+        ['compile_tool', ''],
+        ['compile_filename', ''],
+        ['executable_filename', ''],
+        ['input_file', ''],
+        ['template_root', ''],
+        ['server_target', '', '']
+    ], project_name + dir_char + configure_name)
+    os.chdir(project_name)
+    return
+
+
+def _search_supported_languages(is_CN):
+    kw = _ask({
+        'type': 'input',
+        'message': 'Input a keyword' if user_lang != 'zh' else '输入一个关键词',
+        'name': 'language'
+    })
+
+    import json
+    import requests
+
+    try:
+        res = json.loads(requests.get(f'https://qpro.rhythmlian.cn/?keyword={kw}&is_CN={str(is_CN).lower()}').text)
+        if res['status'] != 'Success':
+            QproDefaultConsole.print(QproErrorString, res['message'])
+            return None
+        data = {i[0]: i[1:] for i in res['data']}
+        return data[
+            _ask({
+                'type': 'list',
+                'message': 'Choose Supported Language' if user_lang != 'zh' else '选择支持的语言',
+                'name': 'url',
+                'choices': list(data.keys())
+            })
+        ]
+    except Exception as e:
+        QproDefaultConsole.print(QproErrorString, repr(e))
+    return None
+
+
 def _external_create(project_name: str, key: str = ''):
     from git import Repo
+
     if key:
         if key in ['empty', '空项目']:
-            __format_json([
-                ['compile_tool', ''],
-                ['compile_filename', ''],
-                ['executable_filename', ''],
-                ['input_file', ''],
-                ['template_root', ''],
-                ['server_target', '', '']
-            ], project_name + dir_char + configure_name)
-            return
+            return _create_empty_project(project_name)
 
-        with QproDefaultConsole.status(('Cloning Qpro {} Template to {}' if user_lang != 'zh' else '正在克隆Qpro {} 模板为 {}').format(key, project_name)):
-            try:
-                from QuickStart_Rhy.API.alapi import ip_info
+        try:
+            from QuickStart_Rhy.API.alapi import ip_info
+            with QproDefaultConsole.status(('Check IP to switch mirrors' if user_lang != 'zh' else '检查IP以选择合适的镜像').format(key, project_name)):
                 is_CN = ip_info('')['ad_info']['nation'].startswith('中国')
-            except:
-                is_CN = False
-            templateProjectUrls = templateProjectUrls_is_CN if is_CN else templateProjectUrls_not_CN
-            Repo.clone_from(templateProjectUrls[key][0], project_name)
+        except:
+            is_CN = False
+
+        templateProjectUrls = _search_supported_languages(is_CN)
+        if not templateProjectUrls:
+            exit(0)
+        with QproDefaultConsole.status(('Cloning Qpro {} Template to {}' if user_lang != 'zh' else '正在克隆Qpro {} 模板为 {}').format(key, project_name)):
+            Repo.clone_from(templateProjectUrls[0], project_name)
     else:
         templateProjectUrls = _ask({
             'type': 'input',
@@ -117,7 +145,7 @@ def _external_create(project_name: str, key: str = ''):
     except Exception as e:
         QproDefaultConsole.print(QproErrorString, repr(e))
     if key:
-        __findAndReplace(os.getcwd(), templateProjectUrls[key][1], project_name)
+        __findAndReplace(os.getcwd(), templateProjectUrls[1], project_name)
 
 
 def create():
@@ -134,8 +162,8 @@ def create():
             'name': 'lang_name',
             'message': 'Choose Lang | 选择语言:',
             'choices': [
-                'c', 'cpp', 'java', 'python3', 'python',
                 'empty' if user_lang != 'zh' else '空项目',
+                'Language Template' if user_lang != 'zh' else '语言模板',
                 'external' if user_lang != 'zh' else '外部项目'
             ]
         })
@@ -316,7 +344,7 @@ def pro_init():
         'java': ['javac -d dist --source_file--', 'java -classpath dist ', '.java'],
         'python3': ['', 'python3 ', '.py'],
         'python': ['', 'python ', '.py'],
-        'empty': ['', '', '']
+        'empty | other': ['', '', '']
     }
 
     lang_name = _ask({
@@ -328,7 +356,7 @@ def pro_init():
 
     lang = lang_tool_exe[lang_name]
     source_file = ''
-    if lang_name != 'empty':
+    if lang_name != 'empty | other':
         source_file = ('main' + lang[-1]) if lang[0] != 'javac' else work_project + lang[-1]
         while not os.path.exists(source_file):
             source_file = Prompt.ask((
@@ -430,7 +458,7 @@ def tele_ls():
         path = sys.argv[sys.argv.index('-ls') + 1]
         sub_path = __sub_path(path, False)
     except IndexError:
-        sub_path = ''
+        sub_path = __sub_path('./', False)
     config = get_config()
     if ':' in config['server_target'][0]:
         from . import SshProtocol

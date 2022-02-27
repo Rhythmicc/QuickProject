@@ -69,13 +69,13 @@ class Commander:
         """
         if not route_path and len(self.command_table) > 1:
             ls = [
-                f"{i}:{self.command_table[i]['func'].__doc__.strip().split(':param')[0] if self.command_table[i]['func'].__doc__ else 'NONE'}"
+                f"{i}:{self.command_table[i]['func'].__doc__.strip().split(':param')[0].strip() if self.command_table[i]['func'].__doc__ else 'NONE'}"
                 for i in self.command_table
             ]
             return '\n'.join((ls if len(ls) > 1 else []) + ["--help:应用帮助" if user_lang == 'zh' else '--help:Application help'])
         if len(self.command_table) > 1:
-            call_func = route_path[1]
-            has_args = [i.strip().strip('--') for i in route_path[2:]]
+            call_func = route_path[0]
+            has_args = [i.strip().strip('--') for i in route_path[1:]]
         else:
             call_func = list(self.command_table.keys())[0]
             has_args = [i.strip().strip('--') for i in route_path[1:]]

@@ -1,7 +1,7 @@
 import pyperclip
-from QuickProject import *
+from . import *
 
-config = get_config()
+config = get_config(without_output='--qrun-commander-complete' in sys.argv)
 retain_arg = ['-br', '-b', '-r', '-h', '-i']
 has_recog = {i: False for i in retain_arg}
 

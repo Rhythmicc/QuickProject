@@ -147,7 +147,7 @@ def menu_output(menu):
     )
 
 
-def get_config():
+def get_config(without_output: bool = False):
     config_path = __latest_filename('project_configure.json')
     config = {}
     if config_path:
@@ -155,12 +155,13 @@ def get_config():
         with open(config_path, 'r') as f:
             config = json.load(f)
     else:
-        QproDefaultConsole.print(
-            QproErrorString,
-            "No file named: project_configure.json\n May you need run:\"Qpro -init\" first!"
-            if user_lang != 'zh' else
-            "没有文件: project_configure.json\n可能你需要先运行: \"Qpro -init\"!"
-        )
+        if not without_output:
+            QproDefaultConsole.print(
+                QproErrorString,
+                "No file named: project_configure.json\n May you need run:\"Qpro -init\" first!"
+                if user_lang != 'zh' else
+                "没有文件: project_configure.json\n可能你需要先运行: \"Qpro -init\"!"
+            )
         exit(0)
     return config
 

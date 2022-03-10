@@ -5,6 +5,11 @@ from inspect import isfunction
 from . import QproDefaultConsole, QproErrorString, user_lang
 
 
+def debug(content):
+    with open('debug.txt', 'a') as f:
+        print(content, file=f)
+
+
 class Commander:
     def __init__(self):
         self.command_table = {}
@@ -78,7 +83,7 @@ class Commander:
             has_args = [i.strip().strip('--') for i in route_path[1:]]
         else:
             call_func = list(self.command_table.keys())[0]
-            has_args = [i.strip().strip('--') for i in route_path[1:]]
+            has_args = [i.strip().strip('--') for i in route_path]
         if call_func not in self.command_table:
             return '错误:无该命令' if user_lang != 'zh' else 'ERROR:No such command'
         call_analyser = self.command_table[call_func]['analyser']
@@ -99,6 +104,8 @@ class Commander:
     def __call__(self):
         if len(sys.argv) >= 2:
             if sys.argv[1] == '--qrun-commander-complete':
+                if 'qrun' in sys.argv:
+                    sys.argv.remove('qrun')
                 return print(self.__command_complete__(sys.argv[2:]))
             if sys.argv[1] == '--help':
                 return self.help()

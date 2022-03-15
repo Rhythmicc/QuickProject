@@ -10,6 +10,7 @@ def parseArgs():
     add_flag = True
     isPath = False
     programArgs, retainArgs = [], []
+    conflictArgs = set()
     for i in sys.argv[1:]:
         if not add_flag:
             add_flag = True
@@ -20,6 +21,7 @@ def parseArgs():
             continue
         if i in retain_arg:
             if has_recog[i]:
+                conflictArgs.add(i)
                 programArgs.append(i)
             else:
                 retainArgs.append(i)
@@ -29,6 +31,8 @@ def parseArgs():
             isPath = i == '--path'
         else:
             programArgs.append(i)
+    for i in conflictArgs:
+        has_recog[i] = False
     return programArgs, retainArgs
 
 

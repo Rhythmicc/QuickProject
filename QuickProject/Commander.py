@@ -5,11 +5,6 @@ from inspect import isfunction
 from . import QproDefaultConsole, QproErrorString, user_lang
 
 
-def debug(content):
-    with open('debug.txt', 'a') as f:
-        print(content, file=f)
-
-
 class Commander:
     def __init__(self):
         self.command_table = {}
@@ -31,7 +26,10 @@ class Commander:
                 if arg.default != arg.empty:
                     _default = arg.default
                 if not _default:
-                    func_args_parser.add_argument(arg.name, type=_type)
+                    if _type == list:
+                        func_args_parser.add_argument(f'-{arg.name}', type=str, nargs='+')
+                    else:
+                        func_args_parser.add_argument(arg.name, type=_type)
                 else:
                     func_args_parser.add_argument(f'--{arg.name}', required=False, type=_type, default=_default)
             self.command_table[func_name] = {'func': func, 'analyser': func_analyser, 'parser': func_args_parser}
@@ -77,7 +75,9 @@ class Commander:
                 f"{i}:{self.command_table[i]['func'].__doc__.strip().split(':param')[0].strip() if self.command_table[i]['func'].__doc__ else 'NONE'}"
                 for i in self.command_table
             ]
-            return '\n'.join((ls if len(ls) > 1 else []) + ["--help:应用帮助" if user_lang == 'zh' else '--help:Application help'])
+            return '\n'.join(
+                (ls if len(ls) > 1 else []) + ["--help:应用帮助" if user_lang == 'zh' else '--help:Application help']
+            )
         if len(self.command_table) > 1:
             call_func = route_path[0]
             has_args = [i.strip().strip('--') for i in route_path[1:]]
@@ -121,7 +121,9 @@ class Commander:
                 func_name = sys.argv[1]
                 sys.argv = sys.argv[:1] + sys.argv[2:]
             except IndexError:
-                return QproDefaultConsole.print(QproErrorString, '至少输入一个子命令!' if user_lang == 'zh' else 'Input at least one sub command!')
+                return QproDefaultConsole.print(
+                    QproErrorString, '至少输入一个子命令!' if user_lang == 'zh' else 'Input at least one sub command!'
+                )
             else:
                 func_info = self.command_table[func_name]
                 args = func_info['parser'].parse_args()
@@ -140,5 +142,7 @@ class Commander:
         :return:
         """
         if func_name not in self.command_table:
-            return QproDefaultConsole.print(QproErrorString,  f'{func_name} 未被注册!' if user_lang == 'zh' else f'{func_name} not registered!')
+            return QproDefaultConsole.print(
+                QproErrorString,  f'{func_name} 未被注册!' if user_lang == 'zh' else f'{func_name} not registered!'
+            )
         return self.command_table[func_name]['func'](*args, **kwargs)

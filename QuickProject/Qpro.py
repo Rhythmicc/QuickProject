@@ -397,14 +397,15 @@ def pro_init():
         f.write('edit this file to make input' if user_lang != 'zh' else '编辑此文件作为程序输入')
     if not os.path.exists('template') or not os.path.isdir('template'):
         os.mkdir('template')
-    try:
-        with open(info[1][-1], 'r') as f:
-            main_cont = f.read()
-        with open('template' + dir_char + 'main', 'w') as f:
-            f.write(main_cont)
-    except Exception as e:
-        QproDefaultConsole.print(
-            QproErrorString, "make backup failed with error: %s, you need backup code by yourself!" % e)
+    if lang_name != 'empty':
+        try:
+            with open(info[1][-1], 'r') as f:
+                main_cont = f.read()
+            with open('template' + dir_char + 'main', 'w') as f:
+                f.write(main_cont)
+        except Exception as e:
+            QproDefaultConsole.print(
+                QproErrorString, "make backup failed with error: %s, you need backup code by yourself!" % e)
     scp_init(info[-1][1:] if server_target else None)
 
 

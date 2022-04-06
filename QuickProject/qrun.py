@@ -1,7 +1,7 @@
 import pyperclip
 from . import *
 
-config = get_config(without_output='--qrun-commander-complete' in sys.argv)
+config = get_config(without_output='--qrun-commander-complete' in sys.argv or '--qrun-fig-complete' in sys.argv)
 retain_arg = ['-br', '-b', '-r', '-h', '-i']
 has_recog = {i: False for i in retain_arg}
 
@@ -47,6 +47,12 @@ def run(use_txt=False, executable_file=str(config['executable_filename'])):
     if '--qrun-commander-complete' in argv:
         if 'enable_complete' in config and config['enable_complete']:
             os.system(cmd + ' '.join(argv))
+        else:
+            print()
+        return
+    if '--qrun-fig-complete' in argv:
+        if 'enable_complete' in config and config['enable_complete']:
+            os.system(cmd + ' --qrun-fig-complete')
         else:
             print()
         return

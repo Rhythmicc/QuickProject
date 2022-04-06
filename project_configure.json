@@ -5,7 +5,7 @@
  "input_file": "",
  "template_root": "/",
  "server_target": [
-  "lianhaocheng@localhost:/Library/Frameworks/Python.framework/Versions/Current/lib/python3.10/site-packages/",
+  "lianhaocheng@localhost:/opt/homebrew/Cellar/python@3.10/3.10.2/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/",
   22
  ],
  "enable_complete": true

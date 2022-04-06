@@ -2,21 +2,13 @@ const completionSpec: Fig.Spec = {
   name: "qrun",
   description: "QuickProject的运行器",
   args: { 
-    name: 'subcommand',
+    name: 'command',
     isCommand: true,
     generators: {
-      script: 'qrun --qrun-commander-complete',
+      script: 'qrun --qrun-fig-complete',
       postProcess: function (out) {
-        return out.split('\n').filter((name) => {
-          return name? true: false;
-        }).map((line) => {
-          var ls = line.split(':')
-          var name = ls[0], description = ls[1];
-          return {
-            name: name,
-            description: description,
-          }
-        })
+        if (out) return JSON.parse(out);
+        return [];
       }
     },
     isOptional: true

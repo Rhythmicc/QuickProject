@@ -1,3 +1,4 @@
+import re
 import sys
 import inspect
 import argparse
@@ -8,14 +9,18 @@ from . import QproDefaultConsole, QproErrorString, user_lang
 class Commander:
     def __init__(self):
         self.command_table = {}
+        self.fig_table = [{'name': '--help', 'description': '获取帮助'}]
 
     def command(self):
         def wrapper(func):
             if not isfunction(func):
                 raise TypeError(f'{func} not a function')
+            param_doc = {i[0].strip(): i[1].strip() for i in re.findall(':param(.*?):(.*?)\n', func.__doc__, re.S)}
             func_analyser = inspect.signature(func)
             func_args_parser = argparse.ArgumentParser()
             func_name = func.__name__.strip('_')
+
+            func_fig = {'name': func_name, 'description': func.__doc__.strip().split(':param')[0].strip(), 'args': []}
             if func_name in self.command_table:
                 raise Exception(f'{func} already in command table')
             for arg in func_analyser.parameters.values():
@@ -28,11 +33,34 @@ class Commander:
                 if not _default:
                     if _type == list:
                         func_args_parser.add_argument(f'-{arg.name}', type=str, nargs='+')
+                        func_fig['args'].append({
+                            'name': f'-{arg.name}',
+                            'description': param_doc.get(arg.name, f'<{arg.name}>'),
+                            'args': {
+                                'name': arg.name,
+                                'description': param_doc.get(arg.name, f'<{arg.name}>'),
+                                'isVariadic': True
+                            }
+                        })
                     else:
                         func_args_parser.add_argument(arg.name, type=_type)
+                        func_fig['args'].append({
+                            'name': arg.name,
+                            'description': param_doc.get(arg.name, f'<{arg.name}>'),
+                        })
                 else:
                     func_args_parser.add_argument(f'--{arg.name}', required=False, type=_type, default=_default)
-            self.command_table[func_name] = {'func': func, 'analyser': func_analyser, 'parser': func_args_parser}
+                    func_fig['args'].append({
+                        'name': f'--{arg.name}',
+                        'description': param_doc.get(arg.name, f'<{arg.name}>'),
+                        'isOptional': True,
+                        'args': {
+                            'name': arg.name,
+                            'description': param_doc.get(arg.name, f'<{arg.name}>'),
+                        }
+                    })
+            self.fig_table.append(func_fig)
+            self.command_table[func_name] = {'func': func, 'analyser': func_analyser, 'parser': func_args_parser, 'param_doc': param_doc}
         return wrapper
 
     def help(self):
@@ -87,12 +115,7 @@ class Commander:
         if call_func not in self.command_table:
             return '错误:无该命令' if user_lang != 'zh' else 'ERROR:No such command'
         call_analyser = self.command_table[call_func]['analyser']
-        call_func = self.command_table[call_func]['func']
-        call_doc = call_func.__doc__
-        if not call_doc:
-            return ''
-        import re
-        param_doc = {i[0].strip(): i[1].strip() for i in re.findall(':param(.*?):(.*?)\n', call_doc, re.S)}
+        param_doc = self.command_table[call_func]['param_doc']
         res = []
         for arg in call_analyser.parameters.values():
             if arg.name in has_args:
@@ -101,12 +124,18 @@ class Commander:
                 res.append(f'--{arg.name}:{param_doc[arg.name].replace(" ", "_") if arg.name in param_doc else "No Description" if user_lang != "zh" else "无参数描述"}')
         return '\n'.join(res + ["--help:应用帮助" if user_lang == 'zh' else '--help:Application help'])
 
+    def _fig_complete_(self):
+        import json
+        return json.dumps(self.fig_table)
+
     def __call__(self):
         if len(sys.argv) >= 2:
             if sys.argv[1] == '--qrun-commander-complete':
                 if 'qrun' in sys.argv:
                     sys.argv.remove('qrun')
                 return print(self.__command_complete__(sys.argv[2:]))
+            elif sys.argv[1] == '--qrun-fig-complete':
+                return print(self._fig_complete_())
             if sys.argv[1] == '--help':
                 return self.help()
         if len(self.command_table) <= 1:

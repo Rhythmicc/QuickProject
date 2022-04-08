@@ -7,9 +7,15 @@ from . import QproDefaultConsole, QproErrorString, user_lang
 
 
 class Commander:
-    def __init__(self):
+    def __init__(self, seg_flag: False):
+        """
+        QuickProject的Commander类，帮助快速构建一个命令工具
+
+        :param seg_flag: 是否将函数名中的'_'替换为'-'
+        """
         self.command_table = {}
         self.fig_table = [{'name': '--help', 'description': '获取帮助'}]
+        self.seg_flag = seg_flag
 
     def command(self):
         def wrapper(func):
@@ -19,6 +25,8 @@ class Commander:
             func_analyser = inspect.signature(func)
             func_args_parser = argparse.ArgumentParser()
             func_name = func.__name__.strip('_')
+            if self.seg_flag:
+                func_name = func_name.replace('_', '-')
 
             func_fig = {'name': func_name, 'description': func.__doc__.strip().split(':param')[0].strip(), 'args': []}
             if func_name in self.command_table:
@@ -170,6 +178,8 @@ class Commander:
         :param kwargs: 参数
         :return:
         """
+        if self.seg_flag:
+            func_name = func_name.replace('_', '-')
         if func_name not in self.command_table:
             return QproDefaultConsole.print(
                 QproErrorString,  f'{func_name} 未被注册!' if user_lang == 'zh' else f'{func_name} not registered!'

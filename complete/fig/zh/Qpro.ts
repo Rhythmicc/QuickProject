@@ -46,6 +46,12 @@ const completionSpec: Fig.Spec = {
     name: '-ls',
     description: '展示路径中的子项',
     args: {name: 'path', description: '路径', template: ['filepaths', 'folders']}
+  }, {
+    name: '-enable-complete',
+    description: '支持Commander应用的自动补全'
+  }, {
+    name: '-csv',
+    description: '将旧的Qpro配置表改为json格式'
   }],
   // Only uncomment if Qpro takes an argument
   // args: {}

@@ -7,7 +7,7 @@ from . import QproDefaultConsole, QproErrorString, user_lang
 
 
 class Commander:
-    def __init__(self, seg_flag: False):
+    def __init__(self, seg_flag: bool = False):
         """
         QuickProject的Commander类，帮助快速构建一个命令工具
 
@@ -21,14 +21,14 @@ class Commander:
         def wrapper(func):
             if not isfunction(func):
                 raise TypeError(f'{func} not a function')
-            param_doc = {i[0].strip(): i[1].strip() for i in re.findall(':param(.*?):(.*?)\n', func.__doc__, re.S)}
+            param_doc = {i[0].strip(): i[1].strip() for i in re.findall(':param(.*?):(.*?)\n', func.__doc__, re.S)} if func.__doc__ else {}
             func_analyser = inspect.signature(func)
             func_args_parser = argparse.ArgumentParser()
             func_name = func.__name__.strip('_')
             if self.seg_flag:
                 func_name = func_name.replace('_', '-')
 
-            func_fig = {'name': func_name, 'description': func.__doc__.strip().split(':param')[0].strip(), 'args': []}
+            func_fig = {'name': func_name, 'description': func.__doc__.strip().split(':param')[0].strip() if func.__doc__ else func_name, 'args': []}
             if func_name in self.command_table:
                 raise Exception(f'{func} already in command table')
             for arg in func_analyser.parameters.values():

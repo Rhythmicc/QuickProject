@@ -68,7 +68,7 @@ def run(use_txt=False, executable_file=str(config['executable_filename'])):
 def main():
     to_build = '-b' in qrun_argv or '-br' in qrun_argv
     to_run = '-r' in qrun_argv or '-b' not in qrun_argv
-    filename = rt_dir + config['compile_filename']
+    filename = rt_dir + config['compile_filename'] if config['compile_filename'] else ''
     flag = False
     if has_recog['-h']:
         menu_output({'title': 'qrun usage\n',
@@ -123,7 +123,10 @@ def main():
     os.chdir(rt_dir)
 
     if config['compile_tool'] and to_build:
-        os.system(config['compile_tool'].replace(config['compile_filename'], filename))
+        cmd = config['compile_tool']
+        if filename and config['compile_filename']:
+            cmd = cmd.replace(config['compile_filename'], filename)
+        os.system(cmd)
     if to_run:
         run('-i' in qrun_argv or '-if' in qrun_argv, o_file)
     if config['compile_tool'] and flag:

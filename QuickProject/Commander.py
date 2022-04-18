@@ -38,7 +38,7 @@ class Commander:
                     _type = arg.annotation
                 if arg.default != arg.empty:
                     _default = arg.default
-                if not _default:
+                if _default is None:
                     if _type == list:
                         func_args_parser.add_argument(f'-{arg.name}', type=str, nargs='+')
                         func_fig['args'].append({
@@ -86,7 +86,7 @@ class Commander:
                 _type = arg.annotation.__name__ if arg.annotation != arg.empty else 'Any'
                 _default = arg.default if arg.default != arg.empty else None
                 arg_str = f'{name}: [bold cyan]{_type}[/bold cyan]'
-                if _default:
+                if _default is not None:
                     if _type == 'str':
                         arg_str += f" = [dim]'[/dim][yellow]{_default}[/yellow][dim]'[/dim]"
                     elif _type == 'int' or _type == 'float':
@@ -157,6 +157,8 @@ class Commander:
             try:
                 func_name = sys.argv[1]
                 sys.argv = sys.argv[:1] + sys.argv[2:]
+                if func_name not in self.command_table:
+                    return QproDefaultConsole.print(QproErrorString, f'"{func_name}"' + (':无该命令' if user_lang != 'zh' else ':No such command'))
             except IndexError:
                 return QproDefaultConsole.print(
                     QproErrorString, '至少输入一个子命令!' if user_lang == 'zh' else 'Input at least one sub command!'

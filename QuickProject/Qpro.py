@@ -116,7 +116,7 @@ def _external_create(project_name: str, key: str = ''):
     from git import Repo
 
     if key:
-        if key in ['empty', '空项目']:
+        if key in ['Empty', '空白项目']:
             return _create_empty_project(project_name)
 
         try:
@@ -162,9 +162,9 @@ def create():
             'name': 'lang_name',
             'message': 'Choose Lang | 选择语言:',
             'choices': [
-                'empty' if user_lang != 'zh' else '空项目',
-                'Language Template' if user_lang != 'zh' else '语言模板',
-                'external' if user_lang != 'zh' else '外部项目'
+                'Empty' if user_lang != 'zh' else '空白项目',
+                'Template' if user_lang != 'zh' else '内置模板',
+                'External' if user_lang != 'zh' else '外部项目'
             ]
         })
 

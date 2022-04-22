@@ -150,9 +150,9 @@ def _external_create(project_name: str, key: str = ''):
 
 def create():
     try:
-        project_name = sys.argv[sys.argv.index('-c') + 1]
+        project_name = sys.argv[2]
     except IndexError:
-        return QproDefaultConsole.print(QproWarnString, 'usage: Qpro -c <project>' if user_lang != 'zh' else '使用: Qpro -c <项目>')
+        return QproDefaultConsole.print(QproWarnString, 'usage: Qpro create <project>' if user_lang != 'zh' else '使用: Qpro create <项目>')
     else:
         if os.path.exists(project_name) and os.path.isdir(project_name):
             return QproDefaultConsole.print(QproErrorString, '"%s" is exist!' % (os.path.abspath(project_name)))
@@ -198,9 +198,9 @@ def create():
 
 
 def scp(smv_flag: bool = False):
-    kw = '-scp' if not smv_flag else '-smv'
+    kw = 'scp' if not smv_flag else 'smv'
     try:
-        path = sys.argv[sys.argv.index(kw) + 1]
+        path = sys.argv[2]
         sub_path = __sub_path(path)
     except IndexError:
         return QproDefaultConsole.print(
@@ -238,11 +238,11 @@ def smv():
 
 def get():
     try:
-        path = sys.argv[sys.argv.index('-get') + 1]
+        path = sys.argv[2]
         sub_path = __sub_path(path, isExist=False)
     except IndexError:
         return QproDefaultConsole.print(
-            QproWarnString, 'usage: Qpro -get <path>' if user_lang != 'zh' else '使用: Qpro -get <路径>'
+            QproWarnString, 'usage: Qpro get <path>' if user_lang != 'zh' else '使用: Qpro get <路径>'
         )
     else:
         if not sub_path:
@@ -428,11 +428,11 @@ def delete_all():
 
 def delete():
     try:
-        path = os.path.abspath(sys.argv[sys.argv.index('-del') + 1])
+        path = os.path.abspath(sys.argv[2])
         sub_path = __sub_path(path)
     except IndexError:
         return QproDefaultConsole.print(
-            QproWarnString, 'usage: Qpro -del <path>' if user_lang != 'zh' else '使用: Qpro -del <路径>'
+            QproWarnString, 'usage: Qpro del <path>' if user_lang != 'zh' else '使用: Qpro del <路径>'
         )
     else:
         if not sub_path:
@@ -456,7 +456,7 @@ def delete():
 
 def tele_ls():
     try:
-        path = sys.argv[sys.argv.index('-ls') + 1]
+        path = sys.argv[2]
         sub_path = __sub_path(path, False)
     except IndexError:
         sub_path = __sub_path('./', False)
@@ -490,17 +490,17 @@ def enable_complete():
 
 
 func = {
-    '-c': create,
-    '-scp': scp,
-    '-smv': smv,
-    '-get': get,
-    '-adjust': adjust,
-    '-ssh': ssh,
-    '-del-all': delete_all,
-    '-del': delete,
-    '-ls': tele_ls,
-    '-csv': template_format,
-    '-enable-complete': enable_complete
+    'create': create,
+    'scp': scp,
+    'smv': smv,
+    'get': get,
+    'adjust': adjust,
+    'ssh': ssh,
+    'del-all': delete_all,
+    'del': delete,
+    'ls': tele_ls,
+    'csv': template_format,
+    'enable-complete': enable_complete
 }
 
 
@@ -508,34 +508,35 @@ def main():
     if len(sys.argv) < 2 or '-h' == sys.argv[1]:
         menu_output({'title': 'Qpro usage\n' if user_lang != 'zh' else 'Qpro 菜单\n',
                      'lines': [
-                        ('-init', 'let current dir be a Qpro project!' if user_lang != 'zh' else '使当前目录成为Qpro项目'),
+                        ('init', 'let current dir be a Qpro project!' if user_lang != 'zh' else '使当前目录成为Qpro项目'),
                         ('-h', 'help' if user_lang != 'zh' else '帮助'),
-                        ('-c   [bold magenta]<name>', 'create a Qpro project' if user_lang != 'zh' else '创建Qpro项目'),
-                        ('-update', 'update Qpro' if user_lang != 'zh' else '更新Qpro'),
-                        ('-adjust', 'adjust configure' if user_lang != 'zh' else '调整配置表'),
-                        ('-ssh', 'login server by ssh' if user_lang != 'zh' else '通过SSH登录远程映射'),
+                        ('create   [bold magenta]<name>', 'create a Qpro project' if user_lang != 'zh' else '创建Qpro项目'),
+                        ('update', 'update Qpro' if user_lang != 'zh' else '更新Qpro'),
+                        ('adjust', 'adjust configure' if user_lang != 'zh' else '调整配置表'),
+                        ('ssh', 'login server by ssh' if user_lang != 'zh' else '通过SSH登录远程映射'),
                         (
-                            '-scp [bold magenta]<path>',
+                            'scp [bold magenta]<path>',
                             'upload path to default server target' if user_lang != 'zh' else '上传路径到默认的远程映射对应位置'
                         ),
                         (
-                            '-smv [bold magenta]<path>',
+                            'smv [bold magenta]<path>',
                             'delete after scp' if user_lang != 'zh' else '上传完成后删除文件或目录'
                         ),
                         (
-                            '-scp-init',
+                            'scp-init',
                             'upload all of project to server target' if user_lang != 'zh' else '上传当前全部内容到远程映射'
                         ),
                         (
-                            '-get [bold magenta]<path>',
+                            'get [bold magenta]<path>',
                             'download file from server target' if user_lang != 'zh' else '从远程映射下载'
                         ),
                         (
-                            '-del [bold magenta]<path>',
+                            'del [bold magenta]<path>',
                             'delete path in project' if user_lang != 'zh' else '同时删除本地及远程映射文件或目录'
                         ),
-                        ('-del-all', 'delete Qpro project' if user_lang != 'zh' else '销毁当前Qpro项目(本地+远程)'),
-                        ('-ls  [bold magenta]<path>', 'list element in path' if user_lang != 'zh' else '展示路径中的子项'),
+                        ('del-all', 'delete Qpro project' if user_lang != 'zh' else '销毁当前Qpro项目(本地+远程)'),
+                        ('ls  [bold magenta]<path>', 'list element in path' if user_lang != 'zh' else '展示路径中的子项'),
+                        ('enable-complete', 'enable complete' if user_lang != 'zh' else '启用Commander类的自动补全'),
                         ('tmpm *', 'manage your template' if user_lang != 'zh' else '模板管理器'),
                         ('qrun *', 'run your Qpro project' if user_lang != 'zh' else '运行器'),
                         (
@@ -543,13 +544,13 @@ def main():
                             'run beat detector for two source files' if user_lang != 'zh' else '对拍器'
                         )],
                      'prefix': 'Qpro'})
-    elif '-update' == sys.argv[1]:
+    elif 'update' == sys.argv[1]:
         os.system('pip3 install Qpro --upgrade')
     elif sys.argv[1] in func:
         func[sys.argv[1]]()
-    elif sys.argv[1] == '-scp-init':
+    elif sys.argv[1] == 'scp-init':
         scp_init(get_config()['server_target'])
-    elif '-init' not in sys.argv:
+    elif 'init' != sys.argv[1]:
         QproDefaultConsole.print(
             QproErrorString, 'wrong usage! Run "Qpro -h" for help!' if user_lang != 'zh' else '请运行 "Qpro -h" 查看帮助!'
         )

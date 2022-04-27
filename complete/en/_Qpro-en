@@ -7,9 +7,18 @@ prev=${words[CURRENT-1]}
 (( $+functions[_qpro_args_comp_zh] )) ||
 _qpro_args_comp_zh() {
     local -a opt_args
-    if [[ ${prev} == -scp ]] || [[ ${prev} == -smv ]] || [[ ${prev} == -get ]] || [[ ${prev} == -del ]] || [[ ${prev} == -ls ]]; then
+    if [[ ${prev} == scp ]] || [[ ${prev} == smv ]] || [[ ${prev} == get ]] || [[ ${prev} == del ]] || [[ ${prev} == ls ]]; then
         _arguments -S -s '*:filename:_files'
         return
+    elif [[ ${prev} == register-global ]]; then
+        opt_args=(
+            --disable_global_command:'To disable global command'
+        )
+    elif [[ ${prev} == --disable_global_command ]]; then
+        opt_args=(
+            1:'Enable global command'
+            0:'Disable global command'
+        )
     else
         opt_args=()
     fi
@@ -20,20 +29,24 @@ _qpro_args_comp_zh() {
 _qpro_main_zh() {
     local -a args
     args=(
-        -init:'Initial the current directory as Qpro project',
+        init:'Initial the current directory as Qpro project',
         -h:'help'
-        -c:'create Qpro project'
-        -update:'update Qpro'
-        -adjust:'adjust configuration'
-        -ssh:'login server by ssh'
-        -scp:'upload <path> to default server target'
-        -smv:'delete <path> after scp'
-        -scp-init:'upload all of project to server target'
-        -get:'download <file> from server target'
-        -del:'delete <path> in project'
-        -del-all:'delete Qpro project'
-        -ls:'list element in <path>'
-        -enable-complete:'Support Commander Tab Complete (slow)'
+        create:'create Qpro project'
+        update:'update Qpro'
+        adjust:'adjust configuration'
+        ssh:'login server by ssh'
+        scp:'upload <path> to default server target'
+        smv:'delete <path> after scp'
+        scp-init:'upload all of project to server target'
+        get:'download <file> from server target'
+        del:'delete <path> in project'
+        del-all:'delete Qpro project'
+        ls:'list element in <path>'
+        bin:'Execute global command'
+        enable-complete:'Support Commander Tab Complete (slow)'
+        register-global:'Register global command'
+        gen-fig-script:'Generate fig autocomplete script'
+        gen-zsh-comp:'Generate zsh autocomplete script'
     )
 
     _describe -t common-commands 'common commands' args && _ret=0

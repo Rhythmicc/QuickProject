@@ -1,12 +1,12 @@
 {
  "compile_tool": "",
  "compile_filename": "",
- "executable_filename": "",
+ "executable_filename": "python3 main.py",
  "input_file": "",
- "template_root": "/",
+ "template_root": "",
  "server_target": [
-  "lianhaocheng@localhost:/opt/homebrew/Cellar/python@3.10/3.10.2/Frameworks/Python.framework/Versions/3.10/lib/python3.10/site-packages/",
-  22
+  "lianhaocheng@localhost:/opt/homebrew/lib/python3.10/site-packages/",
+  "22"
  ],
  "enable_complete": true
 }

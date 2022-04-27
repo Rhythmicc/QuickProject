@@ -11,6 +11,9 @@ Qpro.egg-info/top_level.txt
 Qpro.egg-info/zip-safe
 QuickProject/Commander.py
 QuickProject/Qpro.py
+QuickProject/QproFigTable.py
+QuickProject/QproZshComp.py
+QuickProject/__config__.py
 QuickProject/__init__.py
 QuickProject/detector.py
 QuickProject/qrun.py

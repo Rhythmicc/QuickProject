@@ -41,31 +41,40 @@ class Commander:
                 if _default is None:
                     if _type == list:
                         func_args_parser.add_argument(f'-{arg.name}', type=str, nargs='+')
+                        cur_args = {
+                            'name': arg.name,
+                            'description': param_doc.get(arg.name, f'<{arg.name}>'),
+                            'isVariadic': True
+                        }
+                        if 'file' in arg.name.lower() or 'path' in arg.name.lower():
+                            cur_args['template'] = ['filepaths', 'folders']
                         func_fig['args'].append({
                             'name': f'-{arg.name}',
                             'description': param_doc.get(arg.name, f'<{arg.name}>'),
-                            'args': {
-                                'name': arg.name,
-                                'description': param_doc.get(arg.name, f'<{arg.name}>'),
-                                'isVariadic': True
-                            }
+                            'args': cur_args
                         })
                     else:
                         func_args_parser.add_argument(arg.name, type=_type)
-                        func_fig['args'].append({
+                        cur_args = {
                             'name': arg.name,
                             'description': param_doc.get(arg.name, f'<{arg.name}>'),
-                        })
+                        }
+                        if 'file' in arg.name.lower() or 'path' in arg.name.lower():
+                            cur_args['template'] = ['filepaths', 'folders']
+                        func_fig['args'].append(cur_args)
                 else:
                     func_args_parser.add_argument(f'--{arg.name}', required=False, type=_type, default=_default)
+                    cur_args = {
+                        'name': arg.name,
+                        'description': param_doc.get(arg.name, f'<{arg.name}>'),
+                    }
+                    if 'file' in arg.name.lower() or 'path' in arg.name.lower():
+                        cur_args['template'] = ['filepaths', 'folders']
                     func_fig['args'].append({
                         'name': f'--{arg.name}',
                         'description': param_doc.get(arg.name, f'<{arg.name}>'),
                         'isOptional': True,
-                        'args': {
-                            'name': arg.name,
-                            'description': param_doc.get(arg.name, f'<{arg.name}>'),
-                        }
+                        'args': cur_args
                     })
             self.fig_table.append(func_fig)
             self.command_table[func_name] = {'func': func, 'analyser': func_analyser, 'parser': func_args_parser, 'param_doc': param_doc}
@@ -79,7 +88,7 @@ class Commander:
         table.add_column('必填参数\nRequired Args', justify='center')
         table.add_column('可选参数\nOptionnal Args', justify='center')
         for function in self.command_table:
-            cur_line = ['[bold magenta]' + (function if len(self.command_table) > 1 else '*') + '[/bold magenta]']
+            cur_line = ['[bold magenta]' + function + '[/bold magenta]']
             arg1, arg2 = [], []
             for arg in self.command_table[function]['analyser'].parameters.values():
                 name = '[underline]' + arg.name + '[/underline]'
@@ -106,20 +115,16 @@ class Commander:
         :param route_path:
         :return:
         """
-        if not route_path and len(self.command_table) > 1:
+        if not route_path:
             ls = [
-                f"{i}:{self.command_table[i]['func'].__doc__.strip().split(':param')[0].strip() if self.command_table[i]['func'].__doc__ else 'NONE'}"
+                f"{i}:{self.command_table[i]['func'].__doc__.strip().split(':param')[0].strip().replace(' ', '_') if self.command_table[i]['func'].__doc__ else 'NONE'}"
                 for i in self.command_table
             ]
             return '\n'.join(
-                (ls if len(ls) > 1 else []) + ["--help:应用帮助" if user_lang == 'zh' else '--help:Application help']
+                ls + ["--help:应用帮助" if user_lang == 'zh' else '--help:Application help']
             )
-        if len(self.command_table) > 1:
-            call_func = route_path[0]
-            has_args = [i.strip().strip('--') for i in route_path[1:]]
-        else:
-            call_func = list(self.command_table.keys())[0]
-            has_args = [i.strip().strip('--') for i in route_path]
+        call_func = route_path[0]
+        has_args = [i.strip().strip('--') for i in route_path[1:]]
         if call_func not in self.command_table:
             return '错误:无该命令' if user_lang != 'zh' else 'ERROR:No such command'
         call_analyser = self.command_table[call_func]['analyser']
@@ -134,7 +139,7 @@ class Commander:
 
     def _fig_complete_(self):
         import json
-        return json.dumps(self.fig_table)
+        return json.dumps(self.fig_table, ensure_ascii=False)
 
     def __call__(self):
         if len(sys.argv) >= 2:
@@ -146,30 +151,22 @@ class Commander:
                 return print(self._fig_complete_())
             if sys.argv[1] == '--help':
                 return self.help()
-        if len(self.command_table) <= 1:
-            func_info = self.command_table[list(self.command_table.keys())[0]]
+        try:
+            func_name = sys.argv[1]
+            sys.argv = sys.argv[:1] + sys.argv[2:]
+            if func_name not in self.command_table:
+                return QproDefaultConsole.print(QproErrorString, f'"{func_name}"' + (':无该命令' if user_lang != 'zh' else ':No such command'))
+        except IndexError:
+            return QproDefaultConsole.print(
+                QproErrorString, '至少输入一个子命令!' if user_lang == 'zh' else 'Input at least one sub command!'
+            )
+        else:
+            func_info = self.command_table[func_name]
             args = func_info['parser'].parse_args()
             try:
                 return func_info['func'](**{i[0]: i[1] for i in args._get_kwargs()})
             except:
                 return QproDefaultConsole.print_exception()
-        else:
-            try:
-                func_name = sys.argv[1]
-                sys.argv = sys.argv[:1] + sys.argv[2:]
-                if func_name not in self.command_table:
-                    return QproDefaultConsole.print(QproErrorString, f'"{func_name}"' + (':无该命令' if user_lang != 'zh' else ':No such command'))
-            except IndexError:
-                return QproDefaultConsole.print(
-                    QproErrorString, '至少输入一个子命令!' if user_lang == 'zh' else 'Input at least one sub command!'
-                )
-            else:
-                func_info = self.command_table[func_name]
-                args = func_info['parser'].parse_args()
-                try:
-                    return func_info['func'](**{i[0]: i[1] for i in args._get_kwargs()})
-                except:
-                    return QproDefaultConsole.print_exception()
 
     def real_call(self, func_name: str, *args, **kwargs):
         """

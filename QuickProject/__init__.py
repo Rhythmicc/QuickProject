@@ -1,15 +1,6 @@
 import os
 import sys
-from rich.console import Console
-
-try:
-    import QuickStart_Rhy
-
-    user_lang = QuickStart_Rhy.user_lang
-    qs_flag = True
-except:
-    user_lang = 'en'
-    qs_flag = False
+from .__config__ import _ask, QproConfig, QproDefaultConsole
 
 if sys.platform.startswith('win'):
     is_win = True
@@ -17,7 +8,18 @@ if sys.platform.startswith('win'):
 else:
     is_win = False
     dir_char = '/'
-QproDefaultConsole = Console()
+
+user_root = os.path.expanduser('~')
+_qpro_config = QproConfig(user_root + dir_char + '.qprorc', os.path.exists(user_root + dir_char + '.qprorc'))
+
+try:
+    import QuickStart_Rhy
+    qs_flag = True
+except:
+    qs_flag = False
+
+user_lang = _qpro_config.select('default_language')
+user_pip = _qpro_config.select('default_pip')
 QproErrorString = '[bold red][ERRO]' if user_lang != 'zh' else '[bold red][错误]'
 QproInfoString = '[bold cyan][INFO]' if user_lang != 'zh' else '[bold cyan][提示]'
 QproWarnString = '[bold yellow][WARN]' if user_lang != 'zh' else '[bold yellow][警告]'
@@ -57,6 +59,42 @@ def __sub_path(path, isExist=True):
         return ''
     abs_path = os.path.abspath(path)
     return abs_path.replace(rt_dir, '') if abs_path.startswith(rt_dir) else ''
+
+
+def requirePackage(pname: str, module: str = "", real_name: str = "", not_exit: bool = True, not_ask: bool = False, set_pip: str = user_pip):
+    """
+    获取本机上的python第三方库
+
+    :param pname: 库名
+    :param module: 待引入的模块名，可缺省
+    :param real_name: 用于 pip3 install 的名字
+    :param not_exit: 安装后不退出
+    :return: 库或模块的地址
+    """
+    try:
+        exec(f'from {pname} import {module}' if module else f"import {pname}")
+    except (ModuleNotFoundError, ImportError):
+        if not_ask:
+            return None
+        from PyInquirer import prompt
+
+        confirm = prompt({
+            'type': 'confirm',
+            'name': 'install',
+            'message': f"""Qs require {pname + (' -> ' + module if module else '')}, confirm to install?  
+  Qs 依赖 {pname + (' -> ' + module if module else '')}, 是否确认安装?""",
+            'default': True})['install']
+        if confirm:
+            os.system(f'{set_pip} install {pname if not real_name else real_name} -U')
+            if not_exit:
+                exec(f'from {pname} import {module}' if module else f"import {pname}")
+            else:
+                QproDefaultConsole.print(QproInfoString, f'just run again: "{" ".join(sys.argv)}"' if user_lang != 'zh' else f'请重新运行: "{" ".join(sys.argv)}"')
+                exit(0)
+        else:
+            exit(-1)
+    finally:
+        return eval(f'{module if module else pname}')
 
 
 class SshProtocol:
@@ -121,14 +159,6 @@ class SshProtocol:
                     port=port, domain=domain, aim=target + dstPath
                 )
             )
-
-
-def _ask(question):
-    from PyInquirer import prompt
-    try:
-        return prompt(question)[question['name']]
-    except:
-        exit(0)
 
 
 def menu_output(menu):

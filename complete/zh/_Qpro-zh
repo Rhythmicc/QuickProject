@@ -7,9 +7,18 @@ prev=${words[CURRENT-1]}
 (( $+functions[_qpro_args_comp_zh] )) ||
 _qpro_args_comp_zh() {
     local -a opt_args
-    if [[ ${prev} == -scp ]] || [[ ${prev} == -smv ]] || [[ ${prev} == -get ]] || [[ ${prev} == -del ]] || [[ ${prev} == -ls ]]; then
+    if [[ ${prev} == scp ]] || [[ ${prev} == smv ]] || [[ ${prev} == get ]] || [[ ${prev} == del ]] || [[ ${prev} == ls ]]; then
         _arguments -S -s '*:filename:_files'
         return
+    elif [[ ${prev} == register-global ]]; then
+        opt_args=(
+            --disable_global_command:'是否禁用全局命令'
+        )
+    elif [[ ${prev} == --disable_global_command ]]; then
+        opt_args=(
+            1:'启用全局命令'
+            0:'禁用全局命令'
+        )
     else
         opt_args=()
     fi
@@ -20,20 +29,24 @@ _qpro_args_comp_zh() {
 _qpro_main_zh() {
     local -a args
     args=(
-        -init:'初始化当前目录为Qpro项目',
+        init:'初始化当前目录为Qpro项目',
         -h:'帮助'
-        -c:'创建Qpro项目'
-        -update:'更新Qpro'
-        -adjust:'调整配置表'
-        -ssh:'通过SSH登录远程映射'
-        -scp:'上传<路径>到远程映射对应位置'
-        -smv:'上传完成后删除文件或目录'
-        -scp-init:'上传当前全部内容到远程映射'
-        -get:'从远程映射下载<路径>'
-        -del:'同时删除本地及远程映射<文件或目录>'
-        -del-all:'销毁当前Qpro项目(本地+远程)'
-        -ls:'展示<路径>中的子项'
-        -enable-complete:'支持Commander的Tab补全(这会导致Tab补全变慢一些)'
+        create:'创建Qpro项目'
+        update:'更新Qpro'
+        adjust:'调整配置表'
+        ssh:'通过SSH登录远程映射'
+        scp:'上传<路径>到远程映射对应位置'
+        smv:'上传完成后删除文件或目录'
+        scp-init:'上传当前全部内容到远程映射'
+        get:'从远程映射下载<路径>'
+        del:'同时删除本地及远程映射<文件或目录>'
+        del-all:'销毁当前Qpro项目(本地+远程)'
+        ls:'展示<路径>中的子项'
+        bin:'执行全局命令'
+        enable-complete:'支持Commander的Tab补全(这会导致Tab补全变慢一些)'
+        register-global:'将当前Qpro项目注册为全局命令'
+        gen-fig-script:'生成fig自动补全脚本'
+        gen-zsh-comp:'生成zsh自动补全脚本'
     )
 
     _describe -t common-commands 'common commands' args && _ret=0

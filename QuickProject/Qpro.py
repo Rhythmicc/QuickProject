@@ -95,7 +95,7 @@ def _search_supported_languages(is_CN):
 
     try:
         res = json.loads(requests.get(f'https://qpro.rhythmlian.cn/?keyword={kw}&is_CN={str(is_CN).lower()}').text)
-        if res['status'] != 'Success':
+        if not res['status']:
             QproDefaultConsole.print(QproErrorString, res['message'])
             return None
         data = {i[0]: i[1:] for i in res['data']}

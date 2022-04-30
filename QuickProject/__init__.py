@@ -76,14 +76,12 @@ def requirePackage(pname: str, module: str = "", real_name: str = "", not_exit: 
     except (ModuleNotFoundError, ImportError):
         if not_ask:
             return None
-        from PyInquirer import prompt
-
-        confirm = prompt({
+        confirm = _ask({
             'type': 'confirm',
             'name': 'install',
             'message': f"""Qs require {pname + (' -> ' + module if module else '')}, confirm to install?  
   Qs 依赖 {pname + (' -> ' + module if module else '')}, 是否确认安装?""",
-            'default': True})['install']
+            'default': True})
         if confirm:
             os.system(f'{set_pip} install {pname if not real_name else real_name} -U')
             if not_exit:

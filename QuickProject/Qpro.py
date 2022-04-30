@@ -231,13 +231,12 @@ def scp(smv_flag: bool = False):
 
 
 def smv():
-    from PyInquirer import prompt
-    if prompt({
+    if _ask({
         'type': 'confirm',
         'message': 'Confirm delete after transform | 确认传输后删除',
         'default': True,
         'name': 'confirm'
-    })['confirm']:
+    }):
         scp(True)
 
 

@@ -650,11 +650,6 @@ def gen_zsh_comp():
     _arguments -S -s '*:filename:_files'
     return
     """
-    file_comp3 = """
-    if [[ ${prev} == __sub_cmd__ ]]; then
-        _arguments -S -s '*:filename:_files'
-        return
-    """
     for cmd in subcommands:
         proj_name = cmd.split(".")[0]
         if not os.path.exists(os.path.join(QproGlobalDir, 'bin', f'{proj_name}')):

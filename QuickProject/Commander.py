@@ -25,10 +25,10 @@ class Commander:
             func_analyser = inspect.signature(func)
             func_args_parser = argparse.ArgumentParser()
             func_name = func.__name__.strip('_')
+            description = func.__doc__.strip().split(':param')[0].strip() if func.__doc__ else func_name.replace('_', ' ')
             if self.seg_flag:
                 func_name = func_name.replace('_', '-')
-
-            func_fig = {'name': func_name, 'description': func.__doc__.strip().split(':param')[0].strip() if func.__doc__ else func_name, 'args': []}
+            func_fig = {'name': func_name, 'description': description, 'args': []}
             if func_name in self.command_table:
                 raise Exception(f'{func} already in command table')
             for arg in func_analyser.parameters.values():
@@ -63,6 +63,9 @@ class Commander:
                             cur_args['template'] = ['filepaths', 'folders']
                         func_fig['args'].append(cur_args)
                 else:
+                    if _type == list:
+                        QproDefaultConsole.print(QproErrorString, f'{func_name}:', '"list" 类型不可以有默认值' if user_lang == 'zh' else '"list" type can not have default value')
+                        return
                     func_args_parser.add_argument(f'--{arg.name}', required=False, type=_type, default=_default)
                     cur_args = {
                         'name': arg.name,
@@ -77,16 +80,27 @@ class Commander:
                         'args': cur_args
                     })
             self.fig_table.append(func_fig)
-            self.command_table[func_name] = {'func': func, 'analyser': func_analyser, 'parser': func_args_parser, 'param_doc': param_doc}
+            self.command_table[func_name] = {'func': func, 'analyser': func_analyser, 'parser': func_args_parser, 'param_doc': param_doc, 'description': description}
         return wrapper
 
     def help(self):
         from rich.table import Table
         from rich.box import SIMPLE_HEAVY
-        table = Table(show_edge=False, row_styles=['none', 'dim'], box=SIMPLE_HEAVY, title=f'[bold underline]HELP[/bold underline]\n')
+        table = Table(show_edge=False, row_styles=['none', 'dim'], box=SIMPLE_HEAVY, title=f'[bold underline]帮助 HELP[/bold underline]\n')
         table.add_column('子命令\nSub Command', justify='center')
+        table.add_column('描述\nDescription', justify='center')
         table.add_column('必填参数\nRequired Args', justify='center')
-        table.add_column('可选参数\nOptionnal Args', justify='center')
+        has_option = False
+        for function in self.command_table:
+            for arg in self.command_table[function]['analyser'].parameters.values():
+                _default = arg.default if arg.default != arg.empty else None
+                if _default is not None:
+                    has_option = True
+                    break
+            if has_option:
+                break
+        if has_option:
+            table.add_column('可选参数\nOptionnal Args', justify='center')
         for function in self.command_table:
             cur_line = ['[bold magenta]' + function + '[/bold magenta]']
             arg1, arg2 = [], []
@@ -105,7 +119,9 @@ class Commander:
                     arg2.append(arg_str)
                 else:
                     arg1.append(arg_str)
-            cur_line += [', '.join(arg1), ', '.join(arg2)]
+            cur_line += [self.command_table[function]['description'], ', '.join(arg1)]
+            if has_option:
+                cur_line += [', '.join(arg2)]
             table.add_row(*cur_line)
         QproDefaultConsole.print(table, justify='center')
 

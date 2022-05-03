@@ -83,22 +83,39 @@ class Commander:
             self.command_table[func_name] = {'func': func, 'analyser': func_analyser, 'parser': func_args_parser, 'param_doc': param_doc, 'description': description}
         return wrapper
 
+    def _check_args_(self, is_option: bool = True):
+        res = False
+        if is_option:
+            for function in self.command_table:
+                for arg in self.command_table[function]['analyser'].parameters.values():
+                    _default = arg.default if arg.default != arg.empty else None
+                    if _default is not None:
+                        res = True
+                        break
+                if res:
+                    break
+        else:
+            for function in self.command_table:
+                for arg in self.command_table[function]['analyser'].parameters.values():
+                    _default = arg.default if arg.default != arg.empty else None
+                    if _default is None:
+                        res = True
+                        break
+                if res:
+                    break
+        return res
+
     def help(self):
         from rich.table import Table
         from rich.box import SIMPLE_HEAVY
+
+        has_requir = self._check_args_(False)
+        has_option = self._check_args_(True)
         table = Table(show_edge=False, row_styles=['none', 'dim'], box=SIMPLE_HEAVY, title=f'[bold underline]帮助 HELP[/bold underline]\n')
         table.add_column('子命令\nSub Command', justify='center')
         table.add_column('描述\nDescription', justify='center')
-        table.add_column('必填参数\nRequired Args', justify='center')
-        has_option = False
-        for function in self.command_table:
-            for arg in self.command_table[function]['analyser'].parameters.values():
-                _default = arg.default if arg.default != arg.empty else None
-                if _default is not None:
-                    has_option = True
-                    break
-            if has_option:
-                break
+        if has_requir:
+            table.add_column('必填参数\nRequired Args', justify='center')
         if has_option:
             table.add_column('可选参数\nOptionnal Args', justify='center')
         for function in self.command_table:
@@ -119,9 +136,11 @@ class Commander:
                     arg2.append(arg_str)
                 else:
                     arg1.append(arg_str)
-            cur_line += [self.command_table[function]['description'], ', '.join(arg1)]
+            cur_line.append(self.command_table[function]['description'])
+            if has_requir:
+                cur_line.append(', '.join(arg1))
             if has_option:
-                cur_line += [', '.join(arg2)]
+                cur_line.append(', '.join(arg2))
             table.add_row(*cur_line)
         QproDefaultConsole.print(table, justify='center')
 

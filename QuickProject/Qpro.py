@@ -153,6 +153,41 @@ def _external_create(project_name: str, key: str = ''):
         __findAndReplace(os.getcwd(), templateProjectUrls[1], project_name)
 
 
+def __get_server_target_from_string():
+    """
+    从字符串中获取服务器目标
+    """
+    server_target = _ask({
+        'type': 'input',
+        'name': 'server_target',
+        'message': 'Input user@ip:dir_path if you need scp' if user_lang != 'zh' else '输入 用户@IP:路径 如果你打算使用SSH'
+    }).strip().replace(dir_char, '/')
+
+    if server_target and not server_target.endswith('/'):
+        if not server_target.endswith(':'):
+            server_target += '/'
+        else:
+            server_target += '~/'
+    user, host, path, port = '', '', '', 22
+    if server_target:
+        user, target = server_target.split('@')
+        target = target.split(':')
+        host = ':'.join(target[:-1])
+        path = target[-1] + ('' if target[-1].endswith('/') else '/')
+        port = _ask({
+            'type': 'input',
+            'name': 'port',
+            'message': 'input port' if user_lang != 'zh' else '输入端口号',
+            'default': '22'
+        })
+    return {
+        'user': user,
+        'host': host,
+        'port': port,
+        'path': path
+    }
+
+
 def create():
     try:
         project_name = sys.argv[2]
@@ -179,16 +214,8 @@ def create():
         else:
             _external_create(project_name, lang)
 
-        server_target = Prompt.ask(
-            'input user@ip:dir_path if you need scp' if user_lang != 'zh' else '输入 用户@IP:路径 如果你打算使用SSH'
-        ).strip().replace(dir_char, '/')
-        if server_target and not server_target.endswith('/'):
-            if not server_target.endswith(':'):
-                server_target += '/'
-            else:
-                server_target += '~/'
         config = get_config()
-        config['server_target'] = [server_target, '22']
+        config['server_targets'] = [__get_server_target_from_string()]
         __format_json(config, configure_name)
 
         if _ask({
@@ -288,14 +315,6 @@ def pro_init():
                                          if user_lang != 'zh' else
                                          '没有找到 "%s", 请设置源文件'
                                      ) % source_file).strip()
-    server_target = Prompt.ask(
-        'input user@ip:dir_path if you need scp' if user_lang != 'zh' else '输入 用户@IP:路径 如果你打算使用SSH'
-    ).strip().replace(dir_char, '/')
-    if ':' in server_target and not server_target.endswith('/'):
-        if not server_target.endswith(':'):
-            server_target += '/'
-        else:
-            server_target += '~/'
     if lang[0] != 'javac':
         execute = lang[1] + 'dist' + dir_char + work_project if lang[0] else lang[1] + source_file
     elif lang_name != 'empty | other':
@@ -305,30 +324,13 @@ def pro_init():
         execute = ''
     if (not os.path.exists('dist') or not os.path.isdir('dist')) and lang_name != 'empty | other':
         os.mkdir('dist')
-    user, host, path, port = '', '', '', '22'
-    if server_target:
-        user, target = server_target.split('@')
-        target = target.split(':')
-        host = ':'.join(target[:-1])
-        path = target[-1] + ('' if target[-1].endswith('/') else '/')
-        port = _ask({
-            'type': 'input',
-            'name': 'port',
-            'message': 'input port' if user_lang != 'zh' else '输入端口号',
-            'default': '22'
-        })
     info = [
         ['compile_tool', lang[0].replace('--source_file--', source_file).replace('--execute--', execute)],
         ['compile_filename', source_file],
         ['executable_filename', execute],
         ['input_file', 'dist' + dir_char + 'input.txt' if lang_name != 'empty' else ''],
         ['template_root', 'template' + dir_char if lang_name != 'empty' else ''],
-        ['server_targets', {
-            'user': user,
-            'host': host,
-            'path': path,
-            'port': port
-        }]
+        ['server_targets', __get_server_target_from_string()],
     ]
     __format_json(info, configure_name)
     if lang_name and lang_name == 'empty | other':
@@ -338,7 +340,7 @@ def pro_init():
             'default': True,
             'name': 'confirm'
         }):
-            scp_init(info[-1][1:] if server_target else None)
+            scp_init(info[-1][1:])
         return
     with open(info[3][-1], 'w') as f:
         f.write('edit this file to make input' if user_lang != 'zh' else '编辑此文件作为程序输入')
@@ -352,13 +354,13 @@ def pro_init():
     except Exception as e:
         QproDefaultConsole.print(
             QproErrorString, "make backup failed with error: %s, you need backup code by yourself!" % e)
-    if server_target and _ask({
+    if _ask({
         'type': 'confirm',
         'message': 'Confirm to sync project | 确认同步项目',
         'default': True,
         'name': 'confirm'
     }):
-        scp_init(info[-1][1:] if server_target else None)
+        scp_init(info[-1][1:])
 
 
 def ssh():

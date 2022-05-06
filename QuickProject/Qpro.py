@@ -56,6 +56,8 @@ def remove(path):
 
 
 def scp_init(server_targets: list):
+    if not server_targets:
+        return
     for server_target in server_targets:
         user, host, port, target = server_target['user'], server_target['host'], server_target['port'], server_target['path']
         st = SshProtocol.post_all_in_folder(user, host, target, port, '')
@@ -308,11 +310,11 @@ def pro_init():
         user, target = server_target.split('@')
         target = target.split(':')
         host = ':'.join(target[:-1])
-        path = target[-1]
+        path = target[-1] + ('' if target[-1].endswith('/') else '/')
         port = _ask({
             'type': 'input',
             'name': 'port',
-            'message': 'input port if you need ssh' if user_lang != 'zh' else '输入端口号 如果你打算使用SSH',
+            'message': 'input port' if user_lang != 'zh' else '输入端口号',
             'default': '22'
         })
     info = [
@@ -329,24 +331,34 @@ def pro_init():
         }]
     ]
     __format_json(info, configure_name)
-    if lang_name and lang_name == 'empty':
-        scp_init(info[-1][1:] if server_target else None)
+    if lang_name and lang_name == 'empty | other':
+        if _ask({
+            'type': 'confirm',
+            'message': 'Confirm to sync project | 确认同步项目',
+            'default': True,
+            'name': 'confirm'
+        }):
+            scp_init(info[-1][1:] if server_target else None)
         return
     with open(info[3][-1], 'w') as f:
         f.write('edit this file to make input' if user_lang != 'zh' else '编辑此文件作为程序输入')
     if not os.path.exists('template') or not os.path.isdir('template'):
         os.mkdir('template')
-    if lang_name != 'empty':
-        try:
-            with open(info[1][-1], 'r') as f:
-                main_cont = f.read()
-            with open('template' + dir_char + 'main', 'w') as f:
-                f.write(main_cont)
-        except Exception as e:
-            QproDefaultConsole.print(
-                QproErrorString, "make backup failed with error: %s, you need backup code by yourself!" % e)
-    if server_target:
-        scp_init(info[-1][1:])
+    try:
+        with open(info[1][-1], 'r') as f:
+            main_cont = f.read()
+        with open('template' + dir_char + 'main', 'w') as f:
+            f.write(main_cont)
+    except Exception as e:
+        QproDefaultConsole.print(
+            QproErrorString, "make backup failed with error: %s, you need backup code by yourself!" % e)
+    if server_target and _ask({
+        'type': 'confirm',
+        'message': 'Confirm to sync project | 确认同步项目',
+        'default': True,
+        'name': 'confirm'
+    }):
+        scp_init(info[-1][1:] if server_target else None)
 
 
 def ssh():

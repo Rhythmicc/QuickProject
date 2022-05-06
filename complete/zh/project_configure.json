@@ -1,0 +1,15 @@
+{
+ "compile_tool": "",
+ "compile_filename": "",
+ "executable_filename": "",
+ "input_file": "dist/input.txt",
+ "template_root": "template/",
+ "server_targets": [
+  {
+   "user": "lianhaocheng",
+   "host": "localhost",
+   "path": "/usr/local/share/zsh/site-functions/",
+   "port": "22"
+  }
+ ]
+}

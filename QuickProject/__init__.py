@@ -271,12 +271,19 @@ def get_config(without_output: bool = False):
 
 
 def get_server_targets():
-    return get_config()['server_targets']
+    res = get_config()['server_targets']
+    for item in res:
+        if not item['path'].endswith('/'):
+            item['path'] += '/'
+    return res
 
 
 def _choose_server_target():
     server_targets = get_server_targets()
-    choices = [f'{i["user"]}@{i["host"]}:{i["path"]} port: {i["port"]}' for i in server_targets]
+    choices = [
+        f'{i["user"]}@{i["host"]}:{i["path"]} port: {i["port"]}'
+        if i['user'] else
+        f'{i["host"]}:{i["path"]} port: {i["port"]}' for i in server_targets]
     try:
         index = choices.index(_ask({
             'type': 'list',

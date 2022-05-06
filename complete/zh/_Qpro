@@ -33,7 +33,6 @@ _qpro_main_zh() {
         -h:'帮助'
         create:'创建Qpro项目'
         update:'更新Qpro'
-        adjust:'调整配置表'
         ssh:'通过SSH登录远程映射'
         scp:'上传<路径>到远程映射对应位置'
         smv:'上传完成后删除文件或目录'

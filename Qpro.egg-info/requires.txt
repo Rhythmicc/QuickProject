@@ -2,4 +2,3 @@ pyperclip
 rich
 gitpython
 inquirer-rhy
-colorama

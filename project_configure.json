@@ -1,12 +1,16 @@
 {
- "compile_tool": "",
- "compile_filename": "",
- "executable_filename": "python3 main.py",
- "input_file": "",
- "template_root": "",
- "server_target": [
-  "lianhaocheng@localhost:/opt/homebrew/lib/python3.10/site-packages/",
-  "22"
- ],
- "enable_complete": true
+    "compile_tool": "",
+    "compile_filename": "",
+    "executable_filename": "python3 main.py",
+    "input_file": "",
+    "template_root": "",
+    "server_targets": [
+        {
+            "user": "lianhaocheng",
+            "host": "localhost",
+            "port": "22",
+            "path": "/opt/homebrew/lib/python3.10/site-packages/"
+        }
+    ],
+    "enable_complete": true
 }

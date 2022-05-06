@@ -28,6 +28,12 @@ configure_name = 'project_configure.json'
 
 
 def __latest_filename(filename):
+    """
+    获取最近的文件名 （不断向父目录遍历）
+
+    :param filename: 文件名
+    :return: 文件路径
+    """
     import os
 
     cur = os.getcwd()
@@ -55,6 +61,13 @@ project_configure_path = rt_dir + configure_name
 
 
 def __sub_path(path, isExist=True):
+    """
+    计算路径在项目中的相对路径
+
+    :param path: 路径
+    :param isExist: 是否存在
+    :return: 相对路径
+    """
     if not os.path.exists(path) and isExist:
         return ''
     abs_path = os.path.abspath(path)
@@ -98,6 +111,19 @@ def requirePackage(pname: str, module: str = "", real_name: str = "", not_exit: 
 class SshProtocol:
     @staticmethod
     def post_folder(user, domain, target, port, srcPath, dstPath):
+        """
+        发送目录
+
+        scp -P {port} -r {srcPath} {user}@{domain}:{target}/{dstPath}
+
+        :param user: 用户名，可省略
+        :param domain: 目标机器地址
+        :param target: 远程映射路径
+        :param port: 端口
+        :param srcPath: 本地文件路径
+        :param dstPath: 远程映射子路径
+        :return: 发送状态
+        """
         if user:
             status = os.system(
                 'scp -P %s -r %s %s' % (port, srcPath, user + '@\\[' + domain + '\\]:' + target + dstPath))
@@ -107,6 +133,19 @@ class SshProtocol:
 
     @staticmethod
     def post_file(user, domain, target, port, srcPath, dstPath):
+        """
+        发送文件
+
+        scp -P {port} {srcPath} {user}@{domain}:{target}/{dstPath}
+
+        :param user: 用户名，可省略
+        :param domain: 目标机器地址
+        :param target: 远程映射路径
+        :param port: 端口
+        :param srcPath: 本地文件路径
+        :param dstPath: 远程映射子路径
+        :return: 发送状态
+        """
         if user:
             status = os.system('scp -P %s %s %s' % (port, srcPath, user + '@\\[' + domain + '\\]:' + target + dstPath))
         else:
@@ -115,6 +154,19 @@ class SshProtocol:
 
     @staticmethod
     def post_all_in_folder(user, domain, target, port, dstPath):
+        """
+        发送当前目录
+
+        scp -P {port} -r * {user}@{domain}:{target}/{dstPath}
+
+        :param user: 用户名，可省略
+        :param domain: 目标机器地址
+        :param target: 远程映射路径
+        :param port: 端口
+        :param srcPath: 本地文件路径
+        :param dstPath: 远程映射子路径
+        :return: 发送状态
+        """
         if user:
             status = os.system('scp -P %s -r * %s' % (port, user + '@\\[' + domain + '\\]:' + target + dstPath))
         else:
@@ -123,6 +175,19 @@ class SshProtocol:
 
     @staticmethod
     def get_file_or_folder(user, domain, target, port, srcPath, dstPath):
+        """
+        下载文件或目录
+
+        scp -P {port} -r {user}@{domain}:{target}/{srcPath} {dstPath}
+
+        :param user: 用户名，可省略
+        :param domain: 目标机器地址
+        :param target: 远程映射路径
+        :param port: 端口
+        :param srcPath: 远程映射子路径
+        :param dstPath: 本地文件路径
+        :return: 发送状态
+        """
         if user:
             return os.system('scp -P %s -r %s %s' % (port, user + '@\\[' + domain + '\\]:' + target + srcPath, dstPath))
         else:
@@ -130,21 +195,32 @@ class SshProtocol:
 
     @staticmethod
     def command(user, domain, target, port, command):
-        if user:
-            return os.system(
-                'ssh -p {port} {user}@{domain} "cd {target} ; {command}"'.format(
-                    port=port, user=user, domain=domain, target=target, command=command
-                )
-            )
-        else:
-            return os.system(
-                'ssh -p {port} {domain} "cd {target} ; {command}"'.format(
-                    port=port, domain=domain, target=target, command=command
-                )
-            )
+        """
+        在远程映射执行命令
+
+        :param user: 用户名，可省略
+        :param domain: 目标机器地址
+        :param target: 远程映射路径
+        :param port: 端口
+        :param command: 命令
+        :return: 命令输出结果
+        """
+        import subprocess
+        cmd = ['ssh', '-p', port, user + '@' + domain if user else domain, f'cd {target}', ';', command]
+        return subprocess.check_output(cmd).decode('utf-8')
 
     @staticmethod
     def ssh(user, domain, target, port, dstPath):
+        """
+        连接至远程映射控制台
+
+        :param user: 用户名，可省略
+        :param domain: 目标机器地址
+        :param target: 远程映射路径
+        :param port: 端口
+        :param dstPath: 子路径
+        :return:
+        """
         if user:
             return os.system(
                 "ssh -p {port} -t {user}@{domain} 'cd {aim} ; exec $SHELL -l'".format(
@@ -194,20 +270,20 @@ def get_config(without_output: bool = False):
     return config
 
 
-def get_server_target(st=None):
+def get_server_targets():
+    return get_config()['server_targets']
+
+
+def _choose_server_target():
+    server_targets = get_server_targets()
+    choices = [f'{i["user"]}@{i["host"]}:{i["path"]} port: {i["port"]}' for i in server_targets]
     try:
-        if not st:
-            config = get_config()['server_target']
-            ls, port = config[0].split(':'), config[1]
-        else:
-            ls, port = st[0].split(':'), st[1]
-    except IndexError:
-        QproDefaultConsole.print(QproErrorString, 'Didn\'t set server_target!' if user_lang != 'zh' else '未配置远程映射!')
-        exit(0)
-    else:
-        if len(ls) > 2:
-            server = ':'.join(ls[:8])
-            target = ':'.join(ls[8:])
-        else:
-            server, target = ls
-        return server, target, port
+        index = choices.index(_ask({
+            'type': 'list',
+            'name': 'index',
+            'message': 'Choose target | 选择目标:',
+            'choices': choices
+        }))
+        return server_targets[index]
+    except:
+        return None

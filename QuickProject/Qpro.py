@@ -1,6 +1,6 @@
 from . import *
 from . import _ask
-from QuickProject import __sub_path
+from QuickProject import __sub_path, _choose_server_target
 from rich.prompt import Prompt
 
 
@@ -17,7 +17,7 @@ def __format_json(info, path: str):
         if isinstance(info, list):
             config = {}
             for line in info:
-                config[line[0]] = line[1] if line[0] != 'server_target' else line[1:]
+                config[line[0]] = line[1] if line[0] != 'server_targets' else line[1:]
             json.dump(config, f, indent=1)
         elif isinstance(info, dict):
             json.dump(info, f, indent=1)
@@ -55,11 +55,10 @@ def remove(path):
             os.remove(path)
 
 
-def scp_init(server_target: list):
-    if server_target:
-        server, target, port = get_server_target(server_target)
-        user, ip = server.split('@') if '@' in server else [None, server]
-        st = SshProtocol.post_all_in_folder(user, ip, target, port, '')
+def scp_init(server_targets: list):
+    for server_target in server_targets:
+        user, host, port, target = server_target['user'], server_target['host'], server_target['port'], server_target['path']
+        st = SshProtocol.post_all_in_folder(user, host, target, port, '')
         if st:
             QproDefaultConsole.print(QproErrorString, "upload project failed!" if user_lang != 'zh' else '上传项目失败!')
 
@@ -220,12 +219,13 @@ def scp(smv_flag: bool = False):
                     if user_lang != 'zh' else
                     (f"{path} 不在当前 Qpro 项目中!" if os.path.exists(path) else f'该路径不存在: {path}')
                 )
-        server, target, port = get_server_target()
-        user, ip = server.split('@') if '@' in server else [None, server]
-        if os.path.isdir(path):
-            status = SshProtocol.post_folder(user, ip, target, port, path, sub_path)
-        else:
-            status = SshProtocol.post_file(user, ip, target, port, path, sub_path)
+        server_targets = get_server_targets()
+        status = 0
+        for server_target in server_targets:
+            if os.path.isdir(path):
+                status |= SshProtocol.post_folder(server_target['user'], server_target['host'], server_target['path'], server_target['port'], path, sub_path)
+            else:
+                status |= SshProtocol.post_file(server_target['user'], server_target['host'], server_target['path'], server_target['port'], path, sub_path)
         if smv_flag and not status:
             remove(path)
 
@@ -252,92 +252,8 @@ def get():
         if not sub_path:
             return QproDefaultConsole.print(QproErrorString,
                                             f"{path} is not in this Qpro project!" if user_lang != 'zh' else f'{path} 不在当前 Qpro 项目中!')
-        server, target, port = get_server_target()
-        user, ip = server.split('@') if '@' in server else [None, server]
-        SshProtocol.get_file_or_folder(user, ip, target, port, sub_path, path)
-
-
-def adjust():
-    config = get_config()
-    if not config:
-        return QproDefaultConsole.print(QproErrorString, 'Get Qpro config failed!')
-
-    import tkinter as tk
-    win = tk.Tk()
-    win.title('Qpro项目调整器')
-    key_to_name = {
-        'compile_tool': '编译指令:' if user_lang == 'zh' else 'Compile',
-        'compile_filename': '源程序:' if user_lang == 'zh' else 'Source',
-        'executable_filename': '运行指令:' if user_lang == 'zh' else 'Run',
-        'input_file': '输入文件:' if user_lang == 'zh' else 'Input',
-        'template_root': '模板目录:' if user_lang == 'zh' else 'Template',
-        'server_target': '远程映射:' if user_lang == 'zh' else 'Server'
-    }
-    if 'enable_complete' in config:
-        key_to_name.update({'enable_complete': '自动补全:' if user_lang == 'zh' else 'Complete'})
-    all_dt = {}
-    for i, v in enumerate(config):
-        tk.Label(win, text='%12s' % key_to_name[v]).grid(row=i, column=0)
-        if v == 'server_target':
-            stringvar1 = tk.Variable()
-            stringvar1.set(config[v][0])
-            stringvar2 = tk.Variable()
-            stringvar2.set(config[v][1])
-            tk.Entry(win, textvariable=stringvar1, width=20).grid(row=i, column=1)
-            tk.Entry(win, textvariable=stringvar2, width=19).grid(row=i, column=2)
-            all_dt[v] = [stringvar1, stringvar2]
-        else:
-            stringvar1 = tk.Variable()
-            stringvar1.set(config[v])
-            tk.Entry(win, textvariable=stringvar1, width=40).grid(row=i, column=1, columnspan=2)
-            all_dt[v] = stringvar1
-
-    def deal_config():
-        for dt in all_dt:
-            if dt == 'server_target':
-                config[dt] = [all_dt[dt][0].get(), all_dt[dt][1].get()]
-                if config[dt][0]:
-                    try:
-                        if ':' in config[dt][0]:
-                            if config[dt][0].count(':') not in [1, 8]:
-                                raise Exception(
-                                    '%s: not a legal server target' % config[dt][0]
-                                    if user_lang != 'zh' else
-                                    '%s: 不是合法的远程映射' % config[dt][0]
-                                )
-                            if not config[dt][0].endswith(dir_char) and config[dt][0].endswith(':'):
-                                config[dt][0] += '/'
-                        else:
-                            raise Exception(
-                                '%s: not a legal server target' % config[dt][0]
-                                if user_lang != 'zh' else
-                                '%s: 不是合法的远程映射' % config[dt][0]
-                            )
-                    except Exception as e:
-                        QproDefaultConsole.print(QproErrorString, repr(e))
-                        QproDefaultConsole.print(
-                            QproWarnString, 'Legal server target:\n'
-                                            '        addr1: <username>@<ipv4 | ipv6 | domain>:</path/to/project/>\n'
-                                            '        addr2: <configured name>:</path/to/project/>\n'
-                                            '        port : <ssh port>, default 22') \
-                            if user_lang != 'zh' else \
-                            QproDefaultConsole.print(
-                                QproWarnString, '合法的远程映射:\n'
-                                                '        地址1: <用户名>@<ipv4 | ipv6 | 域名>:</项目/路径/>\n'
-                                                '        地址2: <SSH配置表中项目>:</项目/路径/>\n'
-                                                '        端口 : <SSH 端口>, 默认 22')
-            else:
-                config[dt] = all_dt[dt].get()
-        if not config['template_root'].endswith(dir_char):
-            config['template_root'] += dir_char
-        if 'enable_complete' in config:
-            config['enable_complete'] = True if config['enable_complete'] not in ['0', 'false', 'False'] else False
-        win.destroy()
-        __format_json(config, project_configure_path)
-
-    tk.Button(win, text='确认', command=deal_config, width=10).grid(row=7 if 'enable_complete' in config else 6, column=0,
-                                                                  columnspan=3)
-    tk.mainloop()
+        server_target = get_server_targets()[0]
+        SshProtocol.get_file_or_folder(server_target['user'], server_target['host'], server_target['port'], server_target['path'], sub_path, path)
 
 
 def pro_init():
@@ -380,20 +296,37 @@ def pro_init():
             server_target += '~/'
     if lang[0] != 'javac':
         execute = lang[1] + 'dist' + dir_char + work_project if lang[0] else lang[1] + source_file
-    elif lang_name != 'empty':
+    elif lang_name != 'empty | other':
         work_project = source_file.split(dir_char)[-1].split('.')[0]
         execute = lang[1] + work_project
     else:
         execute = ''
-    if (not os.path.exists('dist') or not os.path.isdir('dist')) and lang_name != 'empty':
+    if (not os.path.exists('dist') or not os.path.isdir('dist')) and lang_name != 'empty | other':
         os.mkdir('dist')
+    user, host, path, port = '', '', '', '22'
+    if server_target:
+        user, target = server_target.split('@')
+        target = target.split(':')
+        host = ':'.join(target[:-1])
+        path = target[-1]
+        port = _ask({
+            'type': 'input',
+            'name': 'port',
+            'message': 'input port if you need ssh' if user_lang != 'zh' else '输入端口号 如果你打算使用SSH',
+            'default': '22'
+        })
     info = [
         ['compile_tool', lang[0].replace('--source_file--', source_file).replace('--execute--', execute)],
         ['compile_filename', source_file],
         ['executable_filename', execute],
         ['input_file', 'dist' + dir_char + 'input.txt' if lang_name != 'empty' else ''],
         ['template_root', 'template' + dir_char if lang_name != 'empty' else ''],
-        ['server_target', server_target, '22' if server_target else '']
+        ['server_targets', {
+            'user': user,
+            'host': host,
+            'path': path,
+            'port': port
+        }]
     ]
     __format_json(info, configure_name)
     if lang_name and lang_name == 'empty':
@@ -412,24 +345,26 @@ def pro_init():
         except Exception as e:
             QproDefaultConsole.print(
                 QproErrorString, "make backup failed with error: %s, you need backup code by yourself!" % e)
-    scp_init(info[-1][1:] if server_target else None)
+    if server_target:
+        scp_init(info[-1][1:])
 
 
 def ssh():
-    server, target, port = get_server_target()
-    os.system("ssh -p %s -t %s 'cd %s ; exec $SHELL -l'" % (port, server, target))
+    server_target = _choose_server_target()
+    if not server_target:
+        return
+    SshProtocol.ssh(server_target['user'], server_target['host'], server_target['path'], server_target['port'], __sub_path('.'))
 
 
 def delete_all():
-    config = get_config()
-    if ':' in config['server_target'][0]:
-        server, target, port = get_server_target()
-        user, ip = server.split('@') if '@' in server else [None, server]
-        st = SshProtocol.command(user, ip, target, port, 'rm -rf .')
-        # st = os.system("ssh -p %s %s 'rm -rf %s'" % (port, server, target))
-        if st:
-            return
-    remove(os.getcwd())
+    server_targets = get_server_targets()
+    st = 0
+    for server_target in server_targets:
+        _st = SshProtocol.command(server_target['user'], server_target['host'], server_target['path'], server_target['port'], 'rm -rf .')
+        st |= _st
+        QproDefaultConsole.print(QproErrorString, f'{server_target}: delete all failed with error: {st}')
+    if not st:
+        remove(os.getcwd())
 
 
 def delete():
@@ -449,15 +384,19 @@ def delete():
                     if user_lang != 'zh' else
                     (f"{path} 不在当前 Qpro 项目中!" if os.path.exists(path) else f'该路径不存在: {path}')
                 )
-        config = get_config()
-        if ':' in config['server_target'][0]:
-            server, target, port = get_server_target()
-            user, ip = server.split('@') if '@' in server else [None, server]
-            st = SshProtocol.command(user, ip, target, port, f'rm -rf {sub_path}')
-            # st = os.system("ssh -p %s %s 'rm -rf %s'" % (port, server, target + sub_path))
-            if st:
-                return
-        remove(path)
+        server_targets = get_server_targets()
+        st = 0
+        for server_target in server_targets:
+            _st = SshProtocol.command(server_target['user'], server_target['host'], server_target['path'],
+                                      server_target['port'], f'rm -rf {sub_path}')
+            st |= _st
+            QproDefaultConsole.print(QproErrorString, f'{server_target}: delete {sub_path} failed with error: {st}')
+        if not st or _ask({
+            'type': 'confirm',
+            'name': 'confirm',
+            'message': f'{path} is not in this Qpro project! Do you want to delete it?' if user_lang != 'zh' else f'{path} 不在当前 Qpro 项目中! 是否删除?',
+        }):
+            remove(sub_path)
 
 
 def tele_ls():
@@ -466,12 +405,32 @@ def tele_ls():
         sub_path = __sub_path(path, False)
     except IndexError:
         sub_path = __sub_path('./', False)
-    config = get_config()
-    if ':' in config['server_target'][0]:
+    server_target = _choose_server_target()
+    if server_target:
         from . import SshProtocol
-        server, target, port = get_server_target()
-        user, ip = server.split('@') if '@' in server else [None, server]
-        SshProtocol.command(user, ip, target, port, f'ls {sub_path}')
+        res = SshProtocol.command(server_target['user'], server_target['host'], server_target['path'], server_target['port'], f'ls -lah {sub_path}').strip().split('\n')[3:]
+        res = [i.strip().split() for i in res]
+
+        from rich.table import Table
+        from rich.box import SIMPLE_HEAVY
+        from rich.color import Color
+        from rich.text import Text
+        from rich.style import Style
+
+        table = Table(title=f'{sub_path}', box=SIMPLE_HEAVY, show_header=True, header_style='bold magenta')
+        table.add_column('permission' if user_lang != 'zh' else '权限码', justify='center')
+        table.add_column('size' if user_lang != 'zh' else '尺寸', justify='center')
+        table.add_column('owner' if user_lang != 'zh' else '拥有者', justify='center')
+        table.add_column('time' if user_lang != 'zh' else '修改时间', justify='center')
+        table.add_column('name' if user_lang != 'zh' else '文件名', justify='right')
+        for i in res:
+            is_dir = True if i[0][0] == 'd' else False
+            color = Color.from_rgb(112, 87, 250) if is_dir else None
+            p_color = Color.from_rgb(171, 157, 242)
+            permission = ''.join(['1' if j != '-' else '0' for j in i[0][1:]])
+            permission = '%d%d%d' % (int(permission[:3], 2), int(permission[3: 6], 2), int(permission[6:], 2))
+            table.add_row(*[Text(permission, style=Style(color=p_color)), f'[green]{i[4]}', '[bold yellow]' + i[2], '[blue]' +  ' '.join(i[5:8]), Text(" ".join(i[8:]), style=Style(color=color, bold=is_dir))])
+        QproDefaultConsole.print(table, justify='center')
 
 
 def template_format():
@@ -521,9 +480,7 @@ def register_global_command():
         return
     import json
 
-    disable_global_command = '--disable_global_command' in sys.argv and int(sys.argv[sys.argv.index('--disable_global_command') + 1])
-    disable_global_command = True if disable_global_command else False
-    print(disable_global_command)
+    disable_global_command = '--disable_global_command' in sys.argv
     project_name = os.getcwd().split(dir_char)[-1]
     fig_dir = os.path.join(QproGlobalDir, 'fig')
     if os.path.exists(os.path.join(fig_dir, f'{project_name}.json')):
@@ -689,7 +646,6 @@ func = {
     'scp': scp,
     'smv': smv,
     'get': get,
-    'adjust': adjust,
     'ssh': ssh,
     'del-all': delete_all,
     'del': delete,
@@ -711,7 +667,6 @@ def main():
                          ('-h', 'help' if user_lang != 'zh' else '帮助'),
                          ('create [bold magenta]<name>', 'create a Qpro project' if user_lang != 'zh' else '创建Qpro项目'),
                          ('update', 'update Qpro' if user_lang != 'zh' else '更新Qpro'),
-                         ('adjust', 'adjust configure' if user_lang != 'zh' else '调整配置表'),
                          ('ssh', 'login server by ssh' if user_lang != 'zh' else '通过SSH登录远程映射'),
                          (
                              'scp [bold magenta]<path>',
@@ -756,7 +711,7 @@ def main():
         except Exception:
             QproDefaultConsole.print_exception()
     elif sys.argv[1] == 'scp-init':
-        scp_init(get_config()['server_target'])
+        scp_init(get_server_targets())
     elif 'init' != sys.argv[1]:
         QproDefaultConsole.print(
             QproErrorString, 'wrong usage! Run "Qpro -h" for help!' if user_lang != 'zh' else '请运行 "Qpro -h" 查看帮助!'

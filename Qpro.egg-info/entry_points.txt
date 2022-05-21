@@ -3,4 +3,3 @@ Qpro = QuickProject.Qpro:main
 detector = QuickProject.detector:main
 qrun = QuickProject.qrun:main
 tmpm = QuickProject.tmpm:main
-

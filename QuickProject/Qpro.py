@@ -375,7 +375,7 @@ def delete_all():
     st = 0
     for server_target in server_targets:
         _st = SshProtocol.command(server_target['user'], server_target['host'], server_target['path'], server_target['port'], 'rm -rf .')
-        st |= _st
+        st |= 1 if _st else 0
         QproDefaultConsole.print(QproErrorString, f'{server_target}: delete all failed with error: {st}')
     if not st:
         remove(os.getcwd())
@@ -403,8 +403,9 @@ def delete():
         for server_target in server_targets:
             _st = SshProtocol.command(server_target['user'], server_target['host'], server_target['path'],
                                       server_target['port'], f'rm -rf {sub_path}')
-            st |= _st
-            QproDefaultConsole.print(QproErrorString, f'{server_target}: delete {sub_path} failed with error: {st}')
+            st |= 1 if _st else 0
+            if _st:
+                QproDefaultConsole.print(QproErrorString, f'{server_target}: delete {sub_path} failed with error: {_st}')
         if not st or _ask({
             'type': 'confirm',
             'name': 'confirm',
@@ -487,6 +488,8 @@ def __get_Qpro_fig_Dir():
 
 
 def register_global_command():
+    if not os.path.exists(configure_name):
+        return QproDefaultConsole.print(QproErrorString, f'{configure_name} is not exists!' if user_lang != 'zh' else f'{configure_name} 不存在!')
     if is_win:
         return QproDefaultConsole.print(QproWarnString, 'Not Support Windows!' if user_lang != 'zh' else '不支持 Windows!')
     QproGlobalDir = __get_Qpro_fig_Dir()

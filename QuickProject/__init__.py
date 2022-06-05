@@ -205,6 +205,8 @@ class SshProtocol:
         :param command: 命令
         :return: 命令输出结果
         """
+        if not domain or not target:
+            return ''
         import subprocess
         cmd = ['ssh', '-p', port, user + '@' + domain if user else domain, f'cd {target}', ';', command]
         return subprocess.check_output(cmd).decode('utf-8')
@@ -283,7 +285,7 @@ def _choose_server_target():
     choices = [
         f'{i["user"]}@{i["host"]}:{i["path"]} port: {i["port"]}'
         if i['user'] else
-        f'{i["host"]}:{i["path"]} port: {i["port"]}' for i in server_targets]
+        f'{i["host"]}:{i["path"]} port: {i["port"]}' for i in server_targets if i['host'] and i['path']]
     try:
         index = choices.index(_ask({
             'type': 'list',

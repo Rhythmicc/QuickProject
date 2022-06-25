@@ -6,6 +6,17 @@ from inspect import isfunction
 from . import QproDefaultConsole, QproErrorString, user_lang
 
 
+def str2bool(v):
+    if isinstance(v, bool):
+        return v
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+
+
 class Commander:
     def __init__(self, seg_flag: bool = False):
         """
@@ -54,10 +65,7 @@ class Commander:
                             'args': cur_args
                         })
                     else:
-                        _kw = {'type': _type}
-                        if _type == bool:
-                            _kw['action'] = 'store_true'
-                        func_args_parser.add_argument(arg.name, **_kw)
+                        func_args_parser.add_argument(arg.name, type=_type if _type != bool else str2bool)
                         cur_args = {
                             'name': arg.name,
                             'description': param_doc.get(arg.name, f'<{arg.name}>'),
@@ -69,7 +77,11 @@ class Commander:
                     if _type == list:
                         QproDefaultConsole.print(QproErrorString, f'{func_name}:', '"list" 类型不可以有默认值' if user_lang == 'zh' else '"list" type can not have default value')
                         return
-                    func_args_parser.add_argument(f'--{arg.name}', required=False, type=_type, default=_default)
+                    _kw = {'required': False, 'type': _type, 'default': _default}
+                    if _type == bool:
+                        _kw.pop('type')
+                        _kw['action'] = 'store_true'
+                    func_args_parser.add_argument(f'--{arg.name}', **_kw)
                     cur_args = {
                         'name': arg.name,
                         'description': param_doc.get(arg.name, f'<{arg.name}>'),

@@ -146,6 +146,8 @@ class Commander:
                         arg_str += f" = [dim]'[/dim][yellow]{_default}[/yellow][dim]'[/dim]"
                     elif _type == 'int' or _type == 'float':
                         arg_str += f' = [bold blue]{_default}[/bold blue]'
+                    elif _type == 'bool':
+                        arg_str += f' = [bold red]{_default}[/bold red]'
                     else:
                         arg_str += f' = {_default}'
                     arg2.append(arg_str)

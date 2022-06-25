@@ -206,7 +206,7 @@ class SshProtocol:
         :return: 命令输出结果
         """
         if not domain or not target:
-            return ''
+            return 0
         import subprocess
         cmd = ['ssh', '-p', port, user + '@' + domain if user else domain, f'cd {target}', ';', command]
         return subprocess.check_output(cmd).decode('utf-8')

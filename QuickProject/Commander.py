@@ -54,7 +54,10 @@ class Commander:
                             'args': cur_args
                         })
                     else:
-                        func_args_parser.add_argument(arg.name, type=_type)
+                        _kw = {'type': _type}
+                        if _type == bool:
+                            _kw['action'] = 'store_true'
+                        func_args_parser.add_argument(arg.name, **_kw)
                         cur_args = {
                             'name': arg.name,
                             'description': param_doc.get(arg.name, f'<{arg.name}>'),

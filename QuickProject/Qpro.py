@@ -38,6 +38,8 @@ def __findAndReplace(dirPath, fo, to):
                 ct = f.read()
             with open(rt + dir_char + file, 'w') as f:
                 f.write(ct.replace(fo, to))
+            if file.startswith(fo):
+                os.rename(rt + dir_char + file, rt + dir_char + file.replace(fo, to))
 
 
 def remove(path):

@@ -502,7 +502,8 @@ def register_global_command():
     import json
     import shutil
 
-    project_name = os.getcwd().split(dir_char)[-1].replace('-', '_')
+    project_name = os.getcwd().split(dir_char)[-1]
+    package_name = project_name.replace('-', '_')
     fig_dir = os.path.join(QproGlobalDir, 'fig')
     commands_dir = os.path.join(QproGlobalDir, 'QproGlobalCommands')
     if os.path.exists(os.path.join(fig_dir, f'{project_name}.json')):
@@ -515,8 +516,8 @@ def register_global_command():
             'default': False
         }):
             os.remove(os.path.join(fig_dir, f'{project_name}.json'))
-            if os.path.exists(os.path.join(commands_dir, f'{project_name}')):
-                shutil.rmtree(os.path.join(commands_dir, f'{project_name}'))
+            if os.path.exists(os.path.join(commands_dir, f'{package_name}')):
+                shutil.rmtree(os.path.join(commands_dir, f'{package_name}'))
         else:
             return
     import subprocess
@@ -548,25 +549,25 @@ def register_global_command():
             'path': os.getcwd()
         }, f, ensure_ascii=False, indent=1)
 
-    shutil.copytree(rt_dir, os.path.join(commands_dir, project_name))
+    shutil.copytree(rt_dir, os.path.join(commands_dir, package_name))
     entry_point = get_config()['compile_filename'].split('.')[0]
-    with open(os.path.join(commands_dir, project_name, f'{entry_point}.py'), 'r') as f:
+    with open(os.path.join(commands_dir, package_name, f'{entry_point}.py'), 'r') as f:
         ct = f.read()
         if 'def main():' not in ct:
             ct = ct.replace("if __name__ == '__main__':", 'def main():').replace('if __name__ == "__main__":', 'def main():')
-    with open(os.path.join(commands_dir, project_name, f'{entry_point}.py'), 'w') as f:
+    with open(os.path.join(commands_dir, package_name, f'{entry_point}.py'), 'w') as f:
         f.write(ct)
     with open(os.path.join(QproGlobalDir, 'bin', f'{project_name}'), 'w') as f:
         ct = f"""#!/usr/bin/env python3
 import sys
 sys.path.append('{QproGlobalDir}')
 
-from QproGlobalCommands.{project_name} import {entry_point}
+from QproGlobalCommands.{package_name} import {entry_point}
 {entry_point}.main()
         """
         f.write(ct)
     os.chmod(os.path.join(QproGlobalDir, 'bin', f'{project_name}'), 0o755)
-    QproDefaultConsole.print(QproInfoString, f'Register {project_name} Success!' if user_lang != 'zh' else f'注册 {project_name} 成功!')
+    QproDefaultConsole.print(QproInfoString, f'Register "{project_name}" Success!' if user_lang != 'zh' else f'注册 "{project_name}" 成功!')
 
 
 def gen_fig_script():

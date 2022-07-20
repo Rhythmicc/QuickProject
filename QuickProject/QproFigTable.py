@@ -55,8 +55,7 @@ default_Qpro_zh_content_template = \
     'description': '支持Commander应用的自动补全'
   }, {
     'name': 'register-global',
-    'description': '注册全局命令',
-    'args': {'name': '--disable_global_command', 'description': '禁用全局命令', 'template': ["boolean"]}
+    'description': '注册全局命令'
   }, {
     'name': 'gen-fig-script',
     'description': '生成Fig自动补全脚本并重新编译'

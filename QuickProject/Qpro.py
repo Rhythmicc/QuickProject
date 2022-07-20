@@ -486,6 +486,8 @@ def __get_Qpro_fig_Dir():
         os.mkdir(os.path.join(QproGlobalDir, 'bin'))
     if not os.path.exists(os.path.join(QproGlobalDir, 'fig')):
         os.mkdir(os.path.join(QproGlobalDir, 'fig'))
+    if not os.path.exists(os.path.join(QproGlobalDir, 'QproGlobalCommands')):
+        os.mkdir(os.path.join(QproGlobalDir, 'QproGlobalCommands'))
     return QproGlobalDir
 
 
@@ -498,10 +500,11 @@ def register_global_command():
     if not QproGlobalDir:
         return
     import json
+    import shutil
 
-    disable_global_command = '--disable_global_command' in sys.argv
     project_name = os.getcwd().split(dir_char)[-1]
     fig_dir = os.path.join(QproGlobalDir, 'fig')
+    commands_dir = os.path.join(QproGlobalDir, 'QproGlobalCommands')
     if os.path.exists(os.path.join(fig_dir, f'{project_name}.json')):
         QproDefaultConsole.print(QproWarnString,
                                  'This project has been registered!' if user_lang != 'zh' else '该项目已注册!')
@@ -512,6 +515,8 @@ def register_global_command():
             'default': False
         }):
             os.remove(os.path.join(fig_dir, f'{project_name}.json'))
+            if os.path.exists(os.path.join(commands_dir, f'{project_name}')):
+                shutil.rmtree(os.path.join(commands_dir, f'{project_name}'))
         else:
             return
     import subprocess
@@ -542,13 +547,23 @@ def register_global_command():
             },
             'path': os.getcwd()
         }, f, ensure_ascii=False, indent=1)
-    if disable_global_command:
-        return
+
+    shutil.copytree(rt_dir, os.path.join(commands_dir, project_name))
+    entry_point = get_config()['compile_filename'].split('.')[0]
+    with open(os.path.join(commands_dir, project_name, f'{entry_point}.py'), 'r') as f:
+        ct = f.read()
+        if 'def main():' not in ct:
+            ct = ct.replace("if __name__ == '__main__':", 'def main():').replace('if __name__ == "__main__":', 'def main():')
+    with open(os.path.join(commands_dir, project_name, f'{entry_point}.py'), 'w') as f:
+        f.write(ct)
     with open(os.path.join(QproGlobalDir, 'bin', f'{project_name}'), 'w') as f:
-        with open(get_config()['compile_filename'], 'r') as ff:
-            ct = ff.read()
-        if not ct.startswith('#!/usr/bin/env python3'):
-            ct = '#!/usr/bin/env python3\n' + ct
+        ct = f"""#!/usr/bin/env python3
+import sys
+sys.path.append('{QproGlobalDir}')
+
+from QproGlobalCommands.{project_name} import {entry_point}
+{entry_point}.main()
+        """
         f.write(ct)
     os.chmod(os.path.join(QproGlobalDir, 'bin', f'{project_name}'), 0o755)
 

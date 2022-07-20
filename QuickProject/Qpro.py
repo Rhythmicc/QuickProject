@@ -502,7 +502,7 @@ def register_global_command():
     import json
     import shutil
 
-    project_name = os.getcwd().split(dir_char)[-1]
+    project_name = os.getcwd().split(dir_char)[-1].replace('-', '_')
     fig_dir = os.path.join(QproGlobalDir, 'fig')
     commands_dir = os.path.join(QproGlobalDir, 'QproGlobalCommands')
     if os.path.exists(os.path.join(fig_dir, f'{project_name}.json')):
@@ -566,6 +566,7 @@ from QproGlobalCommands.{project_name} import {entry_point}
         """
         f.write(ct)
     os.chmod(os.path.join(QproGlobalDir, 'bin', f'{project_name}'), 0o755)
+    QproDefaultConsole.print(QproInfoString, f'Register {project_name} Success!' if user_lang != 'zh' else f'注册 {project_name} 成功!')
 
 
 def gen_fig_script():

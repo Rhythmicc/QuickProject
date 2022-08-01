@@ -217,6 +217,8 @@ class Commander:
             args = func_info['parser'].parse_args()
             try:
                 return func_info['func'](**{i[0]: i[1] for i in args._get_kwargs()})
+            except KeyboardInterrupt:
+                return QproDefaultConsole.print(QproErrorString, '用户中断')
             except:
                 return QproDefaultConsole.print_exception()
 
@@ -235,4 +237,9 @@ class Commander:
             return QproDefaultConsole.print(
                 QproErrorString,  f'{func_name} 未被注册!' if user_lang == 'zh' else f'{func_name} not registered!'
             )
-        return self.command_table[func_name]['func'](*args, **kwargs)
+        try:
+            return self.command_table[func_name]['func'](*args, **kwargs)
+        except KeyboardInterrupt:
+            return QproDefaultConsole.print(QproErrorString, '用户中断')
+        except Exception:
+            return QproDefaultConsole.print_exception()

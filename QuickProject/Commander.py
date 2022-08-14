@@ -216,6 +216,8 @@ class Commander:
             func_info = self.command_table[func_name]
             args = func_info['parser'].parse_args()
             try:
+                if 'pre_func' in func_info:
+                    func_info['pre_func'](args)
                 return func_info['func'](**{i[0]: i[1] for i in args._get_kwargs()})
             except KeyboardInterrupt:
                 return QproDefaultConsole.print(QproErrorString, '用户中断')
@@ -243,3 +245,16 @@ class Commander:
             return QproDefaultConsole.print(QproErrorString, '用户中断')
         except Exception:
             return QproDefaultConsole.print_exception()
+
+    def bind_pre_call(self, func_name, pre_call):
+        """
+        绑定前置函数
+        :param func_name: 函数名
+        :param pre_call: 前置函数
+        :return:
+        """
+        if func_name not in self.command_table:
+            return QproDefaultConsole.print(
+                QproErrorString,  f'{func_name} 未被注册!' if user_lang == 'zh' else f'{func_name} not registered!'
+            )
+        self.command_table[func_name]['pre_call'] = pre_call

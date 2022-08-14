@@ -216,8 +216,8 @@ class Commander:
             func_info = self.command_table[func_name]
             args = func_info['parser'].parse_args()
             try:
-                if 'pre_func' in func_info:
-                    func_info['pre_func'](args)
+                if 'pre_call' in func_info:
+                    func_info['pre_call'](**{i[0]: i[1] for i in args._get_kwargs()})
                 return func_info['func'](**{i[0]: i[1] for i in args._get_kwargs()})
             except KeyboardInterrupt:
                 return QproDefaultConsole.print(QproErrorString, '用户中断')

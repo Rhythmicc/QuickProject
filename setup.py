@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
-VERSION = '0.9.20'
+VERSION = "0.10.0"
 
 setup(
     name='Qpro',
@@ -26,9 +26,7 @@ setup(
     entry_points={
         'console_scripts': [
             'Qpro = QuickProject.Qpro:main',
-            'qrun = QuickProject.qrun:main',
-            'tmpm = QuickProject.tmpm:main',
-            'detector = QuickProject.detector:main'
+            'qrun = QuickProject.qrun:main'
         ]
     },
 )

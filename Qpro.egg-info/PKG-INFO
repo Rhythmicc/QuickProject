@@ -1,12 +1,11 @@
 Metadata-Version: 2.1
 Name: Qpro
-Version: 0.9.20
+Version: 0.10.0
 Summary: Small but powerful command line IDE.
 Home-page: https://github.com/Rhythmicc/QuickProject
 Author: RhythmLian
 License: MIT
 Keywords: script for CLionProjects
-Platform: UNKNOWN
 Classifier: Programming Language :: Python :: 3
 Classifier: License :: OSI Approved :: MIT License
 Classifier: Operating System :: OS Independent
@@ -34,5 +33,3 @@ git clone https://github.com/Rhythmicc/QuickProject.git
 cd QuickProject
 python setup.py install
 ```
-
-

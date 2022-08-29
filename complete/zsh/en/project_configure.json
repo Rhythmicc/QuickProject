@@ -1,7 +1,7 @@
 {
- "compile_tool": "",
- "compile_filename": "",
- "executable_filename": "",
+ "build": "",
+ "entry_point": "",
+ "executable": "",
  "input_file": "dist/input.txt",
  "template_root": "template/",
  "server_targets": [

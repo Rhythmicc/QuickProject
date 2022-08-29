@@ -27,3 +27,15 @@ else
     ___proj_name___main
 fi
 """
+
+zsh_file_comp1 = """
+else
+    _arguments -S -s '*:filename:_files'
+    return
+fi
+"""
+
+zsh_file_comp2 = """
+_arguments -S -s '*:filename:_files'
+return
+"""

@@ -1,7 +1,7 @@
 {
-    "compile_tool": "",
-    "compile_filename": "",
-    "executable_filename": "python3 main.py",
+    "build": "",
+    "entry_point": "",
+    "executable": "",
     "input_file": "",
     "template_root": "",
     "server_targets": [

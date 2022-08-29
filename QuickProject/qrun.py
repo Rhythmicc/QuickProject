@@ -39,11 +39,11 @@ def parseArgs():
 argv, qrun_argv = parseArgs()
 
 
-def run(use_txt=False, executable_file=str(config['executable_filename'])):
-    if os.path.exists(executable_file):
-        cmd = executable_file.replace(' ', '\ ') + ' '
+def run(use_txt=False, executable=str(config['executable'])):
+    if os.path.exists(executable):
+        cmd = executable.replace(' ', '\ ') + ' '
     else:
-        cmd = executable_file + ' '
+        cmd = executable + ' '
     if '--qrun-commander-complete' in argv:
         if 'enable_complete' in config and config['enable_complete']:
             os.system(cmd + ' '.join(argv))
@@ -68,7 +68,7 @@ def run(use_txt=False, executable_file=str(config['executable_filename'])):
 def main():
     to_build = '-b' in qrun_argv or '-br' in qrun_argv
     to_run = '-r' in qrun_argv or '-b' not in qrun_argv
-    filename = rt_dir + config['compile_filename'] if config['compile_filename'] else ''
+    filename = rt_dir + config['entry_point'] if config['entry_point'] else ''
     flag = False
     if has_recog['-h']:
         menu_output({'title': 'qrun usage\n',
@@ -89,7 +89,7 @@ def main():
         index = qrun_argv.index('-f')
         if index == len(qrun_argv) - 1:
             return QproDefaultConsole.print(QproErrorString, 'No file with -f' if user_lang != 'zh' else '-f后没有指定文件')
-        filename = qrun_argv[index + 1] if qrun_argv[index + 1] != '__ignore__' else config['compile_filename']
+        filename = qrun_argv[index + 1] if qrun_argv[index + 1] != '__ignore__' else config['entry_point']
         if not os.path.exists(filename):
             return QproDefaultConsole.print(
                 QproErrorString, (
@@ -97,7 +97,7 @@ def main():
                 ).format(filename=filename)
             )
         filename = os.path.abspath(filename)
-        flag = filename != config['compile_filename']
+        flag = filename != config['entry_point']
     if '-if' in qrun_argv:
         index = qrun_argv.index('-if')
         if index == len(qrun_argv) - 1:
@@ -117,20 +117,20 @@ def main():
                     ).format(input_file=__input_file__)
                 )
             config['input_file'] = os.path.abspath(__input_file__)
-    o_file = config['executable_filename']
+    o_file = config['executable']
     record_file_name = os.path.basename(filename).split('.')[0]
 
     os.chdir(rt_dir)
 
-    if config['compile_tool'] and to_build:
-        cmd = config['compile_tool']
-        if filename and config['compile_filename']:
-            cmd = cmd.replace(config['compile_filename'], filename)
+    if config['build'] and to_build:
+        cmd = config['build']
+        if filename and config['entry_point']:
+            cmd = cmd.replace(config['entry_point'], filename)
         os.system(cmd)
     if to_run:
         run('-i' in qrun_argv or '-if' in qrun_argv, o_file)
-    if config['compile_tool'] and flag:
-        if config['compile_tool'].split()[0] == 'javac':
+    if config['build'] and flag:
+        if config['build'].split()[0] == 'javac':
             os.remove('dist' + dir_char + record_file_name + '.class')
         else:
             os.remove(o_file)

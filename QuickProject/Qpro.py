@@ -40,6 +40,9 @@ def __findAndReplace(dirPath, fo, to):
                 f.write(ct.replace(fo, to))
             if file.startswith(fo):
                 os.rename(rt + dir_char + file, rt + dir_char + file.replace(fo, to))
+        for _dir in son_dir:
+            if _dir.startswith(fo):
+                os.rename(rt + dir_char + _dir, rt + dir_char + _dir.replace(fo, to))
 
 
 def remove(path):
@@ -534,8 +537,8 @@ def register_global_command():
             'path': os.getcwd()
         }, f, ensure_ascii=False, indent=1)
 
-    shutil.copytree(rt_dir, os.path.join(commands_dir, package_name))
-    entry_point = get_config()['entry_point'].split('.')[0]
+    shutil.copytree(rt_dir + dir_char + package_name, os.path.join(commands_dir, package_name))
+    entry_point = get_config()['entry_point'].split(dir_char)[-1].split('.')[0]
     with open(os.path.join(commands_dir, package_name, f'{entry_point}.py'), 'r') as f:
         ct = f.read()
         if 'def main():' not in ct:

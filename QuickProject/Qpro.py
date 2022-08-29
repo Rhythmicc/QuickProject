@@ -670,12 +670,7 @@ def main():
                          ('enable-complete', 'enable complete' if user_lang != 'zh' else '启用Commander类的自动补全'),
                          ('register-global', 'register global command' if user_lang != 'zh' else '注册全局命令'),
                          ('gen-complete', 'generate autocomplete scripts for zsh & fig' if user_lang != 'zh' else '生成Zsh和Fig自动补全脚本'),
-                         ('tmpm *', 'manage your template' if user_lang != 'zh' else '模板管理器'),
-                         ('qrun *', 'run your Qpro project' if user_lang != 'zh' else '运行器'),
-                         (
-                             'detector -<p/f><p/f>',
-                             'run beat detector for two source files' if user_lang != 'zh' else '对拍器'
-                         )],
+                         ('qrun *', 'run your Qpro project' if user_lang != 'zh' else '运行器')],
                      'prefix': 'Qpro'})
     elif 'update' == sys.argv[1]:
         os.system('pip3 install Qpro --upgrade')

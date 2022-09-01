@@ -44,8 +44,7 @@ _qpro_main_zh() {
         bin:'执行全局命令'
         enable-complete:'支持Commander的Tab补全(这会导致Tab补全变慢一些)'
         register-global:'将当前Qpro项目注册为全局命令'
-        gen-fig-script:'生成fig自动补全脚本'
-        gen-zsh-comp:'生成zsh自动补全脚本'
+        gen-complete:'生成自动补全脚本'
     )
 
     _describe -t common-commands 'common commands' args && _ret=0

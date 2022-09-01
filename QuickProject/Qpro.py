@@ -636,6 +636,7 @@ func = {
     'ls': tele_ls,
     'enable-complete': enable_complete,
     'register-global': register_global_command,
+    'gen-complete': gen_complete,
 }
 
 

@@ -24,7 +24,7 @@ const completionSpec: Fig.Spec = {
     description: "运行",
   }, {
     name: "-f",
-    description: "指定源文件",
+    description: "指定入口文件",
     args: {name: 'source', description: '源文件', template: 'filepaths'}
   }, {
     name: "-h",

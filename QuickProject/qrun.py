@@ -52,7 +52,15 @@ def run(use_txt=False, executable=str(config['executable'])):
         return
     if '--qrun-fig-complete' in argv:
         if 'enable_complete' in config and config['enable_complete']:
-            os.system(cmd + ' --qrun-fig-complete')
+            project_name = os.path.basename(os.path.dirname(project_configure_path))
+            if os.path.exists('complete/fig') and os.path.exists(f'complete/fig/{project_name}.ts'):
+                import re
+                import json
+                with open(f'complete/fig/{project_name}.ts', 'r') as f:
+                    json_content = re.findall('const completionSpec: Fig\.Spec = (.*?);', f.read(), re.S)[0]
+                print(json.dumps(json.loads(json_content)['subcommands'], indent=4))
+            else:
+                os.system(cmd + ' --qrun-fig-complete')
         else:
             print()
         return

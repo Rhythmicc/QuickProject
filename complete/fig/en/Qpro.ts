@@ -56,11 +56,8 @@ const completionSpec: Fig.Spec = {
     'name': 'register-global',
     'description': 'Register global command'
   }, {
-    'name': 'gen-fig-script',
-    'description': 'Generate Fig autocompletion script and recompile'
-  }, {
-    'name': 'csv',
-    'description': 'Convert old Qpro configuration to json format'
-  }],
+    'name': 'gen-complete',
+    'description': 'Generate autocompletion script'
+  }]
 };
 export default completionSpec;

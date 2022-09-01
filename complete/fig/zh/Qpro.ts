@@ -56,14 +56,8 @@ const completionSpec: Fig.Spec = {
         'name': 'register-global',
         'description': '注册全局命令'
     }, {
-        'name': 'gen-fig-script',
-        'description': '生成Fig自动补全脚本并重新编译'
-    }, {
-        'name': 'gen-zsh-comp',
-        'description': '生成zsh自动补全脚本'
-    }, {
-        'name': 'csv',
-        'description': '将旧的Qpro配置表改为json格式'
-    }],
+        'name': 'gen-complete',
+        'description': '生成自动补全脚本'
+    }]
 };
 export default completionSpec;

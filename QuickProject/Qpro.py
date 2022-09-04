@@ -33,6 +33,11 @@ def __findAndReplace(dirPath, fo, to):
     :return:
     """
     for rt, son_dir, son_files in os.walk(dirPath):
+        for _dir in son_dir:
+            if _dir.startswith(fo):
+                os.rename(rt + dir_char + _dir, rt + dir_char + _dir.replace(fo, to))
+
+    for rt, son_dir, son_files in os.walk(dirPath):
         for file in son_files:
             with open(rt + dir_char + file, 'r') as f:
                 ct = f.read()
@@ -40,9 +45,6 @@ def __findAndReplace(dirPath, fo, to):
                 f.write(ct.replace(fo, to))
             if file.startswith(fo):
                 os.rename(rt + dir_char + file, rt + dir_char + file.replace(fo, to))
-        for _dir in son_dir:
-            if _dir.startswith(fo):
-                os.rename(rt + dir_char + _dir, rt + dir_char + _dir.replace(fo, to))
 
 
 def remove(path):

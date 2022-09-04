@@ -43,7 +43,8 @@ _qpro_main_zh() {
         ls:'展示<路径>中的子项'
         bin:'执行全局命令'
         enable-complete:'支持Commander的Tab补全(这会导致Tab补全变慢一些)'
-        register-global:'将当前Qpro项目注册为全局命令'
+        register:'将当前Qpro项目注册为全局命令'
+        unregister:'注销当前Qpro项目的全局命令'
         gen-complete:'生成自动补全脚本'
     )
 

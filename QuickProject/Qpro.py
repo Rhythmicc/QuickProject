@@ -481,6 +481,25 @@ def __get_Qpro_fig_Dir():
     return QproGlobalDir
 
 
+def _format_subcommands(project_subcommands: dict):
+    if not project_subcommands:
+        return None
+    for item in project_subcommands:
+        if 'args' in item:
+            if 'options' not in item:
+                item['options'] = []
+            for arg in item['args']:
+                if arg['name'].startswith('-') and not arg['name'].startswith('--'):
+                    if 'file' in arg['name'] or 'path' in arg['name']:
+                        arg['args']['template'] = ['filepaths', 'folders']
+                    item['options'].append(arg)
+                    item['args'].remove(arg)
+                    continue
+                if 'file' in arg['name'] or 'path' in arg['name']:
+                    arg['template'] = ['filepaths', 'folders']
+    return project_subcommands
+
+
 def register_global_command():
     if not os.path.exists(configure_name):
         return QproDefaultConsole.print(QproErrorString, f'{configure_name} is not exists!' if user_lang != 'zh' else f'{configure_name} 不存在!')
@@ -513,23 +532,9 @@ def register_global_command():
     import subprocess
 
     with open(os.path.join(fig_dir, f'{project_name}.json'), 'w') as f:
-        project_subcommands = json.loads(subprocess.check_output(['qrun', '--qrun-fig-complete']).decode('utf-8'))
+        project_subcommands = _format_subcommands(json.loads(subprocess.check_output(['qrun', '--qrun-fig-complete']).decode('utf-8')))
         if not project_subcommands:
             return QproDefaultConsole.print(QproErrorString, 'Not a Commander APP' if user_lang != 'zh' else '不是Commander应用')
-        for item in project_subcommands:
-            if 'args' in item:
-                if 'options' not in item:
-                    item['options'] = []
-                for arg in item['args']:
-                    if arg['name'].startswith('-') and not arg['name'].startswith('--'):
-                        if 'file' in arg['name'] or 'path' in arg['name']:
-                            arg['args']['template'] = ['filepaths', 'folders']
-                        item['options'].append(arg)
-                        item['args'].remove(arg)
-                        continue
-                    if 'file' in arg['name'] or 'path' in arg['name']:
-                        arg['template'] = ['filepaths', 'folders']
-
         json.dump({
             'fig': {
                 'name': project_name,
@@ -556,6 +561,22 @@ from QproGlobalCommands.{package_name} import {entry_point}
 {entry_point}.main()
         """
         f.write(ct)
+    config = get_config()
+    flag = True
+    for item in config['server_targets']:
+        if item['host'] == 'localhost':
+            item['path'] = os.path.join(QproGlobalDir, 'QproGlobalCommands')
+            item['port'] = 22
+            flag = False
+            break
+    if flag:
+        config['server_targets'].append({
+            'user': '',
+            'host': 'localhost',
+            'path': os.path.join(QproGlobalDir, 'QproGlobalCommands'),
+            'port': 22
+        })
+    __format_json(config, project_configure_path)
     os.chmod(os.path.join(QproGlobalDir, 'bin', f'{project_name}'), 0o755)
     QproDefaultConsole.print(QproInfoString, f'Register "{project_name}" Success!' if user_lang != 'zh' else f'注册 "{project_name}" 成功!')
 
@@ -571,22 +592,11 @@ def gen_complete():
     from QuickProject import QproDefaultConsole, QproErrorString, user_lang
 
     project_name = os.getcwd().split(dir_char)[-1]
-    project_subcommands = json.loads(subprocess.check_output(['qrun', '--qrun-fig-complete']).decode('utf-8'))
+    project_subcommands = _format_subcommands(
+        json.loads(subprocess.check_output(['qrun', '--qrun-fig-complete']).decode('utf-8')))
     if not project_subcommands:
-        return QproDefaultConsole.print(QproErrorString, 'Not a Commander APP' if user_lang != 'zh' else '不是Commander应用')
-    for item in project_subcommands:
-        if 'args' in item:
-            if 'options' not in item:
-                item['options'] = []
-            for arg in item['args']:
-                if arg['name'].startswith('-') and not arg['name'].startswith('--'):
-                    if 'file' in arg['name'] or 'path' in arg['name']:
-                        arg['args']['template'] = ['filepaths', 'folders']
-                    item['options'].append(arg)
-                    item['args'].remove(arg)
-                    continue
-                if 'file' in arg['name'] or 'path' in arg['name']:
-                    arg['template'] = ['filepaths', 'folders']
+        return QproDefaultConsole.print(QproErrorString,
+                                        'Not a Commander APP' if user_lang != 'zh' else '不是Commander应用')
     if not os.path.exists('complete') or not os.path.isdir('complete'):
         os.mkdir('complete')
         os.mkdir(f'complete{dir_char}fig')
@@ -627,6 +637,28 @@ def gen_complete():
         f.write(template)
 
 
+def unregister():
+    QproGlobalDir = __get_Qpro_fig_Dir()
+    if not QproGlobalDir:
+        return
+
+    import shutil
+
+    config = get_config()
+    project_name = os.getcwd().split(dir_char)[-1]
+    fig_dir = os.path.join(QproGlobalDir, 'fig')
+    bin_dir = os.path.join(QproGlobalDir, 'bin')
+
+    for item in config['server_targets']:
+        if item['host'] == 'localhost':
+            shutil.rmtree(os.path.join(item['path'], project_name))
+            break
+    if os.path.exists(os.path.join(fig_dir, f'{project_name}.json')):
+        os.remove(os.path.join(fig_dir, f'{project_name}.json'))
+    if os.path.exists(os.path.join(bin_dir, f'{project_name}')):
+        os.remove(os.path.join(bin_dir, f'{project_name}'))
+
+
 func = {
     'create': create,
     'scp': scp,
@@ -637,7 +669,8 @@ func = {
     'del': delete,
     'ls': tele_ls,
     'enable-complete': enable_complete,
-    'register-global': register_global_command,
+    'register': register_global_command,
+    'unregister': unregister,
     'gen-complete': gen_complete,
 }
 
@@ -674,7 +707,8 @@ def main():
                          ('del-all', 'delete Qpro project' if user_lang != 'zh' else '销毁当前Qpro项目(本地+远程)'),
                          ('ls  [bold magenta]<path>', 'list element in path' if user_lang != 'zh' else '展示路径中的子项'),
                          ('enable-complete', 'enable complete' if user_lang != 'zh' else '启用Commander类的自动补全'),
-                         ('register-global', 'register global command' if user_lang != 'zh' else '注册全局命令'),
+                         ('register', 'register global command' if user_lang != 'zh' else '注册全局命令'),
+                         ('unregister', 'unregister global command' if user_lang != 'zh' else '注销全局命令'),
                          ('gen-complete', 'generate autocomplete scripts for zsh & fig' if user_lang != 'zh' else '生成Zsh和Fig自动补全脚本'),
                          ('qrun *', 'run your Qpro project' if user_lang != 'zh' else '运行器')],
                      'prefix': 'Qpro'})

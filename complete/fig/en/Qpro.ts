@@ -53,8 +53,11 @@ const completionSpec: Fig.Spec = {
     'name': 'enable-complete',
     'description': 'Support the auto completion of the Commander application'
   }, {
-    'name': 'register-global',
+    'name': 'register',
     'description': 'Register global command'
+  }, {
+    'name': 'unregister',
+    'description': 'Unregister global command'
   }, {
     'name': 'gen-complete',
     'description': 'Generate autocompletion script'

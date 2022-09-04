@@ -43,7 +43,8 @@ _qpro_main_zh() {
         ls:'list element in <path>'
         bin:'Execute global command'
         enable-complete:'Support Commander Tab Complete (slow)'
-        register-global:'Register global command'
+        register:'Register global command'
+        unregister:'Unregister global command'
         gen-complete:'Generate autocomplete script'
     )
 

@@ -677,41 +677,46 @@ func = {
 
 def main():
     if len(sys.argv) < 2 or '-h' == sys.argv[1]:
-        menu_output({'title': 'Qpro usage\n' if user_lang != 'zh' else 'Qpro 菜单\n',
-                     'lines': [
-                         ('init', 'let current dir be a Qpro project!' if user_lang != 'zh' else '使当前目录成为Qpro项目'),
-                         ('-h', 'help' if user_lang != 'zh' else '帮助'),
-                         ('create [bold magenta]<name>', 'create a Qpro project' if user_lang != 'zh' else '创建Qpro项目'),
-                         ('update', 'update Qpro' if user_lang != 'zh' else '更新Qpro'),
-                         ('ssh', 'login server by ssh' if user_lang != 'zh' else '通过SSH登录远程映射'),
-                         (
-                             'scp [bold magenta]<path>',
-                             'upload path to default server target' if user_lang != 'zh' else '上传路径到默认的远程映射对应位置'
-                         ),
-                         (
-                             'smv [bold magenta]<path>',
-                             'delete after scp' if user_lang != 'zh' else '上传完成后删除文件或目录'
-                         ),
-                         (
-                             'scp-init',
-                             'upload all of project to server target' if user_lang != 'zh' else '上传当前全部内容到远程映射'
-                         ),
-                         (
-                             'get [bold magenta]<path>',
-                             'download file from server target' if user_lang != 'zh' else '从远程映射下载'
-                         ),
-                         (
-                             'del [bold magenta]<path>',
-                             'delete path in project' if user_lang != 'zh' else '同时删除本地及远程映射文件或目录'
-                         ),
-                         ('del-all', 'delete Qpro project' if user_lang != 'zh' else '销毁当前Qpro项目(本地+远程)'),
-                         ('ls  [bold magenta]<path>', 'list element in path' if user_lang != 'zh' else '展示路径中的子项'),
-                         ('enable-complete', 'enable complete' if user_lang != 'zh' else '启用Commander类的自动补全'),
-                         ('register', 'register global command' if user_lang != 'zh' else '注册全局命令'),
-                         ('unregister', 'unregister global command' if user_lang != 'zh' else '注销全局命令'),
-                         ('gen-complete', 'generate autocomplete scripts for zsh & fig' if user_lang != 'zh' else '生成Zsh和Fig自动补全脚本'),
-                         ('qrun *', 'run your Qpro project' if user_lang != 'zh' else '运行器')],
-                     'prefix': 'Qpro'})
+        menu_output(
+            {
+                'title': 'Qpro usage\n' if user_lang != 'zh' else 'Qpro 菜单\n',
+                'lines': [
+                    ('init', 'let current dir be a Qpro project!' if user_lang != 'zh' else '使当前目录成为Qpro项目'),
+                    ('-h', 'help' if user_lang != 'zh' else '帮助'),
+                    ('create [bold magenta]<name>', 'create a Qpro project' if user_lang != 'zh' else '创建Qpro项目'),
+                    ('update', 'update Qpro' if user_lang != 'zh' else '更新Qpro'),
+                    ('ssh', 'login server by ssh' if user_lang != 'zh' else '通过SSH登录远程映射'),
+                    (
+                        'scp [bold magenta]<path>',
+                        'upload path to default server target' if user_lang != 'zh' else '上传路径到默认的远程映射对应位置'
+                    ),
+                    (
+                        'smv [bold magenta]<path>',
+                        'delete after scp' if user_lang != 'zh' else '上传完成后删除文件或目录'
+                    ),
+                    (
+                        'scp-init',
+                        'upload all of project to server target' if user_lang != 'zh' else '上传当前全部内容到远程映射'
+                    ),
+                    (
+                        'get [bold magenta]<path>',
+                        'download file from server target' if user_lang != 'zh' else '从远程映射下载'
+                    ),
+                    (
+                        'del [bold magenta]<path>',
+                        'delete path in project' if user_lang != 'zh' else '同时删除本地及远程映射文件或目录'
+                    ),
+                    ('del-all', 'delete Qpro project' if user_lang != 'zh' else '销毁当前Qpro项目(本地+远程)'),
+                    ('ls  [bold magenta]<path>', 'list element in path' if user_lang != 'zh' else '展示路径中的子项'),
+                    ('enable-complete', 'enable complete' if user_lang != 'zh' else '启用Commander类的自动补全'),
+                    ('register', 'register global command' if user_lang != 'zh' else '注册全局命令'),
+                    ('unregister', 'unregister global command' if user_lang != 'zh' else '注销全局命令'),
+                    ('gen-complete', 'generate autocomplete scripts for zsh & fig' if user_lang != 'zh' else '生成Zsh和Fig自动补全脚本'),
+                    ('qrun *', 'run your Qpro project' if user_lang != 'zh' else '运行器')
+                ],
+                'prefix': 'Qpro'
+             }
+        )
     elif 'update' == sys.argv[1]:
         os.system('pip3 install Qpro --upgrade')
     elif sys.argv[1] in func:

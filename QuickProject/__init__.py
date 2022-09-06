@@ -51,7 +51,7 @@ def __latest_filename(filename):
     return ''
 
 
-if ' '.join(sys.argv[:2]) != 'Qpro -init':
+if ' '.join(sys.argv[:2]) != 'Qpro init':
     rt_dir = os.path.dirname(__latest_filename(configure_name)) + dir_char
     if rt_dir == dir_char:
         rt_dir = os.path.abspath('.') + dir_char

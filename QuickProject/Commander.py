@@ -26,7 +26,30 @@ class Commander:
         """
         self.command_table = {}
         self.fig_table = [{'name': '--help', 'description': '获取帮助'}]
+        self.custom_complete_table = {}
         self.seg_flag = seg_flag
+
+    def custom_complete(self, param: str):
+        """
+        自定义补全
+
+        :param param: 参数名
+        :return:
+        """
+        def wrapper(func):
+            if not isfunction(func):
+                raise TypeError(f'{func} not a function')
+            func_name = func.__name__.strip('_')
+            if self.seg_flag:
+                func_name = func_name.replace('_', '-')
+            if func_name not in self.custom_complete_table:
+                self.custom_complete_table[func_name] = {}
+            self.custom_complete_table[func_name][param] = func()
+        return wrapper
+
+    def __op_cur_args(self, func_name, cur_args, name):
+        if name in self.custom_complete_table.get(func_name, {}):
+            cur_args['suggestions'] = self.custom_complete_table[func_name][name]
 
     def command(self):
         def wrapper(func):
@@ -57,6 +80,7 @@ class Commander:
                             'description': param_doc.get(arg.name, f'<{arg.name}>'),
                             'isVariadic': True
                         }
+                        self.__op_cur_args(func_name, cur_args, arg.name)
                         if 'file' in arg.name.lower() or 'path' in arg.name.lower():
                             cur_args['template'] = ['filepaths', 'folders']
                         func_fig['args'].append({
@@ -70,6 +94,7 @@ class Commander:
                             'name': arg.name,
                             'description': param_doc.get(arg.name, f'<{arg.name}>'),
                         }
+                        self.__op_cur_args(func_name, cur_args, arg.name)
                         if 'file' in arg.name.lower() or 'path' in arg.name.lower():
                             cur_args['template'] = ['filepaths', 'folders']
                         func_fig['args'].append(cur_args)
@@ -86,6 +111,7 @@ class Commander:
                         'name': arg.name,
                         'description': param_doc.get(arg.name, f'<{arg.name}>'),
                     }
+                    self.__op_cur_args(func_name, cur_args, arg.name)
                     if 'file' in arg.name.lower() or 'path' in arg.name.lower():
                         cur_args['template'] = ['filepaths', 'folders']
                     func_fig['args'].append({

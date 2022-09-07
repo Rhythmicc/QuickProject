@@ -83,8 +83,10 @@ class QproConfig:
         return self.config[key]
 
 
-def _ask(question):
+def _ask(question: dict):
     try:
+        if 'name' not in question:
+            question['name'] = 'NoName'
         return prompt(question)[question['name']]
     except:
         exit(0)

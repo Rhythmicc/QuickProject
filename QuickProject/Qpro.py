@@ -95,7 +95,6 @@ def _search_supported_languages(is_CN):
     kw = _ask({
         'type': 'input',
         'message': 'Input a keyword' if user_lang != 'zh' else '输入一个关键词',
-        'name': 'language'
     })
 
     import json
@@ -111,7 +110,6 @@ def _search_supported_languages(is_CN):
             _ask({
                 'type': 'list',
                 'message': 'Choose Supported Language' if user_lang != 'zh' else '选择支持的语言',
-                'name': 'url',
                 'choices': list(data.keys())
             })
         ]
@@ -146,7 +144,6 @@ def _external_create(project_name: str, key: str = ''):
         templateProjectUrls = _ask({
             'type': 'input',
             'message': 'GIT ' + ('URL' if user_lang != 'zh' else '链接') + ':',
-            'name': 'url'
         })
         with QproDefaultConsole.status(
                 ('Cloning External Template to {}' if user_lang != 'zh' else '正在克隆Qpro 外部模板为 {}').format(project_name)):
@@ -166,7 +163,6 @@ def __get_server_target_from_string():
     """
     server_target = _ask({
         'type': 'input',
-        'name': 'server_target',
         'message': 'Input user@ip:dir_path if you need scp' if user_lang != 'zh' else '输入 用户@IP:路径 如果你打算使用SSH'
     }).strip().replace(dir_char, '/')
 
@@ -183,7 +179,6 @@ def __get_server_target_from_string():
         path = target[-1] + ('' if target[-1].endswith('/') else '/')
         port = _ask({
             'type': 'input',
-            'name': 'port',
             'message': 'input port' if user_lang != 'zh' else '输入端口号',
             'default': '22'
         })
@@ -207,7 +202,6 @@ def create():
 
         lang = _ask({
             'type': 'list',
-            'name': 'lang_name',
             'message': 'Choose Lang | 选择语言:',
             'choices': [
                 'Empty' if user_lang != 'zh' else '空白项目',
@@ -228,7 +222,6 @@ def create():
         if _ask({
             'type': 'confirm',
             'message': 'Open it with VS Code?' if user_lang != 'zh' else '是否现在使用VS Code打开?',
-            'name': 'open',
             'default': True
         }):
             if sys.platform == 'darwin':
@@ -271,7 +264,6 @@ def smv():
         'type': 'confirm',
         'message': 'Confirm delete after transform | 确认传输后删除',
         'default': True,
-        'name': 'confirm'
     }):
         scp(True)
 
@@ -307,7 +299,6 @@ def pro_init():
 
     lang_name = _ask({
         'type': 'list',
-        'name': 'lang_name',
         'message': 'Choose Lang | 选择语言:',
         'choices': lang_tool_exe.keys()
     })
@@ -345,7 +336,6 @@ def pro_init():
             'type': 'confirm',
             'message': 'Confirm to sync project | 确认同步项目',
             'default': True,
-            'name': 'confirm'
         }):
             scp_init(info[-1][1:])
         return
@@ -364,8 +354,7 @@ def pro_init():
     if _ask({
         'type': 'confirm',
         'message': 'Confirm to sync project | 确认同步项目',
-        'default': True,
-        'name': 'confirm'
+        'default': True
     }):
         scp_init(info[-1][1:])
 
@@ -415,7 +404,6 @@ def delete():
                 QproDefaultConsole.print(QproErrorString, f'{server_target}: delete {sub_path} failed with error: {_st}')
         if not st or _ask({
             'type': 'confirm',
-            'name': 'confirm',
             'message': f'{path} is not in this Qpro project! Do you want to delete it?' if user_lang != 'zh' else f'{path} 不在当前 Qpro 项目中! 是否删除?',
         }):
             remove(sub_path)
@@ -520,7 +508,6 @@ def register_global_command():
                                  'This project has been registered!' if user_lang != 'zh' else '该项目已注册!')
         if _ask({
             'type': 'confirm',
-            'name': 'confirm',
             'message': 'Do you want to override it?' if user_lang != 'zh' else '是否覆盖?',
             'default': False
         }):
@@ -584,8 +571,6 @@ from QproGlobalCommands.{package_name} import {entry_point}
 def gen_complete():
     """
     为 Pypi Commander APP 生成自动补全脚本
-
-    :param project_name: 项目名称
     """
     import json
     import subprocess

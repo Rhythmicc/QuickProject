@@ -26,7 +26,7 @@ def parseArgs():
             else:
                 retainArgs.append(i)
                 has_recog[i] = True
-        elif i in ['-if', '-f', '--path']:
+        elif i in ['-if', '-f']:
             add_flag = False
             isPath = i == '--path'
         else:
@@ -88,24 +88,10 @@ def main():
                             ('-i', 'use input.txt as input' if user_lang != 'zh' else '使用默认输入文件作为输入'),
                             ('-if [bold magenta]<file>', 'set file as input' if user_lang != 'zh' else '输入重定向'),
                             ('-if [bold magenta]-paste', 'use Clipboard content as input' if user_lang != 'zh' else '输入重定向到粘贴板'),
-                            ('-f  [bold magenta]<file>', 'set file as build file' if user_lang != 'zh' else '指定源文件'),
                             ('*', 'add parameters for program' if user_lang != 'zh' else '程序的任何其他参数')],
                      'prefix': 'qrun '})
         if '-h' not in argv:
             return
-    if '-f' in qrun_argv:
-        index = qrun_argv.index('-f')
-        if index == len(qrun_argv) - 1:
-            return QproDefaultConsole.print(QproErrorString, 'No file with -f' if user_lang != 'zh' else '-f后没有指定文件')
-        filename = qrun_argv[index + 1] if qrun_argv[index + 1] != '__ignore__' else config['entry_point']
-        if not os.path.exists(filename):
-            return QproDefaultConsole.print(
-                QproErrorString, (
-                    'No such file: "{filename}"' if user_lang != 'zh' else '没有这个文件: "{filename}"'
-                ).format(filename=filename)
-            )
-        filename = os.path.abspath(filename)
-        flag = filename != config['entry_point']
     if '-if' in qrun_argv:
         index = qrun_argv.index('-if')
         if index == len(qrun_argv) - 1:

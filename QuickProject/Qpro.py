@@ -1,7 +1,10 @@
+import os.path
+
+from rich.prompt import Prompt
+
+from QuickProject import __sub_path, _choose_server_target
 from . import *
 from . import _ask
-from QuickProject import __sub_path, _choose_server_target
-from rich.prompt import Prompt
 
 
 def __format_json(info, path: str):
@@ -66,10 +69,12 @@ def scp_init(server_targets: list):
     if not server_targets:
         return
     for server_target in server_targets:
-        user, host, port, target = server_target['user'], server_target['host'], server_target['port'], server_target['path']
+        user, host, port, target = server_target['user'], server_target['host'], server_target['port'], server_target[
+            'path']
         st = SshProtocol.post_all_in_folder(user, host, target, port, '')
         if st:
-            QproDefaultConsole.print(QproErrorString, "upload project failed!" if user_lang != 'zh' else '上传项目失败!')
+            QproDefaultConsole.print(QproErrorString,
+                                     "upload project failed!" if user_lang != 'zh' else '上传项目失败!')
 
 
 def _create_empty_project(project_name):
@@ -128,7 +133,8 @@ def _external_create(project_name: str, key: str = ''):
         try:
             from QuickStart_Rhy.API.alapi import ip_info
             with QproDefaultConsole.status(
-                    ('Check IP to switch mirrors' if user_lang != 'zh' else '检查IP以选择合适的镜像').format(key, project_name)):
+                    ('Check IP to switch mirrors' if user_lang != 'zh' else '检查IP以选择合适的镜像').format(key,
+                                                                                                             project_name)):
                 is_CN = ip_info('')['ad_info']['nation'].startswith('中国')
         except:
             is_CN = False
@@ -138,7 +144,7 @@ def _external_create(project_name: str, key: str = ''):
             exit(0)
         with QproDefaultConsole.status(
                 ('Cloning Qpro {} Template to {}' if user_lang != 'zh' else '正在克隆Qpro {} 模板为 {}').format(key,
-                                                                                                         project_name)):
+                                                                                                                project_name)):
             Repo.clone_from(templateProjectUrls[0], project_name)
     else:
         templateProjectUrls = _ask({
@@ -146,7 +152,8 @@ def _external_create(project_name: str, key: str = ''):
             'message': 'GIT ' + ('URL' if user_lang != 'zh' else '链接') + ':',
         })
         with QproDefaultConsole.status(
-                ('Cloning External Template to {}' if user_lang != 'zh' else '正在克隆Qpro 外部模板为 {}').format(project_name)):
+                ('Cloning External Template to {}' if user_lang != 'zh' else '正在克隆Qpro 外部模板为 {}').format(
+                    project_name)):
             Repo.clone_from(templateProjectUrls, project_name)
     os.chdir(project_name)
     try:
@@ -252,9 +259,11 @@ def scp(smv_flag: bool = False):
         status = 0
         for server_target in server_targets:
             if os.path.isdir(path):
-                status |= SshProtocol.post_folder(server_target['user'], server_target['host'], server_target['path'], server_target['port'], path, sub_path)
+                status |= SshProtocol.post_folder(server_target['user'], server_target['host'], server_target['path'],
+                                                  server_target['port'], path, sub_path)
             else:
-                status |= SshProtocol.post_file(server_target['user'], server_target['host'], server_target['path'], server_target['port'], path, sub_path)
+                status |= SshProtocol.post_file(server_target['user'], server_target['host'], server_target['path'],
+                                                server_target['port'], path, sub_path)
         if smv_flag and not status:
             remove(path)
 
@@ -281,7 +290,8 @@ def get():
             return QproDefaultConsole.print(QproErrorString,
                                             f"{path} is not in this Qpro project!" if user_lang != 'zh' else f'{path} 不在当前 Qpro 项目中!')
         server_target = get_server_targets()[0]
-        SshProtocol.get_file_or_folder(server_target['user'], server_target['host'], server_target['port'], server_target['path'], sub_path, path)
+        SshProtocol.get_file_or_folder(server_target['user'], server_target['host'], server_target['port'],
+                                       server_target['path'], sub_path, path)
 
 
 def pro_init():
@@ -363,14 +373,16 @@ def ssh():
     server_target = _choose_server_target()
     if not server_target:
         return
-    SshProtocol.ssh(server_target['user'], server_target['host'], server_target['path'], server_target['port'], __sub_path('.'))
+    SshProtocol.ssh(server_target['user'], server_target['host'], server_target['path'], server_target['port'],
+                    __sub_path('.'))
 
 
 def delete_all():
     server_targets = get_server_targets()
     st = 0
     for server_target in server_targets:
-        _st = SshProtocol.command(server_target['user'], server_target['host'], server_target['path'], server_target['port'], 'rm -rf .')
+        _st = SshProtocol.command(server_target['user'], server_target['host'], server_target['path'],
+                                  server_target['port'], 'rm -rf .')
         st |= 1 if _st else 0
         QproDefaultConsole.print(QproErrorString, f'{server_target}: delete all failed with error: {st}')
     if not st:
@@ -401,7 +413,8 @@ def delete():
                                       server_target['port'], f'rm -rf {sub_path}')
             st |= 1 if _st else 0
             if _st:
-                QproDefaultConsole.print(QproErrorString, f'{server_target}: delete {sub_path} failed with error: {_st}')
+                QproDefaultConsole.print(QproErrorString,
+                                         f'{server_target}: delete {sub_path} failed with error: {_st}')
         if not st or _ask({
             'type': 'confirm',
             'message': f'{path} is not in this Qpro project! Do you want to delete it?' if user_lang != 'zh' else f'{path} 不在当前 Qpro 项目中! 是否删除?',
@@ -418,7 +431,8 @@ def tele_ls():
     server_target = _choose_server_target()
     if server_target:
         from . import SshProtocol
-        res = SshProtocol.command(server_target['user'], server_target['host'], server_target['path'], server_target['port'], f'ls -lah {sub_path}').strip().split('\n')[3:]
+        res = SshProtocol.command(server_target['user'], server_target['host'], server_target['path'],
+                                  server_target['port'], f'ls -lah {sub_path}').strip().split('\n')[3:]
         res = [i.strip().split() for i in res]
 
         from rich.table import Table
@@ -439,7 +453,8 @@ def tele_ls():
             p_color = Color.from_rgb(171, 157, 242)
             permission = ''.join(['1' if j != '-' else '0' for j in i[0][1:]])
             permission = '%d%d%d' % (int(permission[:3], 2), int(permission[3: 6], 2), int(permission[6:], 2))
-            table.add_row(*[Text(permission, style=Style(color=p_color)), f'[green]{i[4]}', '[bold yellow]' + i[2], '[blue]' +  ' '.join(i[5:8]), Text(" ".join(i[8:]), style=Style(color=color, bold=is_dir))])
+            table.add_row(*[Text(permission, style=Style(color=p_color)), f'[green]{i[4]}', '[bold yellow]' + i[2],
+                            '[blue]' + ' '.join(i[5:8]), Text(" ".join(i[8:]), style=Style(color=color, bold=is_dir))])
         QproDefaultConsole.print(table, justify='center')
 
 
@@ -490,9 +505,11 @@ def _format_subcommands(project_subcommands: dict):
 
 def register_global_command():
     if not os.path.exists(configure_name):
-        return QproDefaultConsole.print(QproErrorString, f'{configure_name} is not exists!' if user_lang != 'zh' else f'{configure_name} 不存在!')
+        return QproDefaultConsole.print(QproErrorString,
+                                        f'{configure_name} is not exists!' if user_lang != 'zh' else f'{configure_name} 不存在!')
     if is_win:
-        return QproDefaultConsole.print(QproWarnString, 'Not Support Windows!' if user_lang != 'zh' else '不支持 Windows!')
+        return QproDefaultConsole.print(QproWarnString,
+                                        'Not Support Windows!' if user_lang != 'zh' else '不支持 Windows!')
     QproGlobalDir = __get_Qpro_fig_Dir()
     if not QproGlobalDir:
         return
@@ -519,9 +536,11 @@ def register_global_command():
     import subprocess
 
     with open(os.path.join(fig_dir, f'{project_name}.json'), 'w') as f:
-        project_subcommands = _format_subcommands(json.loads(subprocess.check_output(['qrun', '--qrun-fig-complete']).decode('utf-8')))
+        project_subcommands = _format_subcommands(
+            json.loads(subprocess.check_output(['qrun', '--qrun-fig-complete']).decode('utf-8')))
         if not project_subcommands:
-            return QproDefaultConsole.print(QproErrorString, 'Not a Commander APP' if user_lang != 'zh' else '不是Commander应用')
+            return QproDefaultConsole.print(QproErrorString,
+                                            'Not a Commander APP' if user_lang != 'zh' else '不是Commander应用')
         json.dump({
             'fig': {
                 'name': project_name,
@@ -536,7 +555,8 @@ def register_global_command():
     with open(os.path.join(commands_dir, package_name, f'{entry_point}.py'), 'r') as f:
         ct = f.read()
         if 'def main():' not in ct:
-            ct = ct.replace("if __name__ == '__main__':", 'def main():').replace('if __name__ == "__main__":', 'def main():')
+            ct = ct.replace("if __name__ == '__main__':", 'def main():').replace('if __name__ == "__main__":',
+                                                                                 'def main():')
     with open(os.path.join(commands_dir, package_name, f'{entry_point}.py'), 'w') as f:
         f.write(ct)
     with open(os.path.join(QproGlobalDir, 'bin', f'{project_name}'), 'w') as f:
@@ -565,7 +585,8 @@ from QproGlobalCommands.{package_name} import {entry_point}
         })
     __format_json(config, project_configure_path)
     os.chmod(os.path.join(QproGlobalDir, 'bin', f'{project_name}'), 0o755)
-    QproDefaultConsole.print(QproInfoString, f'Register "{project_name}" Success!' if user_lang != 'zh' else f'注册 "{project_name}" 成功!')
+    QproDefaultConsole.print(QproInfoString,
+                             f'Register "{project_name}" Success!' if user_lang != 'zh' else f'注册 "{project_name}" 成功!')
 
 
 def gen_complete():
@@ -582,17 +603,24 @@ def gen_complete():
     if not project_subcommands:
         return QproDefaultConsole.print(QproErrorString,
                                         'Not a Commander APP' if user_lang != 'zh' else '不是Commander应用')
-    if not os.path.exists('complete') or not os.path.isdir('complete'):
-        os.mkdir('complete')
-        os.mkdir(f'complete{dir_char}fig')
-        os.mkdir(f'complete{dir_char}zsh')
-    with open(f'complete{dir_char}fig{dir_char}{project_name}.ts', 'w') as f:
+    if os.path.exists('complete') and os.path.isdir('complete'):
+        remove('complete')
+    os.mkdir('complete')
+    os.mkdir(os.path.join('complete', 'fig'))
+    os.mkdir(os.path.join('complete', 'zsh'))
+    with open(os.path.join('complete', 'fig', f'{project_name}.ts'), 'w') as f:
         from .QproFigTable import default_custom_command_template
-        f.write(default_custom_command_template.replace('__CUSTOM_COMMAND_SPEC__', json.dumps({
-            'name': project_name,
-            'description': project_name,
-            'subcommands': project_subcommands,
-        }, ensure_ascii=False, indent=4)))
+        f.write(
+            default_custom_command_template.replace(
+                '__CUSTOM_COMMAND_SPEC__', json.dumps(
+                    {
+                        'name': project_name,
+                        'description': project_name,
+                        'subcommands': project_subcommands,
+                    }, ensure_ascii=False, indent=4
+                )
+            )
+        )
     cur_sub_cmds = []
     sub_cmd_args = []
     for sub_cmd in project_subcommands:
@@ -613,12 +641,13 @@ def gen_complete():
             cur_args = cur_args.replace('__sub_cmd_opts__', '\n            '.join(sub_cmd_opts))
             sub_cmd_args.append(cur_args)
 
-    with open(f'complete{dir_char}zsh{dir_char}_{project_name}', 'w') as f:
+    with open(os.path.join('complete', 'zsh', f'_{project_name}'), 'w') as f:
         from .QproZshComp import zsh_comp_template, zsh_file_comp1, zsh_file_comp2
         template = zsh_comp_template
         template = template.replace('__proj_name__', project_name)
         template = template.replace('__sub_commands__', '\n        '.join(cur_sub_cmds))
-        template = template.replace('__sub_commands_args__', '\n    el'.join(sub_cmd_args) + zsh_file_comp1 if sub_cmd_args else zsh_file_comp2)
+        template = template.replace('__sub_commands_args__',
+                                    '\n    el'.join(sub_cmd_args) + zsh_file_comp1 if sub_cmd_args else zsh_file_comp2)
         f.write(template)
 
 
@@ -696,11 +725,12 @@ def main():
                     ('enable-complete', 'enable complete' if user_lang != 'zh' else '启用Commander类的自动补全'),
                     ('register', 'register global command' if user_lang != 'zh' else '注册全局命令'),
                     ('unregister', 'unregister global command' if user_lang != 'zh' else '注销全局命令'),
-                    ('gen-complete', 'generate autocomplete scripts for zsh & fig' if user_lang != 'zh' else '生成Zsh和Fig自动补全脚本'),
+                    ('gen-complete',
+                     'generate autocomplete scripts for zsh & fig' if user_lang != 'zh' else '生成Zsh和Fig自动补全脚本'),
                     ('qrun *', 'run your Qpro project' if user_lang != 'zh' else '运行器')
                 ],
                 'prefix': 'Qpro'
-             }
+            }
         )
     elif 'update' == sys.argv[1]:
         os.system('pip3 install Qpro --upgrade')

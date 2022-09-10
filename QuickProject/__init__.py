@@ -92,8 +92,8 @@ def requirePackage(pname: str, module: str = "", real_name: str = "", not_exit: 
         confirm = _ask({
             'type': 'confirm',
             'name': 'install',
-            'message': f"""Qs require {pname + (' -> ' + module if module else '')}, confirm to install?  
-  Qs 依赖 {pname + (' -> ' + module if module else '')}, 是否确认安装?""",
+            'message': f"""Qpro require {pname + (' -> ' + module if module else '')}, confirm to install?  
+  Qpro 依赖 {pname + (' -> ' + module if module else '')}, 是否确认安装?""",
             'default': True})
         if confirm:
             os.system(f'{set_pip} install {pname if not real_name else real_name} -U')
@@ -106,6 +106,26 @@ def requirePackage(pname: str, module: str = "", real_name: str = "", not_exit: 
             exit(-1)
     finally:
         return eval(f'{module if module else pname}')
+
+
+def external_exec(cmd: str, without_output: bool = False):
+    """
+    外部执行命令
+
+    :param cmd: 命令
+    :param without_output: 是否不输出
+    :return: status code, output
+    """
+    from subprocess import Popen, PIPE
+    p = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE, encoding='utf-8')
+    ret_code = p.wait()
+    stdout, stderr = p.communicate()
+    content = stdout.strip() + stderr.strip()
+    if ret_code and content and not without_output:
+        QproDefaultConsole.print(QproErrorString, content)
+    elif content and not without_output:
+        QproDefaultConsole.print(QproInfoString, content)
+    return ret_code, content
 
 
 class SshProtocol:
@@ -207,9 +227,11 @@ class SshProtocol:
         """
         if not domain or not target:
             return 0
-        import subprocess
-        cmd = ['ssh', '-p', port, user + '@' + domain if user else domain, f'cd {target}', ';', command]
-        return subprocess.check_output(cmd).decode('utf-8')
+        status, content = external_exec(
+            'ssh -p %s %s@%s "cd %s ; %s"' % (port, user, domain, target, command) if user else
+            'ssh -p %s %s "cd %s ; %s"' % (port, domain, target, command), without_output=True
+        )
+        return status, content
 
     @staticmethod
     def ssh(user, domain, target, port, dstPath):

@@ -20,6 +20,7 @@ except:
 
 user_lang = _qpro_config.select('default_language')
 user_pip = _qpro_config.select('default_pip')
+using_gitee = _qpro_config.select('using_gitee')
 QproErrorString = '[bold red][ERRO]' if user_lang != 'zh' else '[bold red][错误]'
 QproInfoString = '[bold cyan][INFO]' if user_lang != 'zh' else '[bold cyan][提示]'
 QproWarnString = '[bold yellow][WARN]' if user_lang != 'zh' else '[bold yellow][警告]'

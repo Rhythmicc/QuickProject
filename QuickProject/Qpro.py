@@ -96,7 +96,7 @@ def _create_empty_project(project_name):
     return
 
 
-def _search_supported_languages(is_CN):
+def _search_supported_languages(is_CN=using_gitee):
     kw = _ask({
         'type': 'input',
         'message': 'Input a keyword' if user_lang != 'zh' else '输入一个关键词',
@@ -130,21 +130,11 @@ def _external_create(project_name: str, key: str = ''):
         if key in ['Empty', '空白项目']:
             return _create_empty_project(project_name)
 
-        try:
-            from QuickStart_Rhy.API.alapi import ip_info
-            with QproDefaultConsole.status(
-                    ('Check IP to switch mirrors' if user_lang != 'zh' else '检查IP以选择合适的镜像').format(key,
-                                                                                                             project_name)):
-                is_CN = ip_info('')['ad_info']['nation'].startswith('中国')
-        except:
-            is_CN = False
-
-        templateProjectUrls = _search_supported_languages(is_CN)
+        templateProjectUrls = _search_supported_languages()
         if not templateProjectUrls:
             exit(0)
         with QproDefaultConsole.status(
-                ('Cloning Qpro {} Template to {}' if user_lang != 'zh' else '正在克隆Qpro {} 模板为 {}').format(key,
-                                                                                                                project_name)):
+                ('Cloning Qpro {} Template to {}' if user_lang != 'zh' else '正在克隆Qpro {} 模板为 {}').format(key, project_name)):
             Repo.clone_from(templateProjectUrls[0], project_name)
     else:
         templateProjectUrls = _ask({

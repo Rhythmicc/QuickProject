@@ -151,7 +151,7 @@ def _external_create(project_name: str, key: str = ''):
     except Exception as e:
         QproDefaultConsole.print(QproErrorString, repr(e))
     if key:
-        __findAndReplace(os.getcwd(), templateProjectUrls[1], project_name)
+        __findAndReplace(os.getcwd(), templateProjectUrls[1], project_name.replace('-', '_'))
 
 
 def __get_server_target_from_string():
@@ -579,7 +579,7 @@ from QproGlobalCommands.{package_name} import {entry_point}
                              f'Register "{project_name}" Success!' if user_lang != 'zh' else f'注册 "{project_name}" 成功!')
 
 
-def gen_complete():
+def gen_complete(executor: str = 'qrun'):
     """
     为 Pypi Commander APP 生成自动补全脚本
     """
@@ -589,7 +589,7 @@ def gen_complete():
 
     project_name = os.getcwd().split(dir_char)[-1]
     project_subcommands = _format_subcommands(
-        json.loads(subprocess.check_output(['qrun', '--qrun-fig-complete']).decode('utf-8')))
+        json.loads(subprocess.check_output([executor, '--qrun-fig-complete']).decode('utf-8')))
     if not project_subcommands:
         return QproDefaultConsole.print(QproErrorString,
                                         'Not a Commander APP' if user_lang != 'zh' else '不是Commander应用')

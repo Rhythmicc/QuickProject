@@ -280,8 +280,8 @@ def get():
             return QproDefaultConsole.print(QproErrorString,
                                             f"{path} is not in this Qpro project!" if user_lang != 'zh' else f'{path} 不在当前 Qpro 项目中!')
         server_target = get_server_targets()[0]
-        SshProtocol.get_file_or_folder(server_target['user'], server_target['host'], server_target['port'],
-                                       server_target['path'], sub_path, path)
+        SshProtocol.get_file_or_folder(server_target['user'], server_target['host'],
+                                       server_target['path'], server_target['port'], sub_path, path)
 
 
 def pro_init():

@@ -587,7 +587,7 @@ def gen_complete(executor: str = 'qrun'):
     import subprocess
     from QuickProject import QproDefaultConsole, QproErrorString, user_lang
 
-    project_name = os.getcwd().split(dir_char)[-1]
+    project_name = os.getcwd().split(dir_char)[-1] if executor == 'qrun' else executor
     project_subcommands = _format_subcommands(
         json.loads(subprocess.check_output([executor, '--qrun-fig-complete']).decode('utf-8')))
     if not project_subcommands:

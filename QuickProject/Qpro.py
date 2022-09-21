@@ -474,23 +474,23 @@ def __get_Qpro_fig_Dir():
     return QproGlobalDir
 
 
-def _format_subcommands(project_subcommands: dict):
-    if not project_subcommands:
-        return None
-    for item in project_subcommands:
-        if 'args' in item:
-            if 'options' not in item:
-                item['options'] = []
-            for arg in item['args']:
-                if arg['name'].startswith('-') and not arg['name'].startswith('--'):
-                    if 'file' in arg['name'] or 'path' in arg['name']:
-                        arg['args']['template'] = ['filepaths', 'folders']
-                    item['options'].append(arg)
-                    item['args'].remove(arg)
-                    continue
-                if 'file' in arg['name'] or 'path' in arg['name']:
-                    arg['template'] = ['filepaths', 'folders']
-    return project_subcommands
+# def _format_subcommands(project_subcommands: dict):
+#     if not project_subcommands:
+#         return None
+#     for item in project_subcommands:
+#         if 'args' in item:
+#             if 'options' not in item:
+#                 item['options'] = []
+#             for arg in item['args']:
+#                 if arg['name'].startswith('-') and not arg['name'].startswith('--'):
+#                     if 'file' in arg['name'] or 'path' in arg['name']:
+#                         arg['args']['template'] = ['filepaths', 'folders']
+#                     item['options'].append(arg)
+#                     item['args'].remove(arg)
+#                     continue
+#                 if 'file' in arg['name'] or 'path' in arg['name']:
+#                     arg['template'] = ['filepaths', 'folders']
+#     return project_subcommands
 
 
 def register_global_command():
@@ -526,8 +526,7 @@ def register_global_command():
     import subprocess
 
     with open(os.path.join(fig_dir, f'{project_name}.json'), 'w') as f:
-        project_subcommands = _format_subcommands(
-            json.loads(subprocess.check_output(['qrun', '--qrun-fig-complete']).decode('utf-8')))
+        project_subcommands = json.loads(subprocess.check_output(['qrun', '--qrun-fig-complete']).decode('utf-8'))
         if not project_subcommands:
             return QproDefaultConsole.print(QproErrorString,
                                             'Not a Commander APP' if user_lang != 'zh' else '不是Commander应用')
@@ -588,8 +587,7 @@ def gen_complete(executor: str = 'qrun'):
     from QuickProject import QproDefaultConsole, QproErrorString, user_lang
 
     project_name = os.getcwd().split(dir_char)[-1] if executor == 'qrun' else executor
-    project_subcommands = _format_subcommands(
-        json.loads(subprocess.check_output([executor, '--qrun-fig-complete']).decode('utf-8')))
+    project_subcommands = json.loads(subprocess.check_output([executor, '--qrun-fig-complete']).decode('utf-8'))
     if not project_subcommands:
         return QproDefaultConsole.print(QproErrorString,
                                         'Not a Commander APP' if user_lang != 'zh' else '不是Commander应用')

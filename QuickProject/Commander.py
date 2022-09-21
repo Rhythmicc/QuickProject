@@ -62,7 +62,7 @@ class Commander:
             description = func.__doc__.strip().split(':param')[0].strip() if func.__doc__ else func_name.replace('_', ' ')
             if self.seg_flag:
                 func_name = func_name.replace('_', '-')
-            func_fig = {'name': func_name, 'description': description, 'args': []}
+            func_fig = {'name': func_name, 'description': description, 'args': [], 'options': []}
             if func_name in self.command_table:
                 raise Exception(f'{func} already in command table')
             for arg in func_analyser.parameters.values():
@@ -83,7 +83,7 @@ class Commander:
                         self.__op_cur_args(func_name, cur_args, arg.name)
                         if 'file' in arg.name.lower() or 'path' in arg.name.lower():
                             cur_args['template'] = ['filepaths', 'folders']
-                        func_fig['args'].append({
+                        func_fig['options'].append({
                             'name': f'-{arg.name}',
                             'description': param_doc.get(arg.name, f'<{arg.name}>'),
                             'args': cur_args
@@ -112,14 +112,21 @@ class Commander:
                         'description': param_doc.get(arg.name, f'<{arg.name}>'),
                     }
                     self.__op_cur_args(func_name, cur_args, arg.name)
-                    if 'file' in arg.name.lower() or 'path' in arg.name.lower():
+                    if 'file' in arg.name.lower() or 'path' in arg.name.lower() and _type != bool:
                         cur_args['template'] = ['filepaths', 'folders']
-                    func_fig['args'].append({
-                        'name': f'--{arg.name}',
-                        'description': param_doc.get(arg.name, f'<{arg.name}>'),
-                        'isOptional': True,
-                        'args': cur_args
-                    })
+                    if _type != bool:
+                        func_fig['args'].append({
+                            'name': f'--{arg.name}',
+                            'description': param_doc.get(arg.name, f'<{arg.name}>'),
+                            'isOptional': True,
+                            'args': cur_args
+                        })
+                    else:
+                        func_fig['options'].append({
+                            'name': f'--{arg.name}',
+                            'description': param_doc.get(arg.name, f'<{arg.name}>'),
+                            'isOptional': True
+                        })
             self.fig_table.append(func_fig)
             self.command_table[func_name] = {'func': func, 'analyser': func_analyser, 'parser': func_args_parser, 'param_doc': param_doc, 'description': description}
         return wrapper

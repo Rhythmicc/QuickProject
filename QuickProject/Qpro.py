@@ -106,7 +106,7 @@ def _search_supported_languages(is_CN=using_gitee):
     import requests
 
     try:
-        res = json.loads(requests.get(f'https://qpro.rhythmlian.cn/?keyword={kw}&is_CN={str(is_CN).lower()}').text)
+        res = json.loads(requests.get(f'https://qpro-lang.rhythmlian.cn/?keyword={kw}&is_CN={str(is_CN).lower()}').text)
         if not res['status']:
             QproDefaultConsole.print(QproErrorString, res['message'])
             return None

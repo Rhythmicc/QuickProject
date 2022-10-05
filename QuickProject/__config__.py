@@ -79,13 +79,12 @@ class QproConfig:
         self.path = configPath
         if not isExists:
             _init_config(configPath)
-        else:
-            try:
-                with open(configPath, 'r') as f:
-                    self.config = QproConfig.json.load(f)
-            except:
-                with open(configPath, 'r', encoding='utf8') as f:
-                    self.config = QproConfig.json.load(f, encoding='utf8')
+        try:
+            with open(configPath, 'r') as f:
+                self.config = QproConfig.json.load(f)
+        except:
+            with open(configPath, 'r', encoding='utf8') as f:
+                self.config = QproConfig.json.load(f, encoding='utf8')
 
     def update(self):
         with open(self.path, 'w') as f:

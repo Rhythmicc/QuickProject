@@ -115,7 +115,7 @@ class Commander:
                     if 'file' in arg.name.lower() or 'path' in arg.name.lower() and _type != bool:
                         cur_args['template'] = ['filepaths', 'folders']
                     if _type != bool:
-                        func_fig['args'].append({
+                        func_fig['options'].append({
                             'name': f'--{arg.name}',
                             'description': param_doc.get(arg.name, f'<{arg.name}>'),
                             'isOptional': True,

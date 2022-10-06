@@ -114,7 +114,7 @@ def _search_supported_languages(is_CN=using_gitee):
         return data[
             _ask({
                 'type': 'list',
-                'message': 'Choose Supported Language' if user_lang != 'zh' else '选择支持的语言',
+                'message': 'Choose Supported Template' if user_lang != 'zh' else '选择支持的模板',
                 'choices': list(data.keys())
             })
         ]
@@ -199,7 +199,7 @@ def create():
 
         lang = _ask({
             'type': 'list',
-            'message': 'Choose Lang | 选择语言:',
+            'message': '选择模板:' if user_lang == 'zh' else 'Choose Template:',
             'choices': [
                 'Empty' if user_lang != 'zh' else '空白项目',
                 'Template' if user_lang != 'zh' else '内置模板',

@@ -70,6 +70,63 @@ def __sub_path(path, isExist=True):
     return abs_path.replace(rt_dir, '') if abs_path.startswith(rt_dir) else ''
 
 
+def external_exec(
+    cmd: str,
+    without_output: bool = False,
+    without_stdout: bool = False,
+    without_stderr: bool = False,
+):
+    """
+    外部执行命令
+
+    :param cmd: 命令
+    :param without_output: 是否不输出
+    :param without_stdout: 是否不输出stdout
+    :param without_stderr: 是否不输出stderr
+    :return: status code, output
+    """
+    # import threading
+    from subprocess import Popen, PIPE
+    from concurrent.futures import ThreadPoolExecutor, wait
+
+    class MixContent:
+        def __init__(self):
+            self.content = ""
+
+        def __add__(self, other):
+            self.content += other
+            return self
+
+        def __str__(self):
+            return self.content
+
+    content = MixContent()
+
+    def _output(pipe_name: str, process: Popen, content: MixContent):
+        ignore_status = (
+            without_stdout if pipe_name == "stdout" else without_stderr
+        ) or without_output
+        for line in iter(eval(f"process.{pipe_name}.readline"), ""):
+            if not ignore_status:
+                QproDefaultConsole.print(line.strip())
+            content += line
+
+    pool = ThreadPoolExecutor(2)
+    p = Popen(cmd, shell=True, stdout=PIPE,
+              stderr=PIPE, bufsize=1, encoding="utf-8")
+
+    wait(
+        [
+            pool.submit(_output, "stdout", p, content),
+            pool.submit(_output, "stderr", p, content),
+        ]
+    )
+    pool.shutdown()
+    ret_code = p.wait()
+
+    return ret_code, str(content)
+
+
 def requirePackage(pname: str,
                    module: str = "",
                    real_name: str = "",
@@ -83,6 +140,8 @@ def requirePackage(pname: str,
     :param module: 待引入的模块名，可缺省
     :param real_name: 用于 pip3 install 的名字
     :param not_exit: 安装后不退出
+    :param not_ask: 不询问是否安装
+    :param set_pip: 指定pip
     :return: 库或模块的地址
     """
     try:
@@ -114,26 +173,6 @@ def requirePackage(pname: str,
             exit(-1)
     finally:
         return eval(f'{module if module else pname}')
-
-
-def external_exec(cmd: str, without_output: bool = False):
-    """
-    外部执行命令
-
-    :param cmd: 命令
-    :param without_output: 是否不输出
-    :return: status code, output
-    """
-    from subprocess import Popen, PIPE
-    p = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE, encoding='utf-8')
-    ret_code = p.wait()
-    stdout, stderr = p.communicate()
-    content = stdout.strip() + stderr.strip()
-    if ret_code and content and not without_output:
-        QproDefaultConsole.print(QproErrorString, content)
-    elif content and not without_output:
-        QproDefaultConsole.print(QproInfoString, content)
-    return ret_code, content
 
 
 class SshProtocol:

@@ -321,9 +321,9 @@ def get_config(without_output: bool = False):
         if not without_output:
             QproDefaultConsole.print(
                 QproErrorString,
-                "No file named: project_configure.json\n May you need run:\"Qpro -init\" first!"
+                "No file named: project_configure.json\n May you need run:\"Qpro init\" first!"
                 if user_lang != 'zh' else
-                "没有文件: project_configure.json\n可能你需要先运行: \"Qpro -init\"!")
+                "没有文件: project_configure.json\n可能你需要先运行: \"Qpro init\"!")
         exit(0)
     return config
 

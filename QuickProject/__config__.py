@@ -21,16 +21,18 @@ def _ask(question: dict, timeout: int = 0):
 
             import signal
 
-            signal.signal(signal.SIGALRM, handle)
-            signal.alarm(timeout)
-            res = prompt(question)
-            signal.alarm(0)
-            if not res:
+            try:
+                signal.signal(signal.SIGALRM, handle)
+                signal.alarm(timeout)
+                res = prompt(question)
+                signal.alarm(0)
+                return res
+            except RuntimeError:
                 if dir_char == '/':
                     os.system('stty echo')
-                QproDefaultConsole.print('\n[bold yellow][Warning | 警告][/bold yellow]', f"Time out & Return | 超时并返回: {question['default'] if 'default' in question else None}")
+                QproDefaultConsole.print('\n[bold yellow][Warning | 警告][/bold yellow]',
+                                         f"Time out & Return | 超时并返回: {question['default'] if 'default' in question else None}")
                 return question['default'] if 'default' in question else None
-            return res
     else:
         def ask():
             return prompt(question)[question['name']]

@@ -42,12 +42,15 @@ def __findAndReplace(dirPath, fo, to):
 
     for rt, son_dir, son_files in os.walk(dirPath):
         for file in son_files:
-            with open(rt + dir_char + file, 'r') as f:
-                ct = f.read()
-            with open(rt + dir_char + file, 'w') as f:
-                f.write(ct.replace(fo, to))
-            if file.startswith(fo):
-                os.rename(rt + dir_char + file, rt + dir_char + file.replace(fo, to))
+            try:
+                with open(rt + dir_char + file, 'r') as f:
+                    ct = f.read()
+                with open(rt + dir_char + file, 'w') as f:
+                    f.write(ct.replace(fo, to))
+                if file.startswith(fo):
+                    os.rename(rt + dir_char + file, rt + dir_char + file.replace(fo, to))
+            except UnicodeDecodeError:
+                QproDefaultConsole.print(QproErrorString, f'UnicodeDecodeError: {rt + dir_char + file}')
 
 
 def remove(path):

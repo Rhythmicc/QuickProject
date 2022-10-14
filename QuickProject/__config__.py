@@ -11,11 +11,32 @@ else:
     dir_char = '/'
 
 
-def _ask(question: dict):
+def _ask(question: dict, timeout: int = 0):
+    if timeout:
+        def ask():
+            def handle(signum, frame):
+                raise RuntimeError
+
+            import signal
+
+            try:
+                signal.signal(signal.SIGALRM, handle)
+                signal.alarm(timeout)
+                res = prompt(question)
+                signal.alarm(0)
+                return res
+            except RuntimeError:
+                from QuickProject import QproWarnString
+                QproDefaultConsole.print()
+                QproDefaultConsole.print(QproWarnString, 'Time out | 超时')
+                return question['default'] if 'default' in question else None
+    else:
+        def ask():
+            return prompt(question)[question['name']]
     try:
         if 'name' not in question:
             question['name'] = 'NoName'
-        return prompt(question)[question['name']]
+        return ask()
     except:
         exit(0)
 

@@ -18,7 +18,7 @@ def str2bool(v):
 
 
 class Commander:
-    def __init__(self, name: str, seg_flag: bool = False):
+    def __init__(self, name: str, seg_flag: bool = False, custom_complete: bool = False):
         """
         QuickProject的Commander类，帮助快速构建一个命令工具
 
@@ -30,9 +30,10 @@ class Commander:
         self.custom_complete_table = {}
         self.seg_flag = seg_flag
 
-        @self.command()
-        def complete(team: str = "", token: str = "", is_script: bool = False):
-            return self.generate_complete(team, token, is_script)
+        if not custom_complete:
+            @self.command()
+            def complete(team: str = "", token: str = "", is_script: bool = False):
+                return self.generate_complete(team, token, is_script)
 
     def custom_complete(self, param: str):
         """

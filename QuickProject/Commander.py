@@ -315,7 +315,6 @@ class Commander:
             for item in table:
                 if item['name'] == 'complete':
                     table.remove(item)
-                    break
         return json.dumps(table, ensure_ascii=False, indent=4)
 
     def __call__(self):

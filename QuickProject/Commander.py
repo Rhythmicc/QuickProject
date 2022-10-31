@@ -313,7 +313,7 @@ class Commander:
         table = self.fig_table.copy()
         if self.non_complete:
             for item in table:
-                if item['name'] == 'complete':
+                if item['hidden']:
                     table.remove(item)
         return json.dumps(table, ensure_ascii=False, indent=4)
 
@@ -413,7 +413,8 @@ class Commander:
         if (
             os.path.exists("complete")
             and os.path.isdir("complete")
-            and _ask(
+        ):
+            if _ask(
                 {
                     "type": "confirm",
                     "message": "complete文件夹已存在,是否覆盖?"
@@ -421,13 +422,12 @@ class Commander:
                     else "complete folder already exists, overwrite?",
                     "default": False,
                 }
-            )
-        ):
-            from .Qpro import remove
+            ):
+                from .Qpro import remove
 
-            remove("complete")
-        else:
-            return
+                remove("complete")
+            else:
+                return
 
         os.mkdir("complete")
         os.mkdir(os.path.join("complete", "fig"))

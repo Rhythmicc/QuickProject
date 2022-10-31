@@ -127,7 +127,6 @@ class Commander:
                         func_fig['options'].append({
                             'name': f'--{arg.name}',
                             'description': param_doc.get(arg.name, f'<{arg.name}>'),
-                            'isOptional': True
                         })
             self.fig_table.append(func_fig)
             self.command_table[func_name] = {'func': func, 'analyser': func_analyser, 'parser': func_args_parser, 'param_doc': param_doc, 'description': description}
@@ -172,6 +171,8 @@ class Commander:
             cur_line = ['[bold magenta]' + function + '[/bold magenta]']
             arg1, arg2 = [], []
             for arg in self.command_table[function]['analyser'].parameters.values():
+                if arg.name.startswith('_'):  # 忽略私有参数
+                    continue
                 name = '[underline]' + arg.name + '[/underline]'
                 _type = arg.annotation.__name__ if arg.annotation != arg.empty else 'Any'
                 _default = arg.default if arg.default != arg.empty else None

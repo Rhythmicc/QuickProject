@@ -408,7 +408,12 @@ class Commander:
         import json
 
         project_name = self.name
-        project_subcommands = self.fig_table
+        project_subcommands = self.fig_table.copy()
+
+        if self.non_complete:
+            for item in project_subcommands:
+                if item['hidden']:
+                    project_subcommands.remove(item)
 
         if (
             os.path.exists("complete")

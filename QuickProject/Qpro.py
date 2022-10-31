@@ -477,25 +477,6 @@ def __get_Qpro_fig_Dir():
     return QproGlobalDir
 
 
-# def _format_subcommands(project_subcommands: dict):
-#     if not project_subcommands:
-#         return None
-#     for item in project_subcommands:
-#         if 'args' in item:
-#             if 'options' not in item:
-#                 item['options'] = []
-#             for arg in item['args']:
-#                 if arg['name'].startswith('-') and not arg['name'].startswith('--'):
-#                     if 'file' in arg['name'] or 'path' in arg['name']:
-#                         arg['args']['template'] = ['filepaths', 'folders']
-#                     item['options'].append(arg)
-#                     item['args'].remove(arg)
-#                     continue
-#                 if 'file' in arg['name'] or 'path' in arg['name']:
-#                     arg['template'] = ['filepaths', 'folders']
-#     return project_subcommands
-
-
 def register_global_command():
     if not os.path.exists(configure_name):
         return QproDefaultConsole.print(QproErrorString,
@@ -581,67 +562,6 @@ from QproGlobalCommands.{package_name} import {entry_point}
                              f'Register "{project_name}" Success!' if user_lang != 'zh' else f'注册 "{project_name}" 成功!')
 
 
-def gen_complete(executor: str = 'qrun'):
-    """
-    为 Pypi Commander APP 生成自动补全脚本
-    """
-    import json
-    import subprocess
-    from QuickProject import QproDefaultConsole, QproErrorString, user_lang
-
-    project_name = os.getcwd().split(dir_char)[-1] if executor == 'qrun' else executor
-    project_subcommands = json.loads(subprocess.check_output([executor, '--qrun-fig-complete']).decode('utf-8'))
-    if not project_subcommands:
-        return QproDefaultConsole.print(QproErrorString,
-                                        'Not a Commander APP' if user_lang != 'zh' else '不是Commander应用')
-    if os.path.exists('complete') and os.path.isdir('complete'):
-        remove('complete')
-    os.mkdir('complete')
-    os.mkdir(os.path.join('complete', 'fig'))
-    os.mkdir(os.path.join('complete', 'zsh'))
-    with open(os.path.join('complete', 'fig', f'{project_name}.ts'), 'w') as f:
-        from .QproFigTable import default_custom_command_template
-        f.write(
-            default_custom_command_template.replace(
-                '__CUSTOM_COMMAND_SPEC__', json.dumps(
-                    {
-                        'name': project_name,
-                        'description': project_name,
-                        'subcommands': project_subcommands,
-                    }, ensure_ascii=False, indent=4
-                )
-            )
-        )
-    cur_sub_cmds = []
-    sub_cmd_args = []
-    for sub_cmd in project_subcommands:
-        cur_sub_cmds.append(f"{sub_cmd['name']}:'{sub_cmd['description']}'")
-        if 'args' in sub_cmd and sub_cmd['args']:
-            cur_args = """if [[ ${prev} == __sub_cmd__ ]]; then
-        opt_args=(
-            __sub_cmd_opts__
-        )"""
-            sub_cmd_opts = []
-            for arg in sub_cmd['args']:
-                if arg['name'].startswith('-'):
-                    sub_cmd_opts.append(f"{arg['name']}:'{arg['description']}'")
-            for opt in sub_cmd['options']:
-                if opt['name'].startswith('-'):
-                    sub_cmd_opts.append(f"{opt['name']}:'{opt['description']}'")
-            cur_args = cur_args.replace('__sub_cmd__', sub_cmd['name'])
-            cur_args = cur_args.replace('__sub_cmd_opts__', '\n            '.join(sub_cmd_opts))
-            sub_cmd_args.append(cur_args)
-
-    with open(os.path.join('complete', 'zsh', f'_{project_name}'), 'w') as f:
-        from .QproZshComp import zsh_comp_template, zsh_file_comp1, zsh_file_comp2
-        template = zsh_comp_template
-        template = template.replace('__proj_name__', project_name)
-        template = template.replace('__sub_commands__', '\n        '.join(cur_sub_cmds))
-        template = template.replace('__sub_commands_args__',
-                                    '\n    el'.join(sub_cmd_args) + zsh_file_comp1 if sub_cmd_args else zsh_file_comp2)
-        f.write(template)
-
-
 def unregister():
     QproGlobalDir = __get_Qpro_fig_Dir()
     if not QproGlobalDir:
@@ -676,7 +596,6 @@ func = {
     'enable-complete': enable_complete,
     'register': register_global_command,
     'unregister': unregister,
-    'gen-complete': gen_complete,
 }
 
 
@@ -716,8 +635,6 @@ def main():
                     ('enable-complete', 'enable complete' if user_lang != 'zh' else '启用Commander类的自动补全'),
                     ('register', 'register global command' if user_lang != 'zh' else '注册全局命令'),
                     ('unregister', 'unregister global command' if user_lang != 'zh' else '注销全局命令'),
-                    ('gen-complete',
-                     'generate autocomplete scripts for zsh & fig' if user_lang != 'zh' else '生成Zsh和Fig自动补全脚本'),
                     ('qrun *', 'run your Qpro project' if user_lang != 'zh' else '运行器')
                 ],
                 'prefix': 'Qpro'

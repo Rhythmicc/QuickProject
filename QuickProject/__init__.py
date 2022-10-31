@@ -394,5 +394,5 @@ def _choose_server_target():
         return None
 
 
-def apply_fig_complete(name: str, token: str = "", is_team: bool = False):
-    external_exec(f'npx @fig/publish-spec --spec-path complete/fig/{name}.ts{" --token " + token if token else ""}{" --team" if is_team else ""}')
+def apply_fig_complete(name: str, team: str = "", token: str = ""):
+    external_exec(f'npx @fig/publish-spec --spec-path complete/fig/*.ts --name {name}{" --team " + team if team else ""}{" --token " + token if token else ""}')

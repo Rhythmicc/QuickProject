@@ -18,16 +18,21 @@ def str2bool(v):
 
 
 class Commander:
-    def __init__(self, seg_flag: bool = False):
+    def __init__(self, name: str, seg_flag: bool = False):
         """
         QuickProject的Commander类，帮助快速构建一个命令工具
 
         :param seg_flag: 是否将函数名中的'_'替换为'-'
         """
+        self.name = name
         self.command_table = {}
         self.fig_table = [{'name': '--help', 'description': '获取帮助'}]
         self.custom_complete_table = {}
         self.seg_flag = seg_flag
+
+        @self.command()
+        def complete(team: str = "", token: str = "", is_script: bool = False):
+            return self.generate_complete(team, token, is_script)
 
     def custom_complete(self, param: str):
         """
@@ -294,3 +299,83 @@ class Commander:
                 QproErrorString,  f'{func_name} 未被注册!' if user_lang == 'zh' else f'{func_name} not registered!'
             )
         self.command_table[func_name]['pre_call'] = pre_call
+
+    def generate_complete(self, team: str = "", token: str = "", is_script: bool = False):
+        """
+        生成自动补全文件
+        """
+        import os
+        from . import external_exec, _ask
+
+        import json
+
+        project_name = self.name
+        project_subcommands = self.fig_table
+
+        if os.path.exists('complete') and os.path.isdir('complete') and _ask({
+            'type': 'confirm',
+            'message': 'complete文件夹已存在,是否覆盖?' if user_lang == 'zh' else 'complete folder already exists, overwrite?',
+            'default': False
+        }):
+            from .Qpro import remove
+            remove('complete')
+        else:
+            return
+
+        os.mkdir('complete')
+        os.mkdir(os.path.join('complete', 'fig'))
+        os.mkdir(os.path.join('complete', 'zsh'))
+
+        with open(os.path.join('complete', 'fig', f'{project_name}.ts'), 'w') as f:
+            from .QproFigTable import default_custom_command_template
+            f.write(
+                default_custom_command_template.replace(
+                    '__CUSTOM_COMMAND_SPEC__', json.dumps(
+                        {
+                            'name': project_name,
+                            'description': project_name,
+                            'subcommands': project_subcommands,
+                        }, ensure_ascii=False, indent=4
+                    )
+                )
+            )
+        cur_sub_cmds = []
+        sub_cmd_args = []
+        for sub_cmd in project_subcommands:
+            cur_sub_cmds.append(f"{sub_cmd['name']}:'{sub_cmd['description']}'")
+            if 'args' in sub_cmd and sub_cmd['args']:
+                cur_args = """if [[ ${prev} == __sub_cmd__ ]]; then
+                opt_args=(
+                    __sub_cmd_opts__
+                )"""
+                sub_cmd_opts = []
+                for arg in sub_cmd['args']:
+                    if arg['name'].startswith('-'):
+                        sub_cmd_opts.append(f"{arg['name']}:'{arg['description']}'")
+                for opt in sub_cmd['options']:
+                    if opt['name'].startswith('-'):
+                        sub_cmd_opts.append(f"{opt['name']}:'{opt['description']}'")
+                cur_args = cur_args.replace('__sub_cmd__', sub_cmd['name'])
+                cur_args = cur_args.replace('__sub_cmd_opts__', '\n            '.join(sub_cmd_opts))
+                sub_cmd_args.append(cur_args)
+
+        with open(os.path.join('complete', 'zsh', f'_{project_name}'), 'w') as f:
+            from .QproZshComp import zsh_comp_template, zsh_file_comp1, zsh_file_comp2
+            template = zsh_comp_template
+            template = template.replace('__proj_name__', project_name)
+            template = template.replace('__sub_commands__', '\n        '.join(cur_sub_cmds))
+            template = template.replace('__sub_commands_args__',
+                                        '\n    el'.join(
+                                            sub_cmd_args) + zsh_file_comp1 if sub_cmd_args else zsh_file_comp2)
+            f.write(template)
+
+        if _ask({
+            'type': 'confirm',
+            'message': '是否安装至fig?' if user_lang == 'zh' else 'Install to fig?',
+            'default': False
+        }):
+            external_exec(f'npx @fig/publish-spec --spec-path complete/fig/*.ts --name {project_name}{" --team " + team if team else ""}{" --token " + token if token else ""}{" --is-script" if is_script else ""}')
+
+            if is_script:
+                with open(f'.{project_name}rc', 'w') as f:
+                    f.write(f'alias {project_name}=qrun')

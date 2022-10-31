@@ -33,6 +33,13 @@ class Commander:
         if not custom_complete:
             @self.command()
             def complete(team: str = "", token: str = "", is_script: bool = False):
+                """
+                获取补全列表
+
+                :param team: 团队名
+                :param token: 团队token
+                :param is_script: 是否为脚本
+                """
                 return self.generate_complete(team, token, is_script)
 
     def custom_complete(self, param: str):

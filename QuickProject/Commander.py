@@ -313,7 +313,8 @@ class Commander:
         table = self.fig_table.copy()
         if self.non_complete:
             for item in table:
-                if item['hidden']:
+                _item = self.command_table.get(item['name'], None)
+                if _item and _item['hidden']:
                     table.remove(item)
         return json.dumps(table, ensure_ascii=False, indent=4)
 
@@ -412,7 +413,8 @@ class Commander:
 
         if self.non_complete:
             for item in project_subcommands:
-                if item['hidden']:
+                _item = self.command_table.get(item['name'], None)
+                if _item and _item['hidden']:
                     project_subcommands.remove(item)
 
         if (

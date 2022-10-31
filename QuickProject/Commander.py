@@ -66,6 +66,8 @@ class Commander:
             if func_name in self.command_table:
                 raise Exception(f'{func} already in command table')
             for arg in func_analyser.parameters.values():
+                if arg.name.startswith('_'):  # 忽略私有参数
+                    continue
                 _type = None
                 _default = None
                 if arg.annotation != arg.empty:

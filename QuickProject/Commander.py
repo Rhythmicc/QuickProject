@@ -354,7 +354,8 @@ class Commander:
             except KeyboardInterrupt:
                 return QproDefaultConsole.print(QproErrorString, "用户中断")
             except:
-                return QproDefaultConsole.print_exception()
+                QproDefaultConsole.print_exception()
+                exit(1)
 
     def real_call(self, func_name: str, *args, **kwargs):
         """

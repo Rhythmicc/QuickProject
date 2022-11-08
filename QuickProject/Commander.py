@@ -469,10 +469,16 @@ class Commander:
                 )"""
                 sub_cmd_opts = []
                 for arg in sub_cmd["args"]:
-                    if arg["name"].startswith("-"):
+                    if 'suggestions' in arg:
+                        for i in arg['suggestions']:
+                            sub_cmd_opts.append(f"{i['name']}:'{i.get('description', i['name'])}'")
+                    elif arg["name"].startswith("-"):
                         sub_cmd_opts.append(f"{arg['name']}:'{arg['description']}'")
                 for opt in sub_cmd["options"]:
-                    if opt["name"].startswith("-"):
+                    if 'suggestions' in opt:
+                        for i in opt['suggestions']:
+                            sub_cmd_opts.append(f"{i['name']}:'{i.get('description', i['name'])}'")
+                    elif opt["name"].startswith("-"):
                         sub_cmd_opts.append(f"{opt['name']}:'{opt['description']}'")
                 cur_args = cur_args.replace("__sub_cmd__", sub_cmd["name"])
                 cur_args = cur_args.replace(

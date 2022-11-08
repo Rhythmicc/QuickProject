@@ -464,9 +464,9 @@ class Commander:
             cur_sub_cmds.append(f"{sub_cmd['name']}:'{sub_cmd['description']}'")
             if "args" in sub_cmd and sub_cmd["args"]:
                 cur_args = """if [[ ${prev} == __sub_cmd__ ]]; then
-                opt_args=(
-                    __sub_cmd_opts__
-                )"""
+    	opt_args=(
+            __sub_cmd_opts__
+        )"""
                 sub_cmd_opts = []
                 for arg in sub_cmd["args"]:
                     if 'suggestions' in arg:

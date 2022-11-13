@@ -49,18 +49,11 @@ default_language = {
     'message': """Select your language, the flowing content is available choice
   选择你的语言，下述内容为合法选项
 
-    zh  (Chinese) en  (English)  jp  (Japanese) kor (Korean)   fra (French), 
-    spa (Spanish) th  (Thailand) ara (al-ummah) ru  (Russian)  pt  (Portuguese), 
-    de  (Germany) it  (Italy)    el  (Greece)   nl  (Poland)   bul (Bulgaria),
-    est (Estonia) dan (Denmark)  fin (Finland)  cs  (Czech)    rom (Romania),
-    slo (Iceland) swe (Sweden)   hu  (Hungary)  vie (Vietnam)
+    zh  (Chinese)  en  (English)  fra (French)  
+    ru  (Russian)  spa (Spanish)  ara (Arabic) 
 
   Input the default language | 输入默认语言:""",
-    'validate': lambda val: val in ['zh', 'en', 'jp', 'kor', 'fra',
-                                    'spa', 'th', 'ara', 'ru', 'pt',
-                                    'de', 'it', 'el', 'nl', 'bul',
-                                    'est', 'dan', 'fin', 'cs', 'rom',
-                                    'slo', 'swe', 'hu', 'vie', 'Not Set | 暂不配置'],
+    'validate': lambda val: val in ['zh', 'en', 'fra', 'spa', 'ara', 'ru', 'Not Set | 暂不配置'],
     'default': 'Not Set | 暂不配置'
 }
 

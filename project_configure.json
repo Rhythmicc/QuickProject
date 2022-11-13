@@ -1,16 +1,16 @@
 {
-    "build": "",
-    "entry_point": "",
-    "executable": "",
-    "input_file": "",
-    "template_root": "",
-    "server_targets": [
-        {
-            "user": "lianhaocheng",
-            "host": "localhost",
-            "port": "22",
-            "path": "/opt/homebrew/lib/python3.10/site-packages/"
-        }
-    ],
-    "enable_complete": true
+  "build": "rm -rf dist; python3 setup.py sdist",
+  "entry_point": "",
+  "executable": "",
+  "input_file": "",
+  "template_root": "",
+  "server_targets": [
+    {
+      "user": "lianhaocheng",
+      "host": "localhost",
+      "port": "22",
+      "path": "/opt/homebrew/lib/python3.10/site-packages/"
+    }
+  ],
+  "enable_complete": true
 }

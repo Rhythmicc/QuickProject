@@ -2,12 +2,12 @@ from setuptools import setup, find_packages
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
-VERSION = "0.10.37"
+VERSION = "0.10.38"
 
 setup(
-    name='Qpro',
+    name="Qpro",
     version=VERSION,
-    description='Small but powerful command line IDE.',
+    description="Small but powerful command line IDE.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     classifiers=[
@@ -15,18 +15,18 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    keywords='script for CLionProjects',
-    author='RhythmLian',
+    keywords="script for CLionProjects",
+    author="RhythmLian",
     url="https://github.com/Rhythmicc/QuickProject",
-    license='MIT',
+    license="MIT",
     packages=find_packages(),
     include_package_data=True,
     zip_safe=True,
-    install_requires=['pyperclip', 'rich', 'gitpython', 'inquirer-rhy'],
+    install_requires=["pyperclip", "rich", "gitpython", "inquirer-rhy"],
     entry_points={
-        'console_scripts': [
-            'Qpro = QuickProject.Qpro:main',
-            'qrun = QuickProject.qrun:main'
+        "console_scripts": [
+            "Qpro = QuickProject.Qpro:main",
+            "qrun = QuickProject.qrun:main",
         ]
     },
 )

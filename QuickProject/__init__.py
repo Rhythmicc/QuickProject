@@ -1,6 +1,7 @@
 import os
 import sys
 from .__config__ import _ask, QproConfig, QproDefaultConsole
+from langSrc import LanguageDetector
 
 if sys.platform.startswith('win'):
     is_win = True
@@ -14,11 +15,12 @@ _qpro_config = QproConfig(user_root + dir_char + '.qprorc',
                           os.path.exists(user_root + dir_char + '.qprorc'))
 
 user_lang = _qpro_config.select('default_language')
+_lang = LanguageDetector(user_lang, os.path.join(os.path.dirname(__file__), 'lang.json'))
 user_pip = _qpro_config.select('default_pip')
 using_gitee = _qpro_config.select('using_gitee')
-QproErrorString = '[bold red][ERRO]' if user_lang != 'zh' else '[bold red][错误]'
-QproInfoString = '[bold cyan][INFO]' if user_lang != 'zh' else '[bold cyan][提示]'
-QproWarnString = '[bold yellow][WARN]' if user_lang != 'zh' else '[bold yellow][警告]'
+QproErrorString = f'[bold red][{_lang["error"]}][/]'
+QproInfoString = f'[bold cyan][{_lang["information"]}][/]'
+QproWarnString = f'[bold yellow][{_lang["warning"]}][/]'
 name = 'QuickProject'
 configure_name = 'project_configure.json'
 
@@ -85,7 +87,6 @@ def external_exec(
     :param without_stderr: 是否不输出stderr
     :return: status code, output
     """
-    # import threading
     from subprocess import Popen, PIPE
     from concurrent.futures import ThreadPoolExecutor, wait
 
@@ -152,9 +153,7 @@ def requirePackage(pname: str,
         confirm = _ask({
             'type': 'confirm',
             'name': 'install',
-            'message':
-            f"""Qpro require {pname + (' -> ' + module if module else '')}, confirm to install?  
-  Qpro 依赖 {pname + (' -> ' + module if module else '')}, 是否确认安装?""",
+            'message': _lang['requirePackageDesc1'].format(pname + (' -> ' + module if module else '')),
             'default': True
         })
         if confirm:
@@ -165,9 +164,7 @@ def requirePackage(pname: str,
                 exec(f'from {pname} import {module}'
                      if module else f"import {pname}")
             else:
-                QproDefaultConsole.print(
-                    QproInfoString, f'just run again: "{" ".join(sys.argv)}"'
-                    if user_lang != 'zh' else f'请重新运行: "{" ".join(sys.argv)}"')
+                QproDefaultConsole.print(QproInfoString, _lang['requirePackageDesc2'].format(" ".join(sys.argv)))
                 exit(0)
         else:
             exit(-1)
@@ -330,8 +327,8 @@ def menu_output(menu):
 
     tb = Table(
         *[
-            Column('Parameter', justify='full', style='bold yellow'),
-            Column('Description', justify='right', style='bold cyan')
+            Column(_lang['Parameter'], justify='full', style='bold yellow'),
+            Column(_lang['Description'], justify='right', style='bold cyan')
         ],
         show_edge=False,
         show_header=False,
@@ -344,7 +341,7 @@ def menu_output(menu):
         tb.add_row((menu['prefix'] + ' ' if line[0].startswith('-') else '') +
                    line[0], line[1])
     QproDefaultConsole.print(tb, justify='center')
-    QproDefaultConsole.print('\nDOC:' if user_lang != 'zh' else '\n文档:',
+    QproDefaultConsole.print('\n' + _lang['docs'],
                              'https://qpro-doc.rhythmlian.cn/',
                              justify='center')
 
@@ -359,10 +356,7 @@ def get_config(without_output: bool = False):
     else:
         if not without_output:
             QproDefaultConsole.print(
-                QproErrorString,
-                "No file named: project_configure.json\n May you need run:\"Qpro init\" first!"
-                if user_lang != 'zh' else
-                "没有文件: project_configure.json\n可能你需要先运行: \"Qpro init\"!")
+                QproErrorString, _lang['NoSuchFile'].format('"project_configure.json"') + '\n' + _lang['RunCmd'].format('"Qpro init"'))
         exit(0)
     return config
 
@@ -386,7 +380,7 @@ def _choose_server_target():
         index = choices.index(
             _ask({
                 'type': 'list',
-                'message': 'Choose target | 选择目标:',
+                'message': _lang['ChooseServerTarget'],
                 'choices': choices
             }))
         return server_targets[index]

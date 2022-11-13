@@ -1,4 +1,5 @@
 LICENSE
+MANIFEST.in
 README.md
 setup.cfg
 setup.py
@@ -15,4 +16,5 @@ QuickProject/QproFigTable.py
 QuickProject/QproZshComp.py
 QuickProject/__config__.py
 QuickProject/__init__.py
+QuickProject/lang.json
 QuickProject/qrun.py

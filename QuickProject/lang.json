@@ -662,5 +662,13 @@
     "spa": "No hay archivo de entrada",
     "ara": "لا يوجد ملف إدخال",
     "ru": "Нет входного файла"
+  },
+  "ScriptComplete": {
+    "zh": "为了使zsh补全生效，你需要 `source .{}rc`",
+    "en": "To make zsh completion work, you need `source .{}rc`",
+    "fra": "Pour que la complétion zsh fonctionne, vous devez `source .{}rc`",
+    "spa": "Para que la finalización de zsh funcione, necesita `source .{}rc`",
+    "ara": "لتجعل اكمال zsh يعمل ، تحتاج `source .{}rc`",
+    "ru": "Чтобы zsh completion работал, вам нужно `source .{}rc`"
   }
 }

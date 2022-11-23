@@ -61,6 +61,7 @@ class Commander:
     def custom_complete(self, param: str):
         """
         自定义补全
+        Custom complete
 
         :param param: 参数名
         :return:
@@ -288,8 +289,9 @@ class Commander:
 
     def __command_complete__(self, route_path: list):
         """
+        用于命令补全
 
-        :param route_path:
+        :param route_path: 路径
         :return:
         """
         if not route_path:
@@ -297,7 +299,7 @@ class Commander:
                 f"{i}:{self.command_table[i]['func'].__doc__.strip().split(':param')[0].strip().replace(' ', '_') if self.command_table[i]['func'].__doc__ else 'NONE'}"
                 for i in self.command_table
             ]
-            return "\n".join(ls + ["--help:" + _lang["Help"]])
+            return "\n".join(ls + ["--help:" + _lang["MenuHelp"]])
         call_func = route_path[0]
         has_args = [i.strip().strip("--") for i in route_path[1:]]
         if call_func not in self.command_table:
@@ -312,7 +314,7 @@ class Commander:
                 res.append(
                     f'--{arg.name}:{param_doc[arg.name].replace(" ", "_") if arg.name in param_doc else _lang["NoDescription"]}'
                 )
-        return "\n".join(res + ["--help:" + _lang["Help"]])
+        return "\n".join(res + ["--help:" + _lang["MenuHelp"]])
 
     def _fig_complete_(self):
         import json
@@ -398,6 +400,10 @@ class Commander:
     ):
         """
         生成自动补全文件
+
+        :param team: 团队名
+        :param token: 团队token
+        :param is_script: 是否为脚本
         """
         import os
         from . import external_exec, _ask
@@ -507,6 +513,18 @@ class Commander:
                 f'npx @fig/publish-spec --spec-path complete/fig/*.ts --name {project_name}{" --team " + team if team else ""}{" --token " + token if token else ""}{" --is-script" if is_script else ""}'
             )
 
-            if is_script:
-                with open(f".{project_name}rc", "w") as f:
-                    f.write(f"alias {project_name}=qrun")
+        if is_script:
+            with open(f".{project_name}rc", "w") as f:
+                print("function {}() ".format(self.name), file=f, end="{\n")
+                print("    qrun $@", file=f)
+                print("}", file=f)
+                print("export FPATH=$FPATH:$(pwd)/complete/zsh", file=f)
+                print("autoload -Uz compinit", file=f)
+                print("zstyle ':completion:*' menu select", file=f)
+                print("compinit", file=f)
+            from . import QproInfoString
+
+            QproDefaultConsole.print(
+                QproInfoString,
+                _lang["ScriptComplete"].format(self.name),
+            )

@@ -45,7 +45,6 @@ _qpro_main_zh() {
         enable-complete:'支持Commander的Tab补全(这会导致Tab补全变慢一些)'
         register:'将当前Qpro项目注册为全局命令'
         unregister:'注销当前Qpro项目的全局命令'
-        gen-complete:'生成自动补全脚本'
     )
 
     _describe -t common-commands 'common commands' args && _ret=0

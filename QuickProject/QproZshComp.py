@@ -29,10 +29,10 @@ fi
 """
 
 zsh_file_comp1 = """
-else
-    _arguments -S -s '*:filename:_files'
-    return
-fi
+    else
+        _arguments -S -s '*:filename:_files'
+        return
+    fi
 """
 
 zsh_file_comp2 = """

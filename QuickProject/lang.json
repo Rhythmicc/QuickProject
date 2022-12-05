@@ -463,6 +463,14 @@
     "ara": "إلغاء تسجيل الأمر العالمي",
     "ru": "Отменить регистрацию глобальной команды"
   },
+  "MenuFmt": {
+    "zh": "递归格式化目录下全部老版本的配置文件",
+    "en": "Recursively format all old version configuration files under the directory",
+    "fra": "Formatez récursivement tous les fichiers de configuration de l'ancienne version sous le répertoire",
+    "spa": "Formate recursivamente todos los archivos de configuración de la versión anterior bajo el directorio",
+    "ara": "تنسيق جميع الملفات القديمة تحت الدليل",
+    "ru": "Рекурсивно отформатируйте все старые файлы конфигурации в каталоге"
+  },
   "MenuQrun": {
     "zh": "运行器",
     "en": "Runner",

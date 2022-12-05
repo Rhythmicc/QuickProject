@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: Qpro
-Version: 0.10.41
+Version: 0.10.42
 Summary: Small but powerful command line IDE.
 Home-page: https://github.com/Rhythmicc/QuickProject
 Author: RhythmLian
@@ -14,6 +14,10 @@ License-File: LICENSE
 
 # QuickProject
 
-Do you know how to write Python functions? Yes? Then you now know how to build command-line applications!
+> Do you know how to write Python functions? 
+
+Yes! 
+
+> Then you now know how to build command-line applications!
 
 ## [Docs](https://qpro-doc.rhythmlian.cn/)

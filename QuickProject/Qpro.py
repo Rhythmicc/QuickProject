@@ -727,6 +727,64 @@ def unregister():
         os.remove(os.path.join(bin_dir, f"{project_name}"))
 
 
+def fmt():
+    import json
+
+    def adjust(filepath: str):
+        if filepath.endswith(".csv"):
+            with open(filepath, "r") as f:
+                data = f.read().splitlines()
+                data = {
+                    i[0]: i[1:] if len(i[1:]) > 1 else i[1]
+                    for i in [i.split(",") for i in data]
+                }
+        else:
+            with open(filepath, "r") as f:
+                data = json.load(f)
+        if "server_target" in data:
+            server_target = data.pop("server_target")
+            if server_target[0]:
+                ls = server_target[0].split("@")
+                if len(ls) == 2:
+                    user, target = ls
+                else:
+                    user, target = "", ls[0]
+                target = target.split(":")
+                host = ":".join(target[:-1])
+                path = target[-1]
+                data["server_targets"] = [
+                    {"user": user, "host": host, "path": path, "port": server_target[1]}
+                ]
+            else:
+                data["server_targets"] = [
+                    {"user": "", "host": "", "path": "", "port": "22"}
+                ]
+        new_json = {}
+        if "compile_tool" in data:
+            new_json["build"] = data.pop("compile_tool")
+        if "compile_filename" in data:
+            new_json["entry_point"] = data.pop("compile_filename")
+        if "executable_filename" in data:
+            new_json["executable"] = data.pop("executable_filename")
+        new_json.update(data)
+
+        with open(
+            os.path.join(os.path.dirname(filepath), "project_configure.json"), "w"
+        ) as f:
+            json.dump(new_json, f, indent=4, ensure_ascii=False)
+
+    # walk dir
+    for root, _, files in os.walk(os.getcwd()):
+        for file in files:
+            filepath = os.path.join(root, file)
+            if file == "project_configure.csv" or file == "project_configure.json":
+                try:
+                    adjust(filepath)
+                except Exception as e:
+                    QproDefaultConsole.print(QproErrorString, repr(e))
+                    QproDefaultConsole.print(QproErrorString, filepath)
+
+
 func = {
     "create": create,
     "scp": scp,
@@ -739,6 +797,7 @@ func = {
     "enable-complete": enable_complete,
     "register": register_global_command,
     "unregister": unregister,
+    "fmt": fmt,
 }
 
 
@@ -757,12 +816,13 @@ def main():
                     ("smv [bold magenta]<path>", _lang["MenuSMV"]),
                     ("scp-init", _lang["MenuSCPInit"]),
                     ("get [bold magenta]<path>", _lang["MenuGet"]),
-                    ("del [bold magenta]<path>", _lang["MenuDelete"]),
+                    ("del [bold magenta]<path>", _lang["MenuDel"]),
                     ("del-all", _lang["MenuDelAll"]),
                     ("ls  [bold magenta]<path>", _lang["MenuLs"]),
                     ("enable-complete", _lang["MenuComplete"]),
                     ("register", _lang["MenuRegister"]),
                     ("unregister", _lang["MenuUnregister"]),
+                    ("fmt", _lang["MenuFmt"]),
                     ("qrun *", _lang["MenuQrun"]),
                 ],
                 "prefix": "Qpro",

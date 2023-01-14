@@ -52,15 +52,6 @@ const completionSpec: Fig.Spec = {
     }, {
         'name': 'enable-complete',
         'description': '支持Commander应用的自动补全'
-    }, {
-        'name': 'register',
-        'description': '注册全局命令'
-    }, {
-        'name': 'unregister',
-        'description': '注销全局命令'
-    }, {
-        'name': 'gen-complete',
-        'description': '生成自动补全脚本'
     }]
 };
 export default completionSpec;

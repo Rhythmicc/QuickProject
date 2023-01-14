@@ -58,22 +58,6 @@ def __findAndReplace(dirPath, fo, to):
                 )
 
 
-def remove(path):
-    """
-    删除文件或目录
-
-    :param path: 路径
-    :return:
-    """
-    import shutil
-
-    if os.path.exists(path):
-        if os.path.isdir(path):
-            shutil.rmtree(path)
-        else:
-            os.remove(path)
-
-
 def scp_init(server_targets: list):
     if not server_targets:
         return
@@ -116,30 +100,46 @@ def _search_supported_languages(is_CN=using_gitee):
         }
     )
 
+    status = QproDefaultConsole.status(_lang["SearchingTemplate"])
+    status.start()
+
+    import time
     import json
     import requests
+    from requests.exceptions import ProxyError
 
-    try:
-        res = json.loads(
-            requests.get(
-                f"https://qpro-lang.rhythmlian.cn/?keyword={kw}&is_CN={str(is_CN).lower()}"
-            ).text
-        )
-        if not res["status"]:
-            QproDefaultConsole.print(QproErrorString, res["message"])
-            return None
-        data = {i[0]: i[1:] for i in res["data"]}
-        return data[
-            _ask(
-                {
-                    "type": "list",
-                    "message": _lang["ChooseSupportedTemplate"],
-                    "choices": list(data.keys()),
-                }
+    retry = 3
+
+    while retry:
+        try:
+            res = json.loads(
+                requests.get(
+                    f"https://qpro-lang.rhythmlian.cn/?keyword={kw}&is_CN={str(is_CN).lower()}"
+                ).text
             )
-        ]
-    except Exception as e:
-        QproDefaultConsole.print(QproErrorString, repr(e))
+            if not res["status"]:
+                QproDefaultConsole.print(QproErrorString, res["message"])
+                return None
+            data = {i[0]: i[1:] for i in res["data"]}
+            status.stop()
+            return data[
+                _ask(
+                    {
+                        "type": "list",
+                        "message": _lang["ChooseSupportedTemplate"],
+                        "choices": list(data.keys()),
+                    }
+                )
+            ]
+        except ProxyError as e:
+            retry -= 1
+            time.sleep(3)
+        except Exception as e:
+            QproDefaultConsole.print(QproErrorString, repr(e))
+            return None
+
+    status.stop()
+    QproDefaultConsole.print(QproErrorString, _lang["TemplateServerError"])
     return None
 
 
@@ -582,151 +582,6 @@ def enable_complete():
     __format_json(config, project_configure_path)
 
 
-def __get_Qpro_fig_Dir():
-    QproGlobalDir = os.environ.get("QproGlobalDir", None)
-    if not QproGlobalDir:
-        QproDefaultConsole.print(
-            QproErrorString,
-            _lang["NotSet"].format("QproGlobalDir"),
-        )
-        return None
-    QproGlobalDir = QproGlobalDir.replace("~", user_root)
-    if not os.path.exists(QproGlobalDir):
-        QproDefaultConsole.print(
-            QproErrorString,
-            _lang["notExistsError"].format("QproGlobalDir"),
-        )
-        return None
-    if not os.path.exists(os.path.join(QproGlobalDir, "bin")):
-        os.mkdir(os.path.join(QproGlobalDir, "bin"))
-    if not os.path.exists(os.path.join(QproGlobalDir, "fig")):
-        os.mkdir(os.path.join(QproGlobalDir, "fig"))
-    if not os.path.exists(os.path.join(QproGlobalDir, "QproGlobalCommands")):
-        os.mkdir(os.path.join(QproGlobalDir, "QproGlobalCommands"))
-    return QproGlobalDir
-
-
-def register_global_command():
-    if not os.path.exists(configure_name):
-        return QproDefaultConsole.print(
-            QproErrorString,
-            _lang["notExistsError"].format(configure_name),
-        )
-    if is_win:
-        return QproDefaultConsole.print(QproWarnString, _lang["NotSupportWindows"])
-    QproGlobalDir = __get_Qpro_fig_Dir()
-    if not QproGlobalDir:
-        return
-    import json
-    import shutil
-
-    project_name = os.getcwd().split(dir_char)[-1]
-    package_name = project_name.replace("-", "_")
-    fig_dir = os.path.join(QproGlobalDir, "fig")
-    commands_dir = os.path.join(QproGlobalDir, "QproGlobalCommands")
-    if os.path.exists(os.path.join(fig_dir, f"{project_name}.json")):
-        QproDefaultConsole.print(QproWarnString, _lang["HasBeenRegistered"])
-        if _ask(
-            {
-                "type": "confirm",
-                "message": _lang["Overwrite"],
-                "default": False,
-            }
-        ):
-            os.remove(os.path.join(fig_dir, f"{project_name}.json"))
-            if os.path.exists(os.path.join(commands_dir, f"{package_name}")):
-                shutil.rmtree(os.path.join(commands_dir, f"{package_name}"))
-        else:
-            return
-    import subprocess
-
-    with open(os.path.join(fig_dir, f"{project_name}.json"), "w") as f:
-        project_subcommands = json.loads(
-            subprocess.check_output(["qrun", "--qrun-fig-complete"]).decode("utf-8")
-        )
-        if not project_subcommands:
-            return QproDefaultConsole.print(QproErrorString, _lang["NotACommanderAPP"])
-        json.dump(
-            {
-                "fig": {
-                    "name": project_name,
-                    "description": project_name,
-                    "subcommands": project_subcommands,
-                },
-                "path": os.getcwd(),
-            },
-            f,
-            ensure_ascii=False,
-            indent=1,
-        )
-
-    shutil.copytree(
-        rt_dir + dir_char + package_name, os.path.join(commands_dir, package_name)
-    )
-    entry_point = get_config()["entry_point"].split(dir_char)[-1].split(".")[0]
-    with open(os.path.join(commands_dir, package_name, f"{entry_point}.py"), "r") as f:
-        ct = f.read()
-        if "def main():" not in ct:
-            ct = ct.replace("if __name__ == '__main__':", "def main():").replace(
-                'if __name__ == "__main__":', "def main():"
-            )
-    with open(os.path.join(commands_dir, package_name, f"{entry_point}.py"), "w") as f:
-        f.write(ct)
-    with open(os.path.join(QproGlobalDir, "bin", f"{project_name}"), "w") as f:
-        ct = f"""#!/usr/bin/env python3
-import sys
-sys.path.append('{QproGlobalDir}')
-
-from QproGlobalCommands.{package_name} import {entry_point}
-{entry_point}.main()
-        """
-        f.write(ct)
-    config = get_config()
-    flag = True
-    for item in config["server_targets"]:
-        if item["host"] == "localhost":
-            item["path"] = os.path.join(QproGlobalDir, "QproGlobalCommands")
-            item["port"] = 22
-            flag = False
-            break
-    if flag:
-        config["server_targets"].append(
-            {
-                "user": "",
-                "host": "localhost",
-                "path": os.path.join(QproGlobalDir, "QproGlobalCommands"),
-                "port": 22,
-            }
-        )
-    __format_json(config, project_configure_path)
-    os.chmod(os.path.join(QproGlobalDir, "bin", f"{project_name}"), 0o755)
-    QproDefaultConsole.print(
-        QproInfoString, _lang["RegisterSuccess"].format(f'"{project_name}"')
-    )
-
-
-def unregister():
-    QproGlobalDir = __get_Qpro_fig_Dir()
-    if not QproGlobalDir:
-        return
-
-    import shutil
-
-    config = get_config()
-    project_name = os.getcwd().split(dir_char)[-1]
-    fig_dir = os.path.join(QproGlobalDir, "fig")
-    bin_dir = os.path.join(QproGlobalDir, "bin")
-
-    for item in config["server_targets"]:
-        if item["host"] == "localhost":
-            shutil.rmtree(os.path.join(item["path"], project_name))
-            break
-    if os.path.exists(os.path.join(fig_dir, f"{project_name}.json")):
-        os.remove(os.path.join(fig_dir, f"{project_name}.json"))
-    if os.path.exists(os.path.join(bin_dir, f"{project_name}")):
-        os.remove(os.path.join(bin_dir, f"{project_name}"))
-
-
 def fmt():
     import json
 
@@ -795,8 +650,6 @@ func = {
     "del": delete,
     "ls": tele_ls,
     "enable-complete": enable_complete,
-    "register": register_global_command,
-    "unregister": unregister,
     "fmt": fmt,
 }
 
@@ -820,8 +673,6 @@ def main():
                     ("del-all", _lang["MenuDelAll"]),
                     ("ls  [bold magenta]<path>", _lang["MenuLs"]),
                     ("enable-complete", _lang["MenuComplete"]),
-                    ("register", _lang["MenuRegister"]),
-                    ("unregister", _lang["MenuUnregister"]),
                     ("fmt", _lang["MenuFmt"]),
                     ("qrun *", _lang["MenuQrun"]),
                 ],

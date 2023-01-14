@@ -3,26 +3,29 @@ import sys
 from .__config__ import _ask, QproConfig, QproDefaultConsole
 from langSrc import LanguageDetector
 
-if sys.platform.startswith('win'):
+if sys.platform.startswith("win"):
     is_win = True
-    dir_char = '\\'
+    dir_char = "\\"
 else:
     is_win = False
-    dir_char = '/'
+    dir_char = "/"
 
-user_root = os.path.expanduser('~')
-_qpro_config = QproConfig(user_root + dir_char + '.qprorc',
-                          os.path.exists(user_root + dir_char + '.qprorc'))
+user_root = os.path.expanduser("~")
+_qpro_config = QproConfig(
+    user_root + dir_char + ".qprorc", os.path.exists(user_root + dir_char + ".qprorc")
+)
 
-user_lang = _qpro_config.select('default_language')
-_lang = LanguageDetector(user_lang, os.path.join(os.path.dirname(__file__), 'lang.json'))
-user_pip = _qpro_config.select('default_pip')
-using_gitee = _qpro_config.select('using_gitee')
+user_lang = _qpro_config.select("default_language")
+_lang = LanguageDetector(
+    user_lang, os.path.join(os.path.dirname(__file__), "lang.json")
+)
+user_pip = _qpro_config.select("default_pip")
+using_gitee = _qpro_config.select("using_gitee")
 QproErrorString = f'[bold red][{_lang["error"]}][/]'
 QproInfoString = f'[bold cyan][{_lang["information"]}][/]'
 QproWarnString = f'[bold yellow][{_lang["warning"]}][/]'
-name = 'QuickProject'
-configure_name = 'project_configure.json'
+name = "QuickProject"
+configure_name = "project_configure.json"
 
 
 def __latest_filename(filename):
@@ -40,21 +43,21 @@ def __latest_filename(filename):
         if os.path.exists(filename):
             os.chdir(rec)
             return os.path.abspath(cur + dir_char + filename)
-        os.chdir('..')
+        os.chdir("..")
         last = cur
         cur = os.getcwd()
         if cur == last:
             break
     os.chdir(rec)
-    return ''
+    return ""
 
 
-if ' '.join(sys.argv[:2]) != 'Qpro init':
+if " ".join(sys.argv[:2]) != "Qpro init":
     rt_dir = os.path.dirname(__latest_filename(configure_name)) + dir_char
     if rt_dir == dir_char:
-        rt_dir = os.path.abspath('.') + dir_char
+        rt_dir = os.path.abspath(".") + dir_char
 else:
-    rt_dir = os.path.abspath('.')
+    rt_dir = os.path.abspath(".")
 project_configure_path = rt_dir + configure_name
 
 
@@ -67,9 +70,26 @@ def __sub_path(path, isExist=True):
     :return: 相对路径
     """
     if not os.path.exists(path) and isExist:
-        return ''
+        return ""
     abs_path = os.path.abspath(path)
-    return abs_path.replace(rt_dir, '') if abs_path.startswith(rt_dir) else ''
+    return abs_path.replace(rt_dir, "") if abs_path.startswith(rt_dir) else ""
+
+
+def remove(path):
+    """
+    删除文件或目录
+
+    :param path: 路径
+    :return:
+    """
+
+    if os.path.exists(path):
+        if os.path.isdir(path):
+            import shutil
+
+            shutil.rmtree(path)
+        else:
+            os.remove(path)
 
 
 def external_exec(
@@ -77,6 +97,8 @@ def external_exec(
     without_output: bool = False,
     without_stdout: bool = False,
     without_stderr: bool = False,
+    __expose: bool = False,
+    __no_wait: bool = False,
 ):
     """
     外部执行命令
@@ -85,8 +107,11 @@ def external_exec(
     :param without_output: 是否不输出
     :param without_stdout: 是否不输出stdout
     :param without_stderr: 是否不输出stderr
-    :return: status code, output
+    :param __expose: ⚠️是否暴露, 这意味着命令行输出可能会被截断和修改
+    :param __no_wait: ⚠️是否不等待, 这意味着需要手动获取返回值和输出
+    :return: status code, output | __no_wait 为 True 时返回进程对象
     """
+    from rich.markdown import Markdown
     from subprocess import Popen, PIPE
     from concurrent.futures import ThreadPoolExecutor, wait
 
@@ -107,14 +132,37 @@ def external_exec(
         ignore_status = (
             without_stdout if pipe_name == "stdout" else without_stderr
         ) or without_output
+        status = QproDefaultConsole.status("__")
+        started = False
         for line in iter(eval(f"process.{pipe_name}.readline"), ""):
-            if not ignore_status:
-                QproDefaultConsole.print(line.strip())
+            if not __expose and (
+                line.startswith("__START__")
+                or line.startswith("__STOP__")
+                or line.startswith("__SPLIT__")
+            ):
+                continue
             content += line
+            if ignore_status:
+                continue
+            line = line.strip()
+            if __expose and line.startswith("__START__"):
+                if not started:
+                    status.start()
+                status.update(line.replace("__START__", ""))
+            elif __expose and line.startswith("__STOP__"):
+                status.stop()
+            elif __expose and line.startswith("__SPLIT__"):
+                QproDefaultConsole.print(
+                    Markdown("# " + line.replace("__SPLIT__", "").strip())
+                )
+            else:
+                QproDefaultConsole.print(line)
 
     pool = ThreadPoolExecutor(2)
-    p = Popen(cmd, shell=True, stdout=PIPE,
-              stderr=PIPE, bufsize=1, encoding="utf-8")
+    p = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE, bufsize=1, encoding="utf-8")
+
+    if __no_wait:
+        return p
 
     wait(
         [
@@ -128,12 +176,14 @@ def external_exec(
     return ret_code, str(content)
 
 
-def requirePackage(pname: str,
-                   module: str = "",
-                   real_name: str = "",
-                   not_exit: bool = True,
-                   not_ask: bool = False,
-                   set_pip: str = user_pip):
+def requirePackage(
+    pname: str,
+    module: str = "",
+    real_name: str = "",
+    not_exit: bool = True,
+    not_ask: bool = False,
+    set_pip: str = user_pip,
+):
     """
     获取本机上的python第三方库
 
@@ -146,34 +196,37 @@ def requirePackage(pname: str,
     :return: 库或模块的地址
     """
     try:
-        exec(f'from {pname} import {module}' if module else f"import {pname}")
+        exec(f"from {pname} import {module}" if module else f"import {pname}")
     except (ModuleNotFoundError, ImportError):
         if not_ask:
             return None
-        confirm = _ask({
-            'type': 'confirm',
-            'name': 'install',
-            'message': _lang['requirePackageDesc1'].format(pname + (' -> ' + module if module else '')),
-            'default': True
-        })
+        confirm = _ask(
+            {
+                "type": "confirm",
+                "name": "install",
+                "message": _lang["requirePackageDesc1"].format(
+                    pname + (" -> " + module if module else "")
+                ),
+                "default": True,
+            }
+        )
         if confirm:
-            os.system(
-                f'{set_pip} install {pname if not real_name else real_name} -U'
-            )
+            os.system(f"{set_pip} install {pname if not real_name else real_name} -U")
             if not_exit:
-                exec(f'from {pname} import {module}'
-                     if module else f"import {pname}")
+                exec(f"from {pname} import {module}" if module else f"import {pname}")
             else:
-                QproDefaultConsole.print(QproInfoString, _lang['requirePackageDesc2'].format(" ".join(sys.argv)))
+                QproDefaultConsole.print(
+                    QproInfoString,
+                    _lang["requirePackageDesc2"].format(" ".join(sys.argv)),
+                )
                 exit(0)
         else:
             exit(-1)
     finally:
-        return eval(f'{module if module else pname}')
+        return eval(f"{module if module else pname}")
 
 
 class SshProtocol:
-
     @staticmethod
     def post_folder(user, domain, target, port, srcPath, dstPath):
         """
@@ -190,13 +243,23 @@ class SshProtocol:
         :return: 发送状态
         """
         if user:
-            status = os.system('scp -P %s -r %s %s' %
-                               (port, srcPath, user + '@\\[' + domain +
-                                '\\]:' + os.path.join(target, dstPath)))
+            status = os.system(
+                "scp -P %s -r %s %s"
+                % (
+                    port,
+                    srcPath,
+                    user + "@\\[" + domain + "\\]:" + os.path.join(target, dstPath),
+                )
+            )
         else:
-            status = os.system('scp -P %s -r %s %s' %
-                               (port, srcPath, '\\[' + domain + '\\]:' +
-                                os.path.join(target, dstPath)))
+            status = os.system(
+                "scp -P %s -r %s %s"
+                % (
+                    port,
+                    srcPath,
+                    "\\[" + domain + "\\]:" + os.path.join(target, dstPath),
+                )
+            )
         return status
 
     @staticmethod
@@ -215,13 +278,23 @@ class SshProtocol:
         :return: 发送状态
         """
         if user:
-            status = os.system('scp -P %s %s %s' %
-                               (port, srcPath, user + '@\\[' + domain +
-                                '\\]:' + os.path.join(target, dstPath)))
+            status = os.system(
+                "scp -P %s %s %s"
+                % (
+                    port,
+                    srcPath,
+                    user + "@\\[" + domain + "\\]:" + os.path.join(target, dstPath),
+                )
+            )
         else:
-            status = os.system('scp -P %s %s %s' %
-                               (port, srcPath, '\\[' + domain + '\\]:' +
-                                os.path.join(target, dstPath)))
+            status = os.system(
+                "scp -P %s %s %s"
+                % (
+                    port,
+                    srcPath,
+                    "\\[" + domain + "\\]:" + os.path.join(target, dstPath),
+                )
+            )
         return status
 
     @staticmethod
@@ -240,13 +313,18 @@ class SshProtocol:
         :return: 发送状态
         """
         if user:
-            status = os.system('scp -P %s -r * %s' %
-                               (port, user + '@\\[' + domain + '\\]:' +
-                                os.path.join(target, dstPath)))
+            status = os.system(
+                "scp -P %s -r * %s"
+                % (
+                    port,
+                    user + "@\\[" + domain + "\\]:" + os.path.join(target, dstPath),
+                )
+            )
         else:
-            status = os.system('scp -P %s -r * %s' %
-                               (port, '\\[' + domain + '\\]:' +
-                                os.path.join(target, dstPath)))
+            status = os.system(
+                "scp -P %s -r * %s"
+                % (port, "\\[" + domain + "\\]:" + os.path.join(target, dstPath))
+            )
         return status
 
     @staticmethod
@@ -265,13 +343,15 @@ class SshProtocol:
         :return: 发送状态
         """
         if user:
-            return os.system('scp -P %s -r %s %s' %
-                             (port, user + '@\\[' + domain + '\\]:' + target +
-                              srcPath, dstPath))
+            return os.system(
+                "scp -P %s -r %s %s"
+                % (port, user + "@\\[" + domain + "\\]:" + target + srcPath, dstPath)
+            )
         else:
             return os.system(
-                'scp -P %s -r %s %s' %
-                (port, '\\[' + domain + '\\]:' + target + srcPath, dstPath))
+                "scp -P %s -r %s %s"
+                % (port, "\\[" + domain + "\\]:" + target + srcPath, dstPath)
+            )
 
     @staticmethod
     def command(user, domain, target, port, command):
@@ -288,10 +368,11 @@ class SshProtocol:
         if not domain or not target:
             return 0
         status, content = external_exec(
-            'ssh -p %s %s@%s "cd %s ; %s"' %
-            (port, user, domain, target, command) if user else
-            'ssh -p %s %s "cd %s ; %s"' % (port, domain, target, command),
-            without_output=True)
+            'ssh -p %s %s@%s "cd %s ; %s"' % (port, user, domain, target, command)
+            if user
+            else 'ssh -p %s %s "cd %s ; %s"' % (port, domain, target, command),
+            without_output=True,
+        )
         return status, content
 
     @staticmethod
@@ -308,17 +389,19 @@ class SshProtocol:
         """
         if user:
             return os.system(
-                "ssh -p {port} -t {user}@{domain} 'cd {aim} ; exec $SHELL -l'".
-                format(port=port,
-                       user=user,
-                       domain=domain,
-                       aim=os.path.join(target, dstPath)))
+                "ssh -p {port} -t {user}@{domain} 'cd {aim} ; exec $SHELL -l'".format(
+                    port=port,
+                    user=user,
+                    domain=domain,
+                    aim=os.path.join(target, dstPath),
+                )
+            )
         else:
             return os.system(
                 "ssh -p {port} -t {domain} 'cd {aim} ; exec $SHELL -l'".format(
-                    port=port,
-                    domain=domain,
-                    aim=os.path.join(target, dstPath)))
+                    port=port, domain=domain, aim=os.path.join(target, dstPath)
+                )
+            )
 
 
 def menu_output(menu):
@@ -327,45 +410,53 @@ def menu_output(menu):
 
     tb = Table(
         *[
-            Column(_lang['Parameter'], justify='full', style='bold yellow'),
-            Column(_lang['Description'], justify='right', style='bold cyan')
+            Column(_lang["Parameter"], justify="full", style="bold yellow"),
+            Column(_lang["Description"], justify="right", style="bold cyan"),
         ],
         show_edge=False,
         show_header=False,
-        row_styles=['none', 'dim'],
+        row_styles=["none", "dim"],
         box=SIMPLE,
         pad_edge=False,
-        title='[bold underline] {title}[dim]Author: RhythmLian\n'.format(
-            title=menu['title']))
-    for line in menu['lines']:
-        tb.add_row((menu['prefix'] + ' ' if line[0].startswith('-') else '') +
-                   line[0], line[1])
-    QproDefaultConsole.print(tb, justify='center')
-    QproDefaultConsole.print('\n' + _lang['docs'],
-                             'https://qpro-doc.rhythmlian.cn/',
-                             justify='center')
+        title="[bold underline] {title}[dim]Author: RhythmLian\n".format(
+            title=menu["title"]
+        ),
+    )
+    for line in menu["lines"]:
+        tb.add_row(
+            (menu["prefix"] + " " if line[0].startswith("-") else "") + line[0], line[1]
+        )
+    QproDefaultConsole.print(tb, justify="center")
+    QproDefaultConsole.print(
+        "\n" + _lang["docs"], "https://qpro-doc.rhythmlian.cn/", justify="center"
+    )
 
 
 def get_config(without_output: bool = False):
-    config_path = __latest_filename('project_configure.json')
+    config_path = __latest_filename("project_configure.json")
     config = {}
     if config_path:
         import json
-        with open(config_path, 'r') as f:
+
+        with open(config_path, "r") as f:
             config = json.load(f)
     else:
         if not without_output:
             QproDefaultConsole.print(
-                QproErrorString, _lang['NoSuchFile'].format('"project_configure.json"') + '\n' + _lang['RunCmd'].format('"Qpro init"'))
+                QproErrorString,
+                _lang["NoSuchFile"].format('"project_configure.json"')
+                + "\n"
+                + _lang["RunCmd"].format('"Qpro init"'),
+            )
         exit(0)
     return config
 
 
 def get_server_targets():
-    res = get_config()['server_targets']
+    res = get_config()["server_targets"]
     for item in res:
-        if not item['path'].endswith('/'):
-            item['path'] += '/'
+        if not item["path"].endswith("/"):
+            item["path"] += "/"
     return res
 
 
@@ -373,20 +464,27 @@ def _choose_server_target():
     server_targets = get_server_targets()
     choices = [
         f'{i["user"]}@{i["host"]}:{i["path"]} port: {i["port"]}'
-        if i['user'] else f'{i["host"]}:{i["path"]} port: {i["port"]}'
-        for i in server_targets if i['host'] and i['path']
+        if i["user"]
+        else f'{i["host"]}:{i["path"]} port: {i["port"]}'
+        for i in server_targets
+        if i["host"] and i["path"]
     ]
     try:
         index = choices.index(
-            _ask({
-                'type': 'list',
-                'message': _lang['ChooseServerTarget'],
-                'choices': choices
-            }))
+            _ask(
+                {
+                    "type": "list",
+                    "message": _lang["ChooseServerTarget"],
+                    "choices": choices,
+                }
+            )
+        )
         return server_targets[index]
     except:
         return None
 
 
 def apply_fig_complete(name: str, team: str = "", token: str = ""):
-    external_exec(f'npx @fig/publish-spec --spec-path complete/fig/*.ts --name {name}{" --team " + team if team else ""}{" --token " + token if token else ""}')
+    external_exec(
+        f'npx @fig/publish-spec --spec-path complete/fig/*.ts --name {name}{" --team " + team if team else ""}{" --token " + token if token else ""}'
+    )

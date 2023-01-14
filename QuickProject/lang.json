@@ -447,22 +447,6 @@
     "ara": "تمكين الإكمال التلقائي للمشرف",
     "ru": "Включить автозавершение для Commander"
   },
-  "MenuRegister": {
-    "zh": "注册全局命令",
-    "en": "Register global command",
-    "fra": "Enregistrer la commande globale",
-    "spa": "Registrar comando global",
-    "ara": "تسجيل الأمر العالمي",
-    "ru": "Зарегистрировать глобальную команду"
-  },
-  "MenuUnregister": {
-    "zh": "注销全局命令",
-    "en": "Unregister global command",
-    "fra": "Annuler l'enregistrement de la commande globale",
-    "spa": "Anular el registro del comando global",
-    "ara": "إلغاء تسجيل الأمر العالمي",
-    "ru": "Отменить регистрацию глобальной команды"
-  },
   "MenuFmt": {
     "zh": "递归格式化目录下全部老版本的配置文件",
     "en": "Recursively format all old version configuration files under the directory",
@@ -678,5 +662,21 @@
     "spa": "Para que la finalización de zsh funcione, necesita `source .{}rc`",
     "ara": "لتجعل اكمال zsh يعمل ، تحتاج `source .{}rc`",
     "ru": "Чтобы zsh completion работал, вам нужно `source .{}rc`"
+  },
+  "TemplateServerError": {
+    "zh": "Qpro模板服务器错误",
+    "en": "Qpro template server error",
+    "fra": "Erreur du serveur de modèles Qpro",
+    "spa": "Error del servidor de plantillas Qpro",
+    "ara": "خطأ في خادم قوالب Qpro",
+    "ru": "Ошибка сервера шаблонов Qpro"
+  },
+  "SearchingTemplate": {
+    "zh": "正在搜索模板",
+    "en": "Searching template",
+    "fra": "Recherche de modèle",
+    "spa": "Búsqueda de plantilla",
+    "ara": "البحث عن قالب",
+    "ru": "Поиск шаблона"
   }
 }

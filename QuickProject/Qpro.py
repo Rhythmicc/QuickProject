@@ -1,10 +1,6 @@
 import os.path
-
-from rich.prompt import Prompt
-
-from QuickProject import __sub_path, _choose_server_target
+from . import __sub_path, _choose_server_target, _ask, _lang
 from . import *
-from . import _ask, _lang
 
 
 def __format_json(info, path: str):
@@ -100,8 +96,8 @@ def _search_supported_languages(is_CN=using_gitee):
         }
     )
 
-    status = QproDefaultConsole.status(_lang["SearchingTemplate"])
-    status.start()
+    QproDefaultStatus.update(_lang["SearchingTemplate"])
+    QproDefaultStatus.start()
 
     import time
     import json
@@ -121,7 +117,7 @@ def _search_supported_languages(is_CN=using_gitee):
                 QproDefaultConsole.print(QproErrorString, res["message"])
                 return None
             data = {i[0]: i[1:] for i in res["data"]}
-            status.stop()
+            QproDefaultStatus.stop()
             return data[
                 _ask(
                     {
@@ -138,7 +134,7 @@ def _search_supported_languages(is_CN=using_gitee):
             QproDefaultConsole.print(QproErrorString, repr(e))
             return None
 
-    status.stop()
+    QproDefaultStatus.stop()
     QproDefaultConsole.print(QproErrorString, _lang["TemplateServerError"])
     return None
 
@@ -153,13 +149,14 @@ def _external_create(project_name: str, key: str = ""):
         templateProjectUrls = _search_supported_languages()
         if not templateProjectUrls:
             exit(0)
-        with QproDefaultConsole.status(
+        QproDefaultStatus.update(
             (
                 "Cloning Qpro {} Template to {}"
                 if user_lang != "zh"
                 else "正在克隆Qpro {} 模板为 {}"
             ).format(key, project_name)
-        ):
+        )
+        with QproDefaultStatus:
             Repo.clone_from(templateProjectUrls[0], project_name)
     else:
         templateProjectUrls = _ask(
@@ -168,13 +165,14 @@ def _external_create(project_name: str, key: str = ""):
                 "message": "GIT " + ("URL" if user_lang != "zh" else "链接") + ":",
             }
         )
-        with QproDefaultConsole.status(
+        QproDefaultStatus.update(
             (
                 "Cloning External Template to {}"
                 if user_lang != "zh"
                 else "正在克隆Qpro 外部模板为 {}"
             ).format(project_name)
-        ):
+        )
+        with QproDefaultStatus:
             Repo.clone_from(templateProjectUrls, project_name)
     os.chdir(project_name)
     try:
@@ -349,6 +347,8 @@ def get():
 
 
 def pro_init():
+    from rich.prompt import Prompt
+
     work_project = ""
     while not work_project:
         work_project = Prompt.ask(_lang["askProjectName"]).strip()

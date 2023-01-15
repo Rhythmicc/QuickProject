@@ -26,6 +26,7 @@ QproInfoString = f'[bold cyan][{_lang["information"]}][/]'
 QproWarnString = f'[bold yellow][{_lang["warning"]}][/]'
 name = "QuickProject"
 configure_name = "project_configure.json"
+QproDefaultStatus = QproDefaultConsole.status("")
 
 
 def __latest_filename(filename):
@@ -132,7 +133,6 @@ def external_exec(
         ignore_status = (
             without_stdout if pipe_name == "stdout" else without_stderr
         ) or without_output
-        status = QproDefaultConsole.status("__")
         started = False
         for line in iter(eval(f"process.{pipe_name}.readline"), ""):
             if not __expose and (
@@ -146,11 +146,10 @@ def external_exec(
                 continue
             line = line.strip()
             if __expose and line.startswith("__START__"):
-                if not started:
-                    status.start()
-                status.update(line.replace("__START__", ""))
+                QproDefaultStatus.update(line.replace("__START__", ""))
+                QproDefaultStatus.start()
             elif __expose and line.startswith("__STOP__"):
-                status.stop()
+                QproDefaultStatus.stop()
             elif __expose and line.startswith("__SPLIT__"):
                 QproDefaultConsole.print(
                     Markdown("# " + line.replace("__SPLIT__", "").strip())

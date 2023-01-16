@@ -26,7 +26,65 @@ QproInfoString = f'[bold cyan][{_lang["information"]}][/]'
 QproWarnString = f'[bold yellow][{_lang["warning"]}][/]'
 name = "QuickProject"
 configure_name = "project_configure.json"
-QproDefaultStatus = QproDefaultConsole.status("")
+
+
+class Status:
+    def __init__(
+        self,
+        status,
+        *,
+        spinner: str = "dots",
+        spinner_style: str = "status.spinner",
+        speed: float = 1.0,
+        refresh_per_second: float = 12.5,
+    ) -> None:
+        self.status = QproDefaultConsole.status(
+            status,
+            spinner=spinner,
+            spinner_style=spinner_style,
+            speed=speed,
+            refresh_per_second=refresh_per_second,
+        )
+
+    def __call__(
+        self,
+        status,
+        *,
+        spinner: str = "dots",
+        spinner_style: str = "status.spinner",
+        speed: float = 1.0,
+    ):
+        self.status.update(
+            status,
+            spinner=spinner,
+            spinner_style=spinner_style,
+            speed=speed,
+        )
+        return self.status
+
+    def update(
+        self,
+        status,
+        *,
+        spinner: str = "dots",
+        spinner_style: str = "status.spinner",
+        speed: float = 1.0,
+    ):
+        self.status.update(
+            status,
+            spinner=spinner,
+            spinner_style=spinner_style,
+            speed=speed,
+        )
+
+    def start(self):
+        self.status.start()
+
+    def stop(self):
+        self.status.stop()
+
+
+QproDefaultStatus = Status("")
 
 
 def __latest_filename(filename):
@@ -146,7 +204,7 @@ def external_exec(
                 continue
             line = line.strip()
             if __expose and line.startswith("__START__"):
-                QproDefaultStatus.update(line.replace("__START__", ""))
+                QproDefaultStatus(line.replace("__START__", ""))
                 QproDefaultStatus.start()
             elif __expose and line.startswith("__STOP__"):
                 QproDefaultStatus.stop()

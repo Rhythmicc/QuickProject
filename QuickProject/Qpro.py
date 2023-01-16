@@ -96,7 +96,7 @@ def _search_supported_languages(is_CN=using_gitee):
         }
     )
 
-    QproDefaultStatus.update(_lang["SearchingTemplate"])
+    QproDefaultStatus(_lang["SearchingTemplate"])
     QproDefaultStatus.start()
 
     import time
@@ -149,14 +149,13 @@ def _external_create(project_name: str, key: str = ""):
         templateProjectUrls = _search_supported_languages()
         if not templateProjectUrls:
             exit(0)
-        QproDefaultStatus.update(
+        with QproDefaultStatus(
             (
                 "Cloning Qpro {} Template to {}"
                 if user_lang != "zh"
                 else "正在克隆Qpro {} 模板为 {}"
             ).format(key, project_name)
-        )
-        with QproDefaultStatus:
+        ):
             Repo.clone_from(templateProjectUrls[0], project_name)
     else:
         templateProjectUrls = _ask(
@@ -165,14 +164,13 @@ def _external_create(project_name: str, key: str = ""):
                 "message": "GIT " + ("URL" if user_lang != "zh" else "链接") + ":",
             }
         )
-        QproDefaultStatus.update(
+        with QproDefaultStatus(
             (
                 "Cloning External Template to {}"
                 if user_lang != "zh"
                 else "正在克隆Qpro 外部模板为 {}"
             ).format(project_name)
-        )
-        with QproDefaultStatus:
+        ):
             Repo.clone_from(templateProjectUrls, project_name)
     os.chdir(project_name)
     try:
@@ -200,6 +198,15 @@ def __get_server_target_from_string():
         )
         .strip()
         .replace(dir_char, "/")
+        if _ask(
+            {
+                "type": "confirm",
+                "message": "Do you need to use ssh to map the project?"
+                if user_lang != "zh"
+                else "你需要使用基于SSH的项目映射吗?",
+            }
+        )
+        else ""
     )
 
     if server_target and not server_target.endswith("/"):

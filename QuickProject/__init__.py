@@ -1,6 +1,6 @@
 import os
 import sys
-from .__config__ import _ask, QproConfig, QproDefaultConsole
+from .__config__ import _ask, QproConfig, QproDefaultConsole, QproDefaultStatus
 from langSrc import LanguageDetector
 
 if sys.platform.startswith("win"):
@@ -28,65 +28,6 @@ name = "QuickProject"
 configure_name = "project_configure.json"
 
 
-class Status:
-    def __init__(
-        self,
-        status,
-        *,
-        spinner: str = "dots",
-        spinner_style: str = "status.spinner",
-        speed: float = 1.0,
-        refresh_per_second: float = 12.5,
-    ) -> None:
-        self.status = QproDefaultConsole.status(
-            status,
-            spinner=spinner,
-            spinner_style=spinner_style,
-            speed=speed,
-            refresh_per_second=refresh_per_second,
-        )
-
-    def __call__(
-        self,
-        status,
-        *,
-        spinner: str = "dots",
-        spinner_style: str = "status.spinner",
-        speed: float = 1.0,
-    ):
-        self.status.update(
-            status,
-            spinner=spinner,
-            spinner_style=spinner_style,
-            speed=speed,
-        )
-        return self.status
-
-    def update(
-        self,
-        status,
-        *,
-        spinner: str = "dots",
-        spinner_style: str = "status.spinner",
-        speed: float = 1.0,
-    ):
-        self.status.update(
-            status,
-            spinner=spinner,
-            spinner_style=spinner_style,
-            speed=speed,
-        )
-
-    def start(self):
-        self.status.start()
-
-    def stop(self):
-        self.status.stop()
-
-
-QproDefaultStatus = Status("")
-
-
 def __latest_filename(filename):
     """
     获取最近的文件名 （不断向父目录遍历）
@@ -94,20 +35,13 @@ def __latest_filename(filename):
     :param filename: 文件名
     :return: 文件路径
     """
-    import os
-
     cur = os.getcwd()
-    rec = cur
-    while cur != dir_char:
-        if os.path.exists(filename):
-            os.chdir(rec)
-            return os.path.abspath(cur + dir_char + filename)
-        os.chdir("..")
-        last = cur
-        cur = os.getcwd()
-        if cur == last:
-            break
-    os.chdir(rec)
+    while cur != os.path.dirname(cur):
+        if os.path.exists(_path := os.path.join(cur, filename)):
+            return _path
+        cur = os.path.dirname(cur)
+    if os.path.exists(_path := os.path.join(cur, filename)):
+        return _path
     return ""
 
 
@@ -191,7 +125,6 @@ def external_exec(
         ignore_status = (
             without_stdout if pipe_name == "stdout" else without_stderr
         ) or without_output
-        started = False
         for line in iter(eval(f"process.{pipe_name}.readline"), ""):
             if not __expose and (
                 line.startswith("__START__")
@@ -204,8 +137,7 @@ def external_exec(
                 continue
             line = line.strip()
             if __expose and line.startswith("__START__"):
-                QproDefaultStatus(line.replace("__START__", ""))
-                QproDefaultStatus.start()
+                QproDefaultStatus(line.replace("__START__", "")).start()
             elif __expose and line.startswith("__STOP__"):
                 QproDefaultStatus.stop()
             elif __expose and line.startswith("__SPLIT__"):

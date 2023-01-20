@@ -23,6 +23,14 @@
     "ara": "تحذير",
     "ru": "Предупреждение"
   },
+  "URL": {
+    "zh": "链接",
+    "en": "URL",
+    "fra": "URL",
+    "spa": "URL",
+    "ara": "رابط",
+    "ru": "URL"
+  },
   "requirePackage": {
     "zh": "需要安装包",
     "en": "Require package",
@@ -342,6 +350,22 @@
     "spa": "Registrar {} con éxito",
     "ara": "تسجيل {} بنجاح",
     "ru": "Зарегистрировать {} успешно"
+  },
+  "Menu": {
+    "zh": "菜单",
+    "en": "Menu",
+    "fra": "Menu",
+    "spa": "Menú",
+    "ara": "قائمة طعام",
+    "ru": "Меню"
+  },
+  "Project": {
+    "zh": "项目",
+    "en": "Project",
+    "fra": "Projet",
+    "spa": "Proyecto",
+    "ara": "مشروع",
+    "ru": "Проект"
   },
   "MenuInit": {
     "zh": "使当前项目成为Qpro项目",
@@ -678,5 +702,69 @@
     "spa": "Búsqueda de plantilla",
     "ara": "البحث عن قالب",
     "ru": "Поиск шаблона"
+  },
+  "CloningTemplate": {
+    "zh": "正在克隆Qpro {} 模板为 {}",
+    "en": "Cloning Qpro {} template to {}",
+    "fra": "Clonage du modèle Qpro {} vers {}",
+    "spa": "Clonación de la plantilla Qpro {} a {}",
+    "ara": "يتم اقتباس قالب Qpro {} إلى {}",
+    "ru": "Клонирование шаблона Qpro {} в {}"
+  },
+  "CloningExternelTemplate": {
+    "zh": "正在克隆外部模板 {}",
+    "en": "Cloning external template {}",
+    "fra": "Clonage du modèle externe {}",
+    "spa": "Clonación de la plantilla externa {}",
+    "ara": "يتم اقتباس قالب خارجي {}",
+    "ru": "Клонирование внешнего шаблона {}"
+  },
+  "InputServerTarget": {
+    "zh": "输入 用户@IP:路径 如果你打算使用SSH",
+    "en": "Input user@IP:path if you are going to use SSH",
+    "fra": "Entrez user@IP:path si vous allez utiliser SSH",
+    "spa": "Ingrese user@IP:path si va a usar SSH",
+    "ara": "أدخل user@IP:path إذا كنت تنوي استخدام SSH",
+    "ru": "Введите user@IP:path, если вы собираетесь использовать SSH"
+  },
+  "NeedServerTarget": {
+    "zh": "你需要使用基于SSH的项目映射吗?",
+    "en": "Do you need a project mapping based on SSH?",
+    "fra": "Avez-vous besoin d'une correspondance de projet basée sur SSH?",
+    "spa": "¿Necesita un mapeo de proyecto basado en SSH?",
+    "ara": "هل تحتاج إلى تعيين مشروع مبني على SSH؟",
+    "ru": "Вам нужно сопоставление проекта на основе SSH?"
+  },
+  "InputPort": {
+    "zh": "输入端口号",
+    "en": "Input port",
+    "fra": "Entrez le port",
+    "spa": "Ingrese el puerto",
+    "ara": "أدخل المنفذ",
+    "ru": "Введите порт"
+  },
+  "ChooseTemplate": {
+    "zh": "选择模板",
+    "en": "Choose template",
+    "fra": "Choisir un modèle",
+    "spa": "Elegir plantilla",
+    "ara": "اختر قالب",
+    "ru": "Выберите шаблон"
+  },
+  "ChooseLanguage": {
+    "zh": "选择语言",
+    "en": "Choose language",
+    "fra": "Choisir la langue",
+    "spa": "Elegir idioma",
+    "ara": "اختر اللغة",
+    "ru": "Выберите язык"
+  },
+  "BackupError": {
+    "zh": "备份错误",
+    "en": "Backup error",
+    "fra": "Erreur de sauvegarde",
+    "spa": "Error de copia de seguridad",
+    "ara": "خطأ في النسخ الاحتياطي",
+    "ru": "Ошибка резервного копирования"
   }
 }

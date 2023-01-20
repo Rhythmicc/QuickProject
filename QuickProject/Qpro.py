@@ -127,7 +127,7 @@ def _search_supported_languages(is_CN=using_gitee):
                     }
                 )
             ]
-        except ProxyError as e:
+        except ProxyError:
             retry -= 1
             time.sleep(3)
         except Exception as e:
@@ -149,28 +149,16 @@ def _external_create(project_name: str, key: str = ""):
         templateProjectUrls = _search_supported_languages()
         if not templateProjectUrls:
             exit(0)
-        with QproDefaultStatus(
-            (
-                "Cloning Qpro {} Template to {}"
-                if user_lang != "zh"
-                else "正在克隆Qpro {} 模板为 {}"
-            ).format(key, project_name)
-        ):
+        with QproDefaultStatus(_lang["CloningTemplate"]).format(key, project_name):
             Repo.clone_from(templateProjectUrls[0], project_name)
     else:
         templateProjectUrls = _ask(
             {
                 "type": "input",
-                "message": "GIT " + ("URL" if user_lang != "zh" else "链接") + ":",
+                "message": "GIT " + _lang["URL"] + ":",
             }
         )
-        with QproDefaultStatus(
-            (
-                "Cloning External Template to {}"
-                if user_lang != "zh"
-                else "正在克隆Qpro 外部模板为 {}"
-            ).format(project_name)
-        ):
+        with QproDefaultStatus(_lang["CloningExternalTemplate"].format(project_name)):
             Repo.clone_from(templateProjectUrls, project_name)
     os.chdir(project_name)
     try:
@@ -188,24 +176,10 @@ def __get_server_target_from_string():
     从字符串中获取服务器目标
     """
     server_target = (
-        _ask(
-            {
-                "type": "input",
-                "message": "Input user@ip:dir_path if you need scp"
-                if user_lang != "zh"
-                else "输入 用户@IP:路径 如果你打算使用SSH",
-            }
-        )
+        _ask({"type": "input", "message": _lang["InputServerTarget"]})
         .strip()
         .replace(dir_char, "/")
-        if _ask(
-            {
-                "type": "confirm",
-                "message": "Do you need to use ssh to map the project?"
-                if user_lang != "zh"
-                else "你需要使用基于SSH的项目映射吗?",
-            }
-        )
+        if _ask({"type": "confirm", "message": _lang["NeedServerTarget"]})
         else ""
     )
 
@@ -223,7 +197,7 @@ def __get_server_target_from_string():
         port = _ask(
             {
                 "type": "input",
-                "message": "input port" if user_lang != "zh" else "输入端口号",
+                "message": _lang["InputPort"],
                 "default": "22",
             }
         )
@@ -235,10 +209,7 @@ def create():
         project_name = sys.argv[2]
     except IndexError:
         return QproDefaultConsole.print(
-            QproWarnString,
-            "usage: Qpro create <project>"
-            if user_lang != "zh"
-            else "使用: Qpro create <项目>",
+            QproWarnString, f'{_lang["Usage"]}: Qpro create {_lang["Project"]}'
         )
     else:
         if os.path.exists(project_name) and os.path.isdir(project_name):
@@ -249,7 +220,7 @@ def create():
         lang = _ask(
             {
                 "type": "list",
-                "message": "选择模板:" if user_lang == "zh" else "Choose Template:",
+                "message": _lang["ChooseTemplate"],
                 "choices": [
                     _lang["EmptyProject"],
                     _lang["InnerTemplate"],
@@ -371,7 +342,7 @@ def pro_init():
     lang_name = _ask(
         {
             "type": "list",
-            "message": "Choose Language:" if user_lang != "zh" else "选择语言:",
+            "message": _lang["ChooseLanguage"],
             "choices": lang_tool_exe.keys(),
         }
     )
@@ -435,7 +406,7 @@ def pro_init():
     except Exception as e:
         QproDefaultConsole.print(
             QproErrorString,
-            "make backup failed with error: %s, you need backup code by yourself!" % e,
+            f"{_lang['BackupError']}: {e}",
         )
     if _ask(
         {
@@ -665,7 +636,7 @@ def main():
     if len(sys.argv) < 2 or "-h" == sys.argv[1]:
         menu_output(
             {
-                "title": "Qpro usage\n" if user_lang != "zh" else "Qpro 菜单\n",
+                "title": f"Qpro {_lang['Menu']}\n",
                 "lines": [
                     ("init", _lang["MenuInit"]),
                     ("-h", _lang["MenuHelp"]),

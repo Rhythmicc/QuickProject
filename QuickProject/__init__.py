@@ -1,7 +1,14 @@
-import os
-import sys
-from .__config__ import _ask, QproConfig, QproDefaultConsole, QproDefaultStatus
-from langSrc import LanguageDetector
+from .__config__ import (
+    _ask,
+    _qpro_config,
+    _lang,
+    QproDefaultConsole,
+    QproDefaultStatus,
+    user_root,
+    user_lang,
+    os,
+    sys,
+)
 
 if sys.platform.startswith("win"):
     is_win = True
@@ -10,15 +17,6 @@ else:
     is_win = False
     dir_char = "/"
 
-user_root = os.path.expanduser("~")
-_qpro_config = QproConfig(
-    user_root + dir_char + ".qprorc", os.path.exists(user_root + dir_char + ".qprorc")
-)
-
-user_lang = _qpro_config.select("default_language")
-_lang = LanguageDetector(
-    user_lang, os.path.join(os.path.dirname(__file__), "lang.json")
-)
 user_pip = _qpro_config.select("default_pip")
 using_gitee = _qpro_config.select("using_gitee")
 QproErrorString = f'[bold red][{_lang["error"]}][/]'

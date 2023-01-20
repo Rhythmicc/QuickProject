@@ -1,6 +1,7 @@
 import os
 
 from inquirer_rhy.prompt import prompt
+from langSrc import LanguageDetector
 import sys
 import json
 from rich.console import Console
@@ -69,7 +70,6 @@ class Status:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.stop()
-        self.started = False
 
     def start(self):
         if not self.started:
@@ -129,23 +129,25 @@ def _ask(question: dict, timeout: int = 0):
         def ask():
             try:
                 res = prompt(question)[question["name"]]
+            except:
+                os.system("stty echo")
+                res = question.get("default", None)
+            finally:
                 if record_status:
                     QproDefaultStatus.start()
                 return res
-            except:
-                os.system("stty echo")
-                return question["default"] if "default" in question else None
 
     else:
 
         def ask():
             try:
                 res = prompt(question)[question["name"]]
+            except:
+                res = None
+            finally:
                 if record_status:
                     QproDefaultStatus.start()
                 return res
-            except:
-                raise KeyboardInterrupt
 
     if "name" not in question:
         question["name"] = "NoName"
@@ -223,3 +225,15 @@ class QproConfig:
             self.config[key] = _ask(problems[key])
             self.update()
         return self.config.get(key, None)
+
+
+user_root = os.path.expanduser("~")
+
+_qpro_config = QproConfig(
+    user_root + dir_char + ".qprorc", os.path.exists(user_root + dir_char + ".qprorc")
+)
+
+user_lang = _qpro_config.select("default_language")
+_lang = LanguageDetector(
+    user_lang, os.path.join(os.path.dirname(__file__), "lang.json")
+)

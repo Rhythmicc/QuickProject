@@ -128,7 +128,9 @@ def _ask(question: dict, timeout: int = 0):
         @set_timeout(timeout)
         def ask():
             try:
-                res = prompt(question)[question["name"]]
+                res = prompt(question, keyboard_interrupt_msg=_lang["UserInterrupt"])[
+                    question["name"]
+                ]
             except:
                 os.system("stty echo")
                 res = question.get("default", None)
@@ -141,7 +143,9 @@ def _ask(question: dict, timeout: int = 0):
 
         def ask():
             try:
-                res = prompt(question)[question["name"]]
+                res = prompt(question, keyboard_interrupt_msg=_lang["UserInterrupt"])[
+                    question["name"]
+                ]
             except:
                 res = None
             finally:

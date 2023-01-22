@@ -99,6 +99,8 @@ def set_timeout(num: int):
     :return: wrapper
     """
 
+    assert isinstance(num, int) and num > 0, "num must be a positive integer"
+
     def wrapper(func):
         def handle(signum, frame):
             raise RuntimeError

@@ -149,7 +149,7 @@ def _external_create(project_name: str, key: str = ""):
         templateProjectUrls = _search_supported_languages()
         if not templateProjectUrls:
             exit(0)
-        with QproDefaultStatus(_lang["CloningTemplate"]).format(key, project_name):
+        with QproDefaultStatus(_lang["CloningTemplate"].format(key, project_name)):
             Repo.clone_from(templateProjectUrls[0], project_name)
     else:
         templateProjectUrls = _ask(

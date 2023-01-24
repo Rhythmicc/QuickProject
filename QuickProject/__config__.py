@@ -200,7 +200,7 @@ problems = {
 def _init_config(configPath: str):
     config = {}
     for k, v in problems.items():
-        config[k] = _ask(v, __init__=True)
+        config[k] = _ask(v, _init=True)
     with open(configPath, "w") as f:
         json.dump(config, f, indent=4, ensure_ascii=False)
     QproDefaultConsole.print(

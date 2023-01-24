@@ -6,16 +6,10 @@ from .__config__ import (
     QproDefaultStatus,
     user_root,
     user_lang,
+    dir_char,
     os,
     sys,
 )
-
-if sys.platform.startswith("win"):
-    is_win = True
-    dir_char = "\\"
-else:
-    is_win = False
-    dir_char = "/"
 
 user_pip = _qpro_config.select("default_pip")
 using_gitee = _qpro_config.select("using_gitee")

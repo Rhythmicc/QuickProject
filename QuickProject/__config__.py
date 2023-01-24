@@ -122,7 +122,7 @@ def set_timeout(num: int):
     return wrapper
 
 
-def _ask(question: dict, timeout: int = 0):
+def _ask(question: dict, timeout: int = 0, _init: bool = False):
     record_status = QproDefaultStatus.status
 
     if timeout:
@@ -130,9 +130,12 @@ def _ask(question: dict, timeout: int = 0):
         @set_timeout(timeout)
         def ask():
             try:
-                res = prompt(question, keyboard_interrupt_msg=_lang["UserInterrupt"])[
-                    question["name"]
-                ]
+                res = prompt(
+                    question,
+                    keyboard_interrupt_msg=_lang["UserInterrupt"]
+                    if not _init
+                    else None,
+                )[question["name"]]
             except:
                 os.system("stty echo")
                 res = question.get("default", None)
@@ -145,10 +148,14 @@ def _ask(question: dict, timeout: int = 0):
 
         def ask():
             try:
-                res = prompt(question, keyboard_interrupt_msg=_lang["UserInterrupt"])[
-                    question["name"]
-                ]
-            except:
+                res = prompt(
+                    question,
+                    keyboard_interrupt_msg=_lang["UserInterrupt"]
+                    if not _init
+                    else None,
+                )[question["name"]]
+            except Exception as e:
+                QproDefaultConsole.print(repr(e))
                 res = None
             finally:
                 if record_status:
@@ -193,7 +200,7 @@ problems = {
 def _init_config(configPath: str):
     config = {}
     for k, v in problems.items():
-        config[k] = _ask(v)
+        config[k] = _ask(v, __init__=True)
     with open(configPath, "w") as f:
         json.dump(config, f, indent=4, ensure_ascii=False)
     QproDefaultConsole.print(
@@ -220,7 +227,7 @@ class QproConfig:
                 self.config = QproConfig.json.load(f)
         except:
             with open(configPath, "r", encoding="utf8") as f:
-                self.config = QproConfig.json.load(f, encoding="utf8")
+                self.config = QproConfig.json.load(f)
 
     def update(self):
         with open(self.path, "w") as f:

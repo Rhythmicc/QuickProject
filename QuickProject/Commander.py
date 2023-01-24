@@ -29,6 +29,8 @@ class Commander:
         QuickProject的Commander类，帮助快速构建一个命令工具
 
         :param seg_flag: 是否将函数名中的'_'替换为'-'
+        :param custom_complete: 是否开启自定义补全
+        :param non_complete: 不将隐藏函数加入到帮助菜单和补全插件中
         """
         self.name = name
         self.non_complete = non_complete
@@ -47,7 +49,7 @@ class Commander:
 
         if not custom_complete:
 
-            @self.command(True)
+            @self.command(hidden=True)
             def complete(team: str = "", token: str = "", is_script: bool = False):
                 """
                 获取补全列表

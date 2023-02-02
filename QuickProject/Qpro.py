@@ -435,7 +435,7 @@ def delete_all():
     server_targets = get_server_targets()
     st = 0
     for server_target in server_targets:
-        _st = SshProtocol.command(
+        _st, _ct = SshProtocol.command(
             server_target["user"],
             server_target["host"],
             server_target["path"],
@@ -444,7 +444,9 @@ def delete_all():
         )
         st |= 1 if _st else 0
         QproDefaultConsole.print(
-            QproErrorString, f"{server_target}: delete all failed with error: {st}"
+            QproErrorString,
+            f"{server_target}: delete all failed with error: {st}:",
+            _ct if _ct else "No error message",
         )
     if not st:
         remove(os.getcwd())
@@ -470,7 +472,7 @@ def delete():
         server_targets = get_server_targets()
         st = 0
         for server_target in server_targets:
-            _st = SshProtocol.command(
+            _st, _ct = SshProtocol.command(
                 server_target["user"],
                 server_target["host"],
                 server_target["path"],
@@ -481,7 +483,8 @@ def delete():
             if _st:
                 QproDefaultConsole.print(
                     QproErrorString,
-                    f"{server_target}: delete {sub_path} failed with error: {_st}",
+                    f"{server_target}: delete {sub_path} failed with error: \[{_st}]:",
+                    _ct if _ct else "No error message",
                 )
         if not st or _ask(
             {
@@ -509,9 +512,9 @@ def tele_ls():
                 server_target["path"],
                 server_target["port"],
                 f"ls -lah {sub_path}",
-            )
+            )[1]
             .strip()
-            .split("\n")[3:]
+            .split("\n")[2:]
         )
         res = [i.strip().split() for i in res]
 

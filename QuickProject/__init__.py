@@ -361,7 +361,7 @@ class SshProtocol:
         :param target: 远程映射路径
         :param port: 端口
         :param command: 命令
-        :return: 命令输出结果
+        :return: 命令执行状态, 命令执行结果
         """
         if not domain or not target:
             return 0

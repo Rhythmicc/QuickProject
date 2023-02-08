@@ -1,6 +1,5 @@
 import os
 
-from inquirer_rhy.prompt import prompt
 from langSrc import LanguageDetector
 import sys
 import json
@@ -123,6 +122,8 @@ def set_timeout(num: int):
 
 
 def _ask(question: dict, timeout: int = 0, _init: bool = False):
+    from inquirer_rhy.prompt import prompt
+
     record_status = QproDefaultStatus.status
 
     if timeout:

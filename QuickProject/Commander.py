@@ -6,6 +6,9 @@ from inspect import isfunction
 from . import QproDefaultConsole, QproErrorString, _lang
 
 
+_ROOT_HELP = "__COMMANDER_ROOT_HELP_FUNCTION__"
+
+
 def str2bool(v):
     if isinstance(v, bool):
         return v
@@ -35,17 +38,13 @@ class Commander:
         self.name = name
         self.non_complete = non_complete
         self.command_table = {}
-        self.fig_table = [
-            {
-                "name": "--help",
-                "description": _lang["GetHelp"],
-                "options": [
-                    {"name": "--hidden", "description": _lang["ShowHiddenCommand"]}
-                ],
-            }
-        ]
+        self.fig_table = []
         self.custom_complete_table = {}
+        self.custom_help_table = {}
+
+        self.custom_help_table[_ROOT_HELP] = self.help
         self.seg_flag = seg_flag
+        self.fig_prefix = None
 
         if not custom_complete:
 
@@ -235,6 +234,27 @@ class Commander:
                     break
         return res
 
+    def custom_help(self, root: bool = False):
+        """
+        自定义帮助信息
+
+        :param root: 是否为根命令
+        """
+
+        def wrapper(func):
+            if not isfunction(func):
+                raise TypeError(f"{func} not a function")
+            if root:
+                self.custom_help_table[_ROOT_HELP] = func
+                return
+            func_name = func.__name__.strip("_")
+            if self.seg_flag:
+                func_name = func_name.replace("_", "-")
+            if func_name not in self.custom_help_table:
+                self.custom_help_table[func_name] = func
+
+        return wrapper
+
     def help(self, shown_hidden: bool = False):
         from rich.table import Table
         from rich.box import SIMPLE_HEAVY
@@ -337,17 +357,18 @@ class Commander:
                 return print(self.__command_complete__(sys.argv[2:]))
             elif sys.argv[1] == "--qrun-fig-complete":
                 return print(self._fig_complete_())
-            if sys.argv[1] == "--help":
-                return self.help("--hidden" in sys.argv)
         try:
             func_name = sys.argv[1]
             sys.argv = sys.argv[:1] + sys.argv[2:]
             if func_name not in self.command_table:
-                return QproDefaultConsole.print(
-                    QproErrorString, f'"{func_name}":' + _lang["NoSuchCommand"]
-                )
+                raise KeyError
         except IndexError:
-            return QproDefaultConsole.print(QproErrorString, _lang["NoCommandInput"])
+            return self.custom_help_table[_ROOT_HELP]()
+        except KeyError:
+            QproDefaultConsole.print(
+                QproErrorString, f'"{func_name}":', _lang["NoSuchCommand"]
+            )
+            return self.custom_help_table[_ROOT_HELP](shown_hidden=True)
         else:
             func_info = self.command_table[func_name]
             args = func_info["parser"].parse_args()
@@ -442,6 +463,9 @@ class Commander:
         with open(os.path.join("complete", "fig", f"{project_name}.ts"), "w") as f:
             from .QproFigTable import default_custom_command_template
 
+            if self.fig_prefix:
+                f.write(self.fig_prefix + "\n")
+
             f.write(
                 default_custom_command_template.replace(
                     "__CUSTOM_COMMAND_SPEC__",
@@ -530,3 +554,51 @@ class Commander:
                 QproInfoString,
                 _lang["ScriptComplete"].format(self.name),
             )
+
+    def __add__(self, other):
+        """
+        合并命令
+
+        :param other: 另一个命令
+        :return:
+        """
+        if not isinstance(other, Commander):
+            raise TypeError(
+                f"unsupported operand type(s) for +: '{type(self).__name__}' and '{type(other).__name__}'"
+            )
+        self.command_table.update(other.command_table)
+        self.fig_table.extend(other.fig_table)
+        self.custom_complete_table.update(other.custom_complete_table)
+
+        return self
+
+    def set_fig_prefix(self, prefix):
+        """
+        【高级接口】设置fig前缀代码
+
+        :param prefix: 前缀
+        """
+        self.fig_prefix = prefix
+
+    def set_fig_command(self, name, args: dict = None, options: dict = None):
+        """
+        【高级接口】设置fig命令参数
+
+        :param name: 命令名
+        :param args: 参数
+        :param options: 选项
+        """
+        if name not in self.command_table:
+            raise ValueError(f"command {name} not found")
+        for item in self.fig_table:
+            if item["name"] == name:
+                if args:
+                    item["args"] = args
+                if options:
+                    item["options"] = options
+                if not args and not options:
+                    if "args" in item:
+                        item.pop("args")
+                    if "options" in item:
+                        item.pop("options")
+                return

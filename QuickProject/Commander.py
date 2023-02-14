@@ -117,6 +117,7 @@ class Commander:
             for arg in func_analyser.parameters.values():
                 if arg.name.startswith("_"):  # 忽略私有参数
                     continue
+                arg_name = arg.name if not self.seg_flag else arg.name.replace("_", "-")
                 _type = None
                 _default = None
                 if arg.annotation != arg.empty:
@@ -126,33 +127,35 @@ class Commander:
                 if _default is None:
                     if _type == list:
                         func_args_parser.add_argument(
-                            f"-{arg.name}", type=str, nargs="+"
+                            f"-{arg_name}",
+                            type=str,
+                            nargs="+",
                         )
                         cur_args = {
-                            "name": arg.name,
-                            "description": param_doc.get(arg.name, f"<{arg.name}>"),
+                            "name": arg_name,
+                            "description": param_doc.get(arg.name, f"<{arg_name}>"),
                             "isVariadic": True,
                         }
-                        self.__op_cur_args(func_name, cur_args, arg.name)
-                        if "file" in arg.name.lower() or "path" in arg.name.lower():
+                        self.__op_cur_args(func_name, cur_args, arg_name)
+                        if "file" in arg_name.lower() or "path" in arg_name.lower():
                             cur_args["template"] = ["filepaths", "folders"]
                         func_fig["options"].append(
                             {
-                                "name": f"-{arg.name}",
-                                "description": param_doc.get(arg.name, f"<{arg.name}>"),
+                                "name": f"-{arg_name}",
+                                "description": param_doc.get(arg.name, f"<{arg_name}>"),
                                 "args": cur_args,
                             }
                         )
                     else:
                         func_args_parser.add_argument(
-                            arg.name, type=_type if _type != bool else str2bool
+                            arg_name, type=_type if _type != bool else str2bool
                         )
                         cur_args = {
-                            "name": arg.name,
-                            "description": param_doc.get(arg.name, f"<{arg.name}>"),
+                            "name": arg_name,
+                            "description": param_doc.get(arg.name, f"<{arg_name}>"),
                         }
-                        self.__op_cur_args(func_name, cur_args, arg.name)
-                        if "file" in arg.name.lower() or "path" in arg.name.lower():
+                        self.__op_cur_args(func_name, cur_args, arg_name)
+                        if "file" in arg_name.lower() or "path" in arg_name.lower():
                             cur_args["template"] = ["filepaths", "folders"]
                         func_fig["args"].append(cur_args)
                 else:
@@ -168,23 +171,23 @@ class Commander:
                     if _type == bool:
                         _kw.pop("type")
                         _kw["action"] = "store_true"
-                    func_args_parser.add_argument(f"--{arg.name}", **_kw)
+                    func_args_parser.add_argument(f"--{arg_name}", **_kw)
                     cur_args = {
-                        "name": arg.name,
-                        "description": param_doc.get(arg.name, f"<{arg.name}>"),
+                        "name": arg_name,
+                        "description": param_doc.get(arg.name, f"<{arg_name}>"),
                     }
-                    self.__op_cur_args(func_name, cur_args, arg.name)
+                    self.__op_cur_args(func_name, cur_args, arg_name)
                     if (
-                        "file" in arg.name.lower()
-                        or "path" in arg.name.lower()
+                        "file" in arg_name.lower()
+                        or "path" in arg_name.lower()
                         and _type != bool
                     ):
                         cur_args["template"] = ["filepaths", "folders"]
                     if _type != bool:
                         func_fig["options"].append(
                             {
-                                "name": f"--{arg.name}",
-                                "description": param_doc.get(arg.name, f"<{arg.name}>"),
+                                "name": f"--{arg_name}",
+                                "description": param_doc.get(arg.name, f"<{arg_name}>"),
                                 "isOptional": True,
                                 "args": cur_args,
                             }
@@ -192,8 +195,8 @@ class Commander:
                     else:
                         func_fig["options"].append(
                             {
-                                "name": f"--{arg.name}",
-                                "description": param_doc.get(arg.name, f"<{arg.name}>"),
+                                "name": f"--{arg_name}",
+                                "description": param_doc.get(arg.name, f"<{arg_name}>"),
                             }
                         )
             self.fig_table.append(func_fig)
@@ -281,7 +284,8 @@ class Commander:
             for arg in self.command_table[function]["analyser"].parameters.values():
                 if arg.name.startswith("_"):  # 忽略私有参数
                     continue
-                name = "[underline]" + arg.name + "[/underline]"
+                arg_name = arg.name if not self.seg_flag else arg.name.replace("_", "-")
+                name = "[underline]" + arg_name + "[/underline]"
                 _type = (
                     arg.annotation.__name__ if arg.annotation != arg.empty else "Any"
                 )
@@ -321,7 +325,7 @@ class Commander:
                 f"{i}:{self.command_table[i]['func'].__doc__.strip().split(':param')[0].strip().replace(' ', '_') if self.command_table[i]['func'].__doc__ else 'NONE'}"
                 for i in self.command_table
             ]
-            return "\n".join(ls + ["--help:" + _lang["MenuHelp"]])
+            return "\n".join(ls)
         call_func = route_path[0]
         has_args = [i.strip().strip("--") for i in route_path[1:]]
         if call_func not in self.command_table:
@@ -330,13 +334,14 @@ class Commander:
         param_doc = self.command_table[call_func]["param_doc"]
         res = []
         for arg in call_analyser.parameters.values():
-            if arg.name in has_args:
+            arg_name = arg.name if not self.seg_flag else arg.name.replace("_", "-")
+            if arg_name in has_args:
                 continue
             if arg.default != arg.empty:
                 res.append(
-                    f'--{arg.name}:{param_doc[arg.name].replace(" ", "_") if arg.name in param_doc else _lang["NoDescription"]}'
+                    f'--{arg_name}:{param_doc[arg.name].replace(" ", "_") if arg.name in param_doc else _lang["NoDescription"]}'
                 )
-        return "\n".join(res + ["--help:" + _lang["MenuHelp"]])
+        return "\n".join(res)
 
     def _fig_complete_(self):
         import json

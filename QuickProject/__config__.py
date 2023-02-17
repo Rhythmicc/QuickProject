@@ -12,6 +12,9 @@ if system.startswith("win"):
 else:
     dir_char = "/"
 
+_guess_pip_path = os.path.join(os.path.dirname(sys.executable), "pip3")
+_guess_pip_path = _guess_pip_path if os.path.exists(_guess_pip_path) else "pip3"
+
 
 class Status:
     def __init__(
@@ -188,7 +191,7 @@ problems = {
     "default_pip": {
         "type": "input",
         "message": "Input the default pip | 输入默认pip:",
-        "default": "pip3",
+        "default": _guess_pip_path,
     },
     "using_gitee": {
         "type": "confirm",

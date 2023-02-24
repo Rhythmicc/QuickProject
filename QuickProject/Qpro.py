@@ -78,8 +78,6 @@ def _create_empty_project(project_name):
             ["build", ""],
             ["entry_point", ""],
             ["executable", ""],
-            ["input_file", ""],
-            ["template_root", ""],
             ["server_target", "", ""],
         ],
         project_name + dir_char + configure_name,
@@ -379,8 +377,6 @@ def pro_init():
         ],
         ["entry_point", source_file],
         ["executable", execute],
-        ["input_file", "dist" + dir_char + "input.txt" if lang_name != "empty" else ""],
-        ["template_root", "template" + dir_char if lang_name != "empty" else ""],
         ["server_targets", __get_server_target_from_string()],
     ]
     __format_json(info, configure_name)
@@ -394,20 +390,6 @@ def pro_init():
         ):
             scp_init(info[-1][1:])
         return
-    with open(info[3][-1], "w") as f:
-        f.write(_lang["EditThisFile"])
-    if not os.path.exists("template") or not os.path.isdir("template"):
-        os.mkdir("template")
-    try:
-        with open(info[1][-1], "r") as f:
-            main_cont = f.read()
-        with open("template" + dir_char + "main", "w") as f:
-            f.write(main_cont)
-    except Exception as e:
-        QproDefaultConsole.print(
-            QproErrorString,
-            f"{_lang['BackupError']}: {e}",
-        )
     if _ask(
         {
             "type": "confirm",
@@ -602,6 +584,10 @@ def fmt():
             new_json["entry_point"] = data.pop("compile_filename")
         if "executable_filename" in data:
             new_json["executable"] = data.pop("executable_filename")
+        if 'input_file' in data:
+            data.pop('input_file')
+        if 'template_root' in data:
+            data.pop('template_root')
         new_json.update(data)
 
         with open(

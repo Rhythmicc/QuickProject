@@ -2,8 +2,6 @@
   "build": "rm -rf dist; python3 setup.py sdist",
   "entry_point": "",
   "executable": "",
-  "input_file": "",
-  "template_root": "",
   "server_targets": [
     {
       "user": "lianhaocheng",

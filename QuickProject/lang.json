@@ -247,14 +247,6 @@
     "ara": "تأكيد مزامنة المشروع؟",
     "ru": "Подтвердить синхронизацию проекта?"
   },
-  "EditThisFile": {
-    "zh": "编辑此文件",
-    "en": "Edit this file",
-    "fra": "Modifier ce fichier",
-    "spa": "Editar este archivo",
-    "ara": "تحرير هذا الملف",
-    "ru": "Редактировать этот файл"
-  },
   "ConfirmDeleteNotInProject": {
     "zh": "{} 不在当前项目中, 确认删除?",
     "en": "{} is not in current project, confirm delete?",
@@ -758,13 +750,5 @@
     "spa": "Elegir idioma",
     "ara": "اختر اللغة",
     "ru": "Выберите язык"
-  },
-  "BackupError": {
-    "zh": "备份错误",
-    "en": "Backup error",
-    "fra": "Erreur de sauvegarde",
-    "spa": "Error de copia de seguridad",
-    "ara": "خطأ في النسخ الاحتياطي",
-    "ru": "Ошибка резервного копирования"
   }
 }

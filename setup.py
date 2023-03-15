@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
-VERSION = "0.12.0"
+VERSION = "0.12.1"
 
 setup(
     name="Qpro",

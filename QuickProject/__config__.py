@@ -220,22 +220,20 @@ def _init_config(configPath: str):
 
 
 class QproConfig:
-    import json
-
     def __init__(self, configPath, isExists):
         self.path = configPath
         if not isExists:
             _init_config(configPath)
         try:
             with open(configPath, "r") as f:
-                self.config = QproConfig.json.load(f)
+                self.config = json.load(f)
         except:
             with open(configPath, "r", encoding="utf8") as f:
-                self.config = QproConfig.json.load(f)
+                self.config = json.load(f)
 
     def update(self):
         with open(self.path, "w") as f:
-            QproConfig.json.dump(self.config, f, indent=4, separators=(",", ": "))
+            json.dump(self.config, f, indent=4, separators=(",", ": "))
 
     def select(self, key: str):
         if key not in self.config and key in problems:

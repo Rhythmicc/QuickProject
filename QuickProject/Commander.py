@@ -24,14 +24,14 @@ class Commander:
     def __init__(
         self,
         name: str,
-        seg_flag: bool = False,
+        seg_flag: bool = True,
         custom_complete: bool = False,
         non_complete: bool = False,
     ):
         """
         QuickProject的Commander类，帮助快速构建一个命令工具
 
-        :param seg_flag: 是否将函数名中的'_'替换为'-'
+        :param seg_flag: 是否将函数名和参数名中的'_'替换为'-'
         :param custom_complete: 是否开启自定义补全
         :param non_complete: 不将隐藏函数加入到帮助菜单和补全插件中
         """

@@ -1,5 +1,5 @@
 {
-  "build": "rm -rf dist; python3 setup.py sdist",
+  "build": "rm -rf dist; poetry build",
   "entry_point": "",
   "executable": "",
   "server_targets": [

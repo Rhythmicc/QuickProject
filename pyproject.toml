@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "qpro"
+version = "0.12.1"
+description = "Small but powerful command line APP framework"
+authors = ["Rhythmicc <rhythmlian.cn@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include="QuickProject"}, {include="QuickProject/lang.json"}]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+pyperclip = "^1.8.2"
+rich = "^13.3.5"
+GitPython = "^3.1.31"
+inquirer-rhy = "^0.1.2"
+langsrc = "^0.0.8"
+
+[tool.poetry.scripts]
+Qpro = "QuickProject.Qpro:main"
+qrun = "QuickProject.qrun:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

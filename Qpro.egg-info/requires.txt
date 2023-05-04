@@ -1,5 +1,0 @@
-pyperclip
-rich
-gitpython
-inquirer-rhy
-langsrc

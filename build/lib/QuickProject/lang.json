@@ -1,0 +1,754 @@
+{
+  "error": {
+    "zh": "错误",
+    "en": "Error",
+    "fra": "Erreur",
+    "spa": "Error",
+    "ara": "خطأ",
+    "ru": "Ошибка"
+  },
+  "information": {
+    "zh": "信息",
+    "en": "Information",
+    "fra": "Information",
+    "spa": "Información",
+    "ara": "معلومات",
+    "ru": "Информация"
+  },
+  "warning": {
+    "zh": "警告",
+    "en": "Warning",
+    "fra": "Attention",
+    "spa": "Advertencia",
+    "ara": "تحذير",
+    "ru": "Предупреждение"
+  },
+  "URL": {
+    "zh": "链接",
+    "en": "URL",
+    "fra": "URL",
+    "spa": "URL",
+    "ara": "رابط",
+    "ru": "URL"
+  },
+  "requirePackage": {
+    "zh": "需要安装包",
+    "en": "Require package",
+    "fra": "Paquet requis",
+    "spa": "Paquete requerido",
+    "ara": "الحاجة إلى حزمة",
+    "ru": "Требуется пакет"
+  },
+  "requirePackageDesc1": {
+    "zh": "Qpro 依赖 {}, 是否确认安装?",
+    "en": "Qpro require {}, do you want to install it?",
+    "fra": "Qpro nécessite {}, voulez-vous l'installer?",
+    "spa": "Qpro requiere {}, ¿quieres instalarlo?",
+    "ara": "يتطلب Qpro {}، هل تريد تثبيته؟",
+    "ru": "Qpro требует {}, вы хотите установить eгo?"
+  },
+  "requirePackageDesc2": {
+    "zh": "请重新运行: {}",
+    "en": "Please run again: {}",
+    "fra": "Veuillez exécuter à nouveau: {}",
+    "spa": "Por favor, ejecuta de nuevo: {}",
+    "ara": "{} :يرجى تشغيل مرة أخرى",
+    "ru": "Пожалуйста, запустите снова: {}"
+  },
+  "docs": {
+    "zh": "文档",
+    "en": "Docs",
+    "fra": "Docs",
+    "spa": "Documentos",
+    "ara": "المستندات",
+    "ru": "Документы"
+  },
+  "Parameter": {
+    "zh": "参数",
+    "en": "Parameter",
+    "fra": "Paramètre",
+    "spa": "Parámetro",
+    "ara": "المعلم",
+    "ru": "Параметр"
+  },
+  "Value": {
+    "zh": "值",
+    "en": "Value",
+    "fra": "Valeur",
+    "spa": "Valor",
+    "ara": "القيمة",
+    "ru": "Значение"
+  },
+  "Description": {
+    "zh": "描述",
+    "en": "Description",
+    "fra": "La description",
+    "spa": "Descripción",
+    "ara": "وصف",
+    "ru": "Описание"
+  },
+  "NoSuchFile": {
+    "zh": "文件不存在: {}",
+    "en": "No such file: {}",
+    "fra": "Aucun fichier de ce type: {}",
+    "spa": "No existe tal archivo: {}",
+    "ara": "لا يوجد مثل هذا الملف: {}",
+    "ru": "Нет такого файла: {}"
+  },
+  "RunCmd": {
+    "zh": "运行命令: {}",
+    "en": "Run command: {}",
+    "fra": "Exécuter la commande: {}",
+    "spa": "Ejecutar comando: {}",
+    "ara": "تشغيل الأمر: {}",
+    "ru": "Запустить команду: {}"
+  },
+  "ChooseServerTarget1": {
+    "zh": "请选择远程映射",
+    "en": "Please choose remote mapping",
+    "fra": "Veuillez choisir la correspondance à distance",
+    "spa": "Por favor, elija el mapeo remoto",
+    "ara": "يرجى اختيار تعيين عن بعد",
+    "ru": "Пожалуйста, выберите удаленное сопоставление"
+  },
+  "scp_init_error": {
+    "zh": "上传项目失败",
+    "en": "Upload project failed",
+    "fra": "Échec du téléchargement du projet",
+    "spa": "Error al cargar el proyecto",
+    "ara": "فشل تحميل المشروع",
+    "ru": "Ошибка загрузки проекта"
+  },
+  "existsError": {
+    "zh": "{} 已存在",
+    "en": "{} exists",
+    "fra": "{} existe",
+    "spa": "{} existe",
+    "ara": "{} موجود",
+    "ru": "{} существует"
+  },
+  "notExistsError": {
+    "zh": "{} 不存在",
+    "en": "{} not exists",
+    "fra": "{} n'existe pas",
+    "spa": "{} no existe",
+    "ara": "{} غير موجود",
+    "ru": "{} не существует"
+  },
+  "askKeyword": {
+    "zh": "请输入关键字",
+    "en": "Please enter keyword",
+    "fra": "Veuillez saisir un mot-clé",
+    "spa": "Por favor, ingrese una palabra clave",
+    "ara": "الرجاء إدخال كلمة مفتاحية",
+    "ru": "Пожалуйста, введите ключевое слово"
+  },
+  "ChooseSupportedTemplate": {
+    "zh": "请选择支持的模板",
+    "en": "Please choose supported template",
+    "fra": "Veuillez choisir le modèle pris en charge",
+    "spa": "Por favor, elija la plantilla compatible",
+    "ara": "يرجى اختيار القالب المدعوم",
+    "ru": "Пожалуйста, выберите поддерживаемый шаблон"
+  },
+  "EmptyProject": {
+    "zh": "空白项目",
+    "en": "Empty Project",
+    "fra": "Projet vide",
+    "spa": "Proyecto vacío",
+    "ara": "مشروع فارغ",
+    "ru": "Пустой проект"
+  },
+  "InnerTemplate": {
+    "zh": "内置模板",
+    "en": "Inner Template",
+    "fra": "Modèle interne",
+    "spa": "Plantilla interna",
+    "ara": "القالب الداخلي",
+    "ru": "Внутренний шаблон"
+  },
+  "ExternalProject": {
+    "zh": "外部项目",
+    "en": "External Project",
+    "fra": "Projet externe",
+    "spa": "Proyecto externo",
+    "ara": "مشروع خارجي",
+    "ru": "Внешний проект"
+  },
+  "OpenWithVscode": {
+    "zh": "用 VSCode 打开",
+    "en": "Open with VSCode",
+    "fra": "Ouvrir avec VSCode",
+    "spa": "Abrir con VSCode",
+    "ara": "افتح مع VSCode",
+    "ru": "Открыть c помощью VSCode"
+  },
+  "Usage": {
+    "zh": "用法",
+    "en": "Usage",
+    "fra": "Utilisation",
+    "spa": "Uso",
+    "ara": "استخدام",
+    "ru": "Использование"
+  },
+  "Path": {
+    "zh": "路径",
+    "en": "Path",
+    "fra": "Chemin",
+    "spa": "Ruta",
+    "ara": "مسار",
+    "ru": "Путь"
+  },
+  "NotInProject": {
+    "zh": "不在项目中",
+    "en": "Not in project",
+    "fra": "Pas dans le projet",
+    "spa": "No en el proyecto",
+    "ara": "ليس في المشروع",
+    "ru": "He в проекте"
+  },
+  "ConfirmDelete": {
+    "zh": "确认删除 {} ?",
+    "en": "Confirm delete {} ?",
+    "fra": "Confirmer la suppression de {} ?",
+    "spa": "Confirmar eliminación de {} ?",
+    "ara": "تأكيد حذف {}؟",
+    "ru": "Подтвердить удаление {} ?"
+  },
+  "ConfirmDeleteAfterTransform": {
+    "zh": "确认传输后删除?",
+    "en": "Confirm delete after transform?",
+    "fra": "Confirmer la suppression après la transformation?",
+    "spa": "Confirmar eliminación después de la transformación?",
+    "ara": "تأكيد الحذف بعد التحويل؟",
+    "ru": "Подтвердить удаление после преобразования?"
+  },
+  "askProjectName": {
+    "zh": "请输入项目名称",
+    "en": "Please enter project name",
+    "fra": "Veuillez saisir le nom du projet",
+    "spa": "Por favor, ingrese el nombre del proyecto",
+    "ara": "الرجاء إدخال اسم المشروع",
+    "ru": "Пожалуйста, введите название проекта"
+  },
+  "SetEntryPoint": {
+    "zh": "没有找到 {}, 请设置入口文件",
+    "en": "No {} found, please set entry point",
+    "fra": "Aucun {} trouvé, veuillez définir le point d'entrée",
+    "spa": "No se encontró {}, por favor, establezca el punto de entrada",
+    "ara": "لم يتم العثور على {}, يرجى تعيين نقطة الدخول",
+    "ru": "He найдено {}, пожалуйста, установите точку входа"
+  },
+  "ConfirmSyncProject": {
+    "zh": "确认同步项目?",
+    "en": "Confirm sync project?",
+    "fra": "Confirmer la synchronisation du projet?",
+    "spa": "Confirmar sincronización del proyecto?",
+    "ara": "تأكيد مزامنة المشروع؟",
+    "ru": "Подтвердить синхронизацию проекта?"
+  },
+  "ConfirmDeleteNotInProject": {
+    "zh": "{} 不在当前项目中, 确认删除?",
+    "en": "{} is not in current project, confirm delete?",
+    "fra": "{} n'est pas dans le projet actuel, confirmer la suppression?",
+    "spa": "{} no está en el proyecto actual, confirmar la eliminación?",
+    "ara": "{} ليس في المشروع الحالي، تأكيد الحذف؟",
+    "ru": "{} не в текущем проекте, подтвердить удаление?"
+  },
+  "PermissionCode": {
+    "zh": "权限码",
+    "en": "Permission code",
+    "fra": "Code d'autorisation",
+    "spa": "Código de permiso",
+    "ara": "رمز الإذن",
+    "ru": "Код разрешения"
+  },
+  "Size": {
+    "zh": "大小",
+    "en": "Size",
+    "fra": "Taille",
+    "spa": "Tamaño",
+    "ara": "حجم",
+    "ru": "Размер"
+  },
+  "Owner": {
+    "zh": "所有者",
+    "en": "Owner",
+    "fra": "Propriétaire",
+    "spa": "Propietario",
+    "ara": "مالك",
+    "ru": "Владелец"
+  },
+  "ChangeTime": {
+    "zh": "修改时间",
+    "en": "Change time",
+    "fra": "Heure de changement",
+    "spa": "Hora de cambio",
+    "ara": "وقت التغيير",
+    "ru": "Время изменения"
+  },
+  "Filename": {
+    "zh": "文件名",
+    "en": "Filename",
+    "fra": "Nom de fichier",
+    "spa": "Nombre de archivo",
+    "ara": "اسم الملف",
+    "ru": "Имя файла"
+  },
+  "NotSet": {
+    "zh": "{} 未设置",
+    "en": "{} Not set",
+    "fra": "{} Non défini",
+    "spa": "{} No establecido",
+    "ara": "{} غير محدد",
+    "ru": "{} Не установлено"
+  },
+  "NotSupportWindows": {
+    "zh": "不支持 Windows 系统",
+    "en": "Not support Windows system",
+    "fra": "Système Windows non pris en charge",
+    "spa": "No se admite el sistema Windows",
+    "ara": "لا يدعم نظام Windows",
+    "ru": "Не поддерживается система Windows"
+  },
+  "HasBeenRegistered": {
+    "zh": "该项目已经注册",
+    "en": "The project has been registered",
+    "fra": "Le projet a été enregistré",
+    "spa": "El proyecto ha sido registrado",
+    "ara": "تم تسجيل المشروع",
+    "ru": "Проект был зарегистрирован"
+  },
+  "Overwrite": {
+    "zh": "是否覆盖",
+    "en": "Overwrite",
+    "fra": "Écraser",
+    "spa": "Sobrescribir",
+    "ara": "الكتابة فوق",
+    "ru": "Перезаписать"
+  },
+  "NotACommanderAPP": {
+    "zh": "不是 Commander APP",
+    "en": "Not a Commander APP",
+    "fra": "Pas une application Commander",
+    "spa": "No es una aplicación Commander",
+    "ara": "ليس تطبيق Commander",
+    "ru": "Не является приложением Commander"
+  },
+  "RegisterSuccess": {
+    "zh": "注册 {} 成功",
+    "en": "Register {} success",
+    "fra": "Enregistrer {} avec succès",
+    "spa": "Registrar {} con éxito",
+    "ara": "تسجيل {} بنجاح",
+    "ru": "Зарегистрировать {} успешно"
+  },
+  "Menu": {
+    "zh": "菜单",
+    "en": "Menu",
+    "fra": "Menu",
+    "spa": "Menú",
+    "ara": "قائمة طعام",
+    "ru": "Меню"
+  },
+  "Project": {
+    "zh": "项目",
+    "en": "Project",
+    "fra": "Projet",
+    "spa": "Proyecto",
+    "ara": "مشروع",
+    "ru": "Проект"
+  },
+  "MenuInit": {
+    "zh": "使当前项目成为Qpro项目",
+    "en": "Make current project a Qpro project",
+    "fra": "Faites du projet actuel un projet Qpro",
+    "spa": "Convierta el proyecto actual en un proyecto Qpro",
+    "ara": "جعل المشروع الحالي مشروع Qpro",
+    "ru": "Сделать текущий проект проектом Qpro"
+  },
+  "MenuHelp": {
+    "zh": "帮助",
+    "en": "Help",
+    "fra": "Aidez-moi",
+    "spa": "Ayuda",
+    "ara": "مساعدة",
+    "ru": "Помогите"
+  },
+  "MenuCreate": {
+    "zh": "创建项目",
+    "en": "Create project",
+    "fra": "Créer un projet",
+    "spa": "Crear proyecto",
+    "ara": "إنشاء مشروع",
+    "ru": "Создать проект"
+  },
+  "MenuUpdate": {
+    "zh": "更新Qpro",
+    "en": "Update Qpro",
+    "fra": "Mettre à jour Qpro",
+    "spa": "Actualizar Qpro",
+    "ara": "تحديث Qpro",
+    "ru": "Обновить Qpro"
+  },
+  "MenuSSH": {
+    "zh": "通过SSH登录远程映射",
+    "en": "Login remote mapping through SSH",
+    "fra": "Connectez-vous à la correspondance à distance via SSH",
+    "spa": "Inicie sesión en el mapeo remoto a través de SSH",
+    "ara": "تسجيل الدخول إلى التعيين البعيد عبر SSH",
+    "ru": "Войдите в удаленное сопоставление через SSH"
+  },
+  "MenuSCP": {
+    "zh": "上传路径到默认的远程映射对应位置",
+    "en": "Upload path to the default remote mapping corresponding position",
+    "fra": "Téléchargez le chemin vers la position correspondante de la correspondance à distance par défaut",
+    "spa": "Cargue la ruta en la posición correspondiente del mapeo remoto predeterminado",
+    "ara": "تحميل المسار إلى الموضع المقابل للتعيين البعيد الافتراضي",
+    "ru": "Загрузите путь в соответствующую позицию удаленного сопоставления по умолчанию"
+  },
+  "MenuSMV": {
+    "zh": "上传完成后删除文件或目录",
+    "en": "Delete files or directories after uploading",
+    "fra": "Supprimer les fichiers ou les répertoires après le téléchargement",
+    "spa": "Eliminar archivos o directorios después de cargar",
+    "ara": "حذف الملفات أو الدلائل بعد التحميل",
+    "ru": "Удалите файлы или каталоги после загрузки"
+  },
+  "MenuSCPInit": {
+    "zh": "上传项目全部内容到远程映射",
+    "en": "Upload all of project to the remote mapping",
+    "fra": "Téléchargez tout le projet sur la correspondance à distance",
+    "spa": "Cargue todo el proyecto en el mapeo remoto",
+    "ara": "تحميل كل المشروع إلى التعيين البعيد",
+    "ru": "Загрузите все проекты в удаленное сопоставление"
+  },
+  "MenuGet": {
+    "zh": "从远程映射下载",
+    "en": "Download from remote mapping",
+    "fra": "Téléchargez à partir de la correspondance à distance",
+    "spa": "Descargue desde el mapeo remoto",
+    "ara": "تحميل من التعيين البعيد",
+    "ru": "Загрузите из удаленного сопоставления"
+  },
+  "MenuDel": {
+    "zh": "从项目中完全删除",
+    "en": "Delete from project",
+    "fra": "Supprimer du projet",
+    "spa": "Eliminar del proyecto",
+    "ara": "حذف من المشروع",
+    "ru": "Удалить из проекта"
+  },
+  "MenuDelAll": {
+    "zh": "销毁项目",
+    "en": "Destroy project",
+    "fra": "Détruire le projet",
+    "spa": "Destruir proyecto",
+    "ara": "تدمير المشروع",
+    "ru": "Уничтожить проект"
+  },
+  "MenuLs": {
+    "zh": "展示路径中的子项",
+    "en": "Show subitems in path",
+    "fra": "Afficher les sous-éléments dans le chemin",
+    "spa": "Mostrar subelementos en la ruta",
+    "ara": "عرض العناصر الفرعية في المسار",
+    "ru": "Показать подэлементы в пути"
+  },
+  "MenuComplete": {
+    "zh": "启用Commander的自动补全",
+    "en": "Enable auto-complete for Commander",
+    "fra": "Activer la complétion automatique pour Commander",
+    "spa": "Habilitar la autocompletación para Commander",
+    "ara": "تمكين الإكمال التلقائي للمشرف",
+    "ru": "Включить автозавершение для Commander"
+  },
+  "MenuFmt": {
+    "zh": "递归格式化目录下全部老版本的配置文件",
+    "en": "Recursively format all old version configuration files under the directory",
+    "fra": "Formatez récursivement tous les fichiers de configuration de l'ancienne version sous le répertoire",
+    "spa": "Formate recursivamente todos los archivos de configuración de la versión anterior bajo el directorio",
+    "ara": "تنسيق جميع الملفات القديمة تحت الدليل",
+    "ru": "Рекурсивно отформатируйте все старые файлы конфигурации в каталоге"
+  },
+  "MenuQrun": {
+    "zh": "运行器",
+    "en": "Runner",
+    "fra": "Courseur",
+    "spa": "Carrera",
+    "ara": "منافس",
+    "ru": "Бегун"
+  },
+  "WrongUsage": {
+    "zh": "请运行 \"Qpro -h\" 查看帮助!",
+    "en": "Please run \"Qpro -h\" to see help!",
+    "fra": "Veuillez exécuter \"Qpro -h\" pour voir l'aide!",
+    "spa": "¡Ejecute \"Qpro -h\" para ver la ayuda!",
+    "ara": "يرجى تشغيل \"Qpro -h\" لمشاهدة المساعدة!",
+    "ru": "Пожалуйста, запустите \"Qpro -h\", чтобы увидеть справку!"
+  },
+  "HaveConfigured": {
+    "zh": "你已经配置过这个项目啦, 查看配置表({})来调整它吧!",
+    "en": "You have configured this project, see the configuration table ({}) to adjust it!",
+    "fra": "Vous avez configuré ce projet, consultez le tableau de configuration ({}) pour l'ajuster!",
+    "spa": "Has configurado este proyecto, consulta la tabla de configuración ({}) para ajustarlo!",
+    "ara": "لقد قمت بتكوين هذا المشروع ، انظر جدول التكوين ({}) لضبطه!",
+    "ru": "Вы настроили этот проект, посмотрите таблицу конфигурации ({}) для его настройки!"
+  },
+  "GetHelp": {
+    "zh": "获取帮助",
+    "en": "Get help",
+    "fra": "Obtenir de l'aide",
+    "spa": "Obtener ayuda",
+    "ara": "احصل على المساعدة",
+    "ru": "Получить помощь"
+  },
+  "ShowHiddenCommand": {
+    "zh": "显示隐藏命令",
+    "en": "Show hidden command",
+    "fra": "Afficher la commande masquée",
+    "spa": "Mostrar comando oculto",
+    "ara": "إظهار الأمر المخفي",
+    "ru": "Показать скрытую команду"
+  },
+  "NotFunction": {
+    "zh": "不是函数",
+    "en": "Not a function",
+    "fra": "Pas une fonction",
+    "spa": "No es una función",
+    "ara": "ليس وظيفة",
+    "ru": "Не функция"
+  },
+  "CommandAlreadyExists": {
+    "zh": "已经在命令表中",
+    "en": "Already in command table",
+    "fra": "Déjà dans le tableau de commande",
+    "spa": "Ya en la tabla de comandos",
+    "ara": "موجود بالفعل في جدول الأوامر",
+    "ru": "Уже в таблице команд"
+  },
+  "CantHaveDefaultValue": {
+    "zh": "不能有默认值",
+    "en": "Can't have default value",
+    "fra": "Ne peut pas avoir de valeur par défaut",
+    "spa": "No puede tener valor predeterminado",
+    "ara": "لا يمكن أن يكون له قيمة افتراضية",
+    "ru": "Не может иметь значение по умолчанию"
+  },
+  "SubCommand": {
+    "zh": "子命令",
+    "en": "Sub command",
+    "fra": "Sous-commande",
+    "spa": "Subcomando",
+    "ara": "الأمر الفرعي",
+    "ru": "Подкоманда"
+  },
+  "RequiredArgs": {
+    "zh": "必须参数",
+    "en": "Required args",
+    "fra": "Arguments requis",
+    "spa": "Argumentos requeridos",
+    "ara": "الوسائط المطلوبة",
+    "ru": "Требуемые аргументы"
+  },
+  "OptionnalArgs": {
+    "zh": "可选参数",
+    "en": "Optionnal args",
+    "fra": "Arguments optionnels",
+    "spa": "Argumentos opcionales",
+    "ara": "الوسائط الاختيارية",
+    "ru": "Необязательные аргументы"
+  },
+  "NoSuchCommand": {
+    "zh": "没有这个命令",
+    "en": "No such command",
+    "fra": "Aucune telle commande",
+    "spa": "No hay tal comando",
+    "ara": "لا يوجد أمر بهذا الاسم",
+    "ru": "Нет такой команды"
+  },
+  "NoCommandInput": {
+    "zh": "没有输入命令",
+    "en": "No command input",
+    "fra": "Aucune commande entrée",
+    "spa": "No se ha introducido ningún comando",
+    "ara": "لم يتم إدخال أي أمر",
+    "ru": "Нет входной команды"
+  },
+  "UserInterrupt": {
+    "zh": "用户中断",
+    "en": "User interupt",
+    "fra": "Interruption utilisateur",
+    "spa": "Interrupción de usuario",
+    "ara": "توقف المستخدم",
+    "ru": "Прерывание пользователя"
+  },
+  "OverwriteCompleteDir": {
+    "zh": "complete文件夹已存在,是否覆盖?",
+    "en": "complete directory already exists, overwrite?",
+    "fra": "Le répertoire complet existe déjà, écraser?",
+    "spa": "El directorio completo ya existe, ¿sobrescribir?",
+    "ara": "الدليل الكامل موجود بالفعل ، هل تريد الكتابة عليه؟",
+    "ru": "Полный каталог уже существует, перезаписать?"
+  },
+  "InstallToFig": {
+    "zh": "安装到fig",
+    "en": "Install to fig",
+    "fra": "Installer dans fig",
+    "spa": "Instalar en fig",
+    "ara": "تثبيت إلى fig",
+    "ru": "Установить в fig"
+  },
+  "NoDescription": {
+    "zh": "没有描述",
+    "en": "No description",
+    "fra": "Aucune description",
+    "spa": "Sin descripción",
+    "ara": "لا يوجد وصف",
+    "ru": "Нет описания"
+  },
+  "build": {
+    "zh": "构建",
+    "en": "Build",
+    "fra": "Construire",
+    "spa": "Construir",
+    "ara": "بناء",
+    "ru": "Строить"
+  },
+  "run": {
+    "zh": "运行",
+    "en": "Run",
+    "fra": "Courir",
+    "spa": "Correr",
+    "ara": "تشغيل",
+    "ru": "Бег"
+  },
+  "BuildAndRun": {
+    "zh": "构建并运行",
+    "en": "Build and run",
+    "fra": "Construire et courir",
+    "spa": "Construir y correr",
+    "ara": "بناء وتشغيل",
+    "ru": "Построить и бегать"
+  },
+  "UseDefaultInput": {
+    "zh": "使用默认输入",
+    "en": "Use default input",
+    "fra": "Utiliser l'entrée par défaut",
+    "spa": "Usar entrada predeterminada",
+    "ara": "استخدم الإدخال الافتراضي",
+    "ru": "Использовать входные данные по умолчанию"
+  },
+  "RedirectInput": {
+    "zh": "重定向输入",
+    "en": "Redirect input",
+    "fra": "Rediriger l'entrée",
+    "spa": "Redirigir entrada",
+    "ara": "إعادة توجيه الإدخال",
+    "ru": "Перенаправить ввод"
+  },
+  "RedirectInputFromClipboard": {
+    "zh": "从剪贴板重定向输入",
+    "en": "Redirect input from clipboard",
+    "fra": "Rediriger l'entrée depuis le presse-papiers",
+    "spa": "Redirigir la entrada desde el portapapeles",
+    "ara": "إعادة توجيه الإدخال من الحافظة",
+    "ru": "Перенаправить ввод из буфера обмена"
+  },
+  "OtherParameters": {
+    "zh": "其他参数",
+    "en": "Other parameters",
+    "fra": "Autres paramètres",
+    "spa": "Otros parámetros",
+    "ara": "معلمات أخرى",
+    "ru": "Другие параметры"
+  },
+  "NoInputFile": {
+    "zh": "没有输入文件",
+    "en": "No input file",
+    "fra": "Aucun fichier d'entrée",
+    "spa": "No hay archivo de entrada",
+    "ara": "لا يوجد ملف إدخال",
+    "ru": "Нет входного файла"
+  },
+  "ScriptComplete": {
+    "zh": "为了使zsh补全生效，你需要 `source .{}rc`",
+    "en": "To make zsh completion work, you need `source .{}rc`",
+    "fra": "Pour que la complétion zsh fonctionne, vous devez `source .{}rc`",
+    "spa": "Para que la finalización de zsh funcione, necesita `source .{}rc`",
+    "ara": "لتجعل اكمال zsh يعمل ، تحتاج `source .{}rc`",
+    "ru": "Чтобы zsh completion работал, вам нужно `source .{}rc`"
+  },
+  "TemplateServerError": {
+    "zh": "Qpro模板服务器错误",
+    "en": "Qpro template server error",
+    "fra": "Erreur du serveur de modèles Qpro",
+    "spa": "Error del servidor de plantillas Qpro",
+    "ara": "خطأ في خادم قوالب Qpro",
+    "ru": "Ошибка сервера шаблонов Qpro"
+  },
+  "SearchingTemplate": {
+    "zh": "正在搜索模板",
+    "en": "Searching template",
+    "fra": "Recherche de modèle",
+    "spa": "Búsqueda de plantilla",
+    "ara": "البحث عن قالب",
+    "ru": "Поиск шаблона"
+  },
+  "CloningTemplate": {
+    "zh": "正在克隆Qpro {} 模板为 {}",
+    "en": "Cloning Qpro {} template to {}",
+    "fra": "Clonage du modèle Qpro {} vers {}",
+    "spa": "Clonación de la plantilla Qpro {} a {}",
+    "ara": "يتم اقتباس قالب Qpro {} إلى {}",
+    "ru": "Клонирование шаблона Qpro {} в {}"
+  },
+  "CloningExternelTemplate": {
+    "zh": "正在克隆外部模板 {}",
+    "en": "Cloning external template {}",
+    "fra": "Clonage du modèle externe {}",
+    "spa": "Clonación de la plantilla externa {}",
+    "ara": "يتم اقتباس قالب خارجي {}",
+    "ru": "Клонирование внешнего шаблона {}"
+  },
+  "InputServerTarget": {
+    "zh": "输入 用户@IP:路径 如果你打算使用SSH",
+    "en": "Input user@IP:path if you are going to use SSH",
+    "fra": "Entrez user@IP:path si vous allez utiliser SSH",
+    "spa": "Ingrese user@IP:path si va a usar SSH",
+    "ara": "أدخل user@IP:path إذا كنت تنوي استخدام SSH",
+    "ru": "Введите user@IP:path, если вы собираетесь использовать SSH"
+  },
+  "NeedServerTarget": {
+    "zh": "你需要使用基于SSH的项目映射吗?",
+    "en": "Do you need a project mapping based on SSH?",
+    "fra": "Avez-vous besoin d'une correspondance de projet basée sur SSH?",
+    "spa": "¿Necesita un mapeo de proyecto basado en SSH?",
+    "ara": "هل تحتاج إلى تعيين مشروع مبني على SSH؟",
+    "ru": "Вам нужно сопоставление проекта на основе SSH?"
+  },
+  "InputPort": {
+    "zh": "输入端口号",
+    "en": "Input port",
+    "fra": "Entrez le port",
+    "spa": "Ingrese el puerto",
+    "ara": "أدخل المنفذ",
+    "ru": "Введите порт"
+  },
+  "ChooseTemplate": {
+    "zh": "选择模板",
+    "en": "Choose template",
+    "fra": "Choisir un modèle",
+    "spa": "Elegir plantilla",
+    "ara": "اختر قالب",
+    "ru": "Выберите шаблон"
+  },
+  "ChooseLanguage": {
+    "zh": "选择语言",
+    "en": "Choose language",
+    "fra": "Choisir la langue",
+    "spa": "Elegir idioma",
+    "ara": "اختر اللغة",
+    "ru": "Выберите язык"
+  }
+}

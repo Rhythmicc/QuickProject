@@ -2,4 +2,4 @@ pyperclip
 rich
 gitpython
 inquirer-rhy
-langSrc
+langsrc

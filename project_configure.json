@@ -6,7 +6,7 @@
     {
       "user": "lianhaocheng",
       "host": "localhost",
-      "port": "22",
+      "port": 22,
       "path": "/opt/homebrew/lib/python3.10/site-packages/"
     }
   ],

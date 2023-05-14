@@ -43,7 +43,7 @@ def parseArgs():
 argv, qrun_argv = parseArgs()
 
 
-def run(use_txt=False, executable=str(config["executable"])):
+def run(use_txt=False, executable=str(config["executable"]), current_dir: str = os.getcwd(), set_current_dir=False):
     if os.path.exists(executable):
         cmd = executable.replace(" ", "\ ") + " "
     else:
@@ -75,6 +75,8 @@ def run(use_txt=False, executable=str(config["executable"])):
         return
     if argv:
         cmd += " ".join(argv)
+    if set_current_dir:
+        cmd += f' --qrun-working-dir "{current_dir}"'
     if "--qrun-commander-complete" in argv and not config["enable_complete"]:
         return print()
     if cmd.strip():
@@ -137,7 +139,7 @@ def main():
             cmd = cmd.replace(config["entry_point"], filename)
         os.system(cmd)
     if to_run:
-        run("-i" in qrun_argv or "-if" in qrun_argv, o_file)
+        run("-i" in qrun_argv or "-if" in qrun_argv, o_file, set_current_dir=config['enable_complete'])
     if config["build"] and flag:
         if config["build"].split()[0] == "javac":
             os.remove("dist" + dir_char + record_file_name + ".class")

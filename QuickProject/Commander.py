@@ -3,7 +3,7 @@ import sys
 import inspect
 import argparse
 from inspect import isfunction
-from . import QproDefaultConsole, QproErrorString, _lang
+from . import QproDefaultConsole, QproErrorString, _lang, os
 
 
 _ROOT_HELP = "__COMMANDER_ROOT_HELP_FUNCTION__"
@@ -369,6 +369,12 @@ class Commander:
                 return print(self.__command_complete__(sys.argv[2:]))
             elif sys.argv[1] == "--qrun-fig-complete":
                 return print(self._fig_complete_())
+            elif "--qrun-working-dir" in sys.argv:
+                index = sys.argv.index("--qrun-working-dir")
+                cur_dir = sys.argv[index + 1]
+                sys.argv.pop(index)
+                sys.argv.pop(index)
+                os.chdir(cur_dir)
         try:
             func_name = sys.argv[1]
             sys.argv = sys.argv[:1] + sys.argv[2:]

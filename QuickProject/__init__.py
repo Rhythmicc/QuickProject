@@ -161,7 +161,6 @@ def requirePackage(
     pname: str,
     module: str = "",
     real_name: str = "",
-    not_exit: bool = True,
     not_ask: bool = False,
     set_pip: str = user_pip,
 ):
@@ -171,7 +170,6 @@ def requirePackage(
     :param pname: 库名
     :param module: 待引入的模块名，可缺省
     :param real_name: 用于 pip3 install 的名字
-    :param not_exit: 安装后不退出
     :param not_ask: 不询问
     :param set_pip: pip3的路径
     :return: 库或模块的地址
@@ -211,17 +209,7 @@ def requirePackage(
                     f"'{set_pip} install {package_name} -U'",
                 )
                 exit(-1)
-            if not_exit:
-                exec(f"from {pname} import {module}" if module else f"import {pname}")
-            else:
-                QproDefaultConsole.print(
-                    QproInfoString,
-                    "Install complete! Run again:"
-                    if user_lang != "zh"
-                    else f"安装完成！再次运行:",
-                    " ".join(sys.argv),
-                )
-                exit(0)
+            exec(f"from {pname} import {module}" if module else f"import {pname}")
         else:
             exit(-1)
     return eval(f"{module if module else pname}")
@@ -363,11 +351,13 @@ class SshProtocol:
         :param domain: 目标机器地址
         :param target: 远程映射路径
         :param port: 端口
-        :param command: 命令
+        :param command: 命令, 可以是字符串或字符串列表
         :return: 命令执行状态, 命令执行结果
         """
         if not domain or not target:
             return 0
+        if isinstance(command, list):
+            command = " ; ".join(command)
         status, content = external_exec(
             'ssh -p %s %s@%s "cd %s ; %s"' % (port, user, domain, target, command)
             if user

@@ -182,8 +182,8 @@ default_language = {
 
   Input the default language | 输入默认语言:""",
     "validate": lambda val: val
-    in ["zh", "en", "fra", "spa", "ara", "ru", "Not Set | 暂不配置"],
-    "default": "Not Set | 暂不配置",
+    in ["zh", "en", "fra", "spa", "ara", "ru"],
+    "default": "en",
 }
 
 problems = {
@@ -211,10 +211,6 @@ def _init_config(configPath: str):
         "\nYour configuration table has been stored\n你的配置表被存储在: [bold green]"
         + "%s" % configPath
         + "[/bold green]"
-    )
-    QproDefaultConsole.print(
-        "[bold red]\nqs will not use your configuration do "
-        "anything!\nQpro不会用您的配置表做任何事情![/bold red]"
     )
     _ask({"type": "confirm", "message": "Confirm | 确认", "default": True})
 

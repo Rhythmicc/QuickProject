@@ -622,13 +622,12 @@ func = {
 
 
 def main():
-    if len(sys.argv) < 2 or "-h" == sys.argv[1]:
+    if len(sys.argv) < 2:
         menu_output(
             {
                 "title": f"Qpro {_lang['Menu']}\n",
                 "lines": [
                     ("init", _lang["MenuInit"]),
-                    ("-h", _lang["MenuHelp"]),
                     ("create [bold magenta]<name>", _lang["MenuCreate"]),
                     ("update", _lang["MenuUpdate"]),
                     ("ssh", _lang["MenuSSH"]),
@@ -647,7 +646,8 @@ def main():
             }
         )
     elif "update" == sys.argv[1]:
-        os.system(f"{user_pip} install Qpro --upgrade")
+        with QproDefaultStatus(_lang["MenuUpdate"]):
+            external_exec(f"{user_pip} install Qpro --upgrade", without_output=True)
     elif sys.argv[1] in func:
         try:
             func[sys.argv[1]]()

@@ -367,14 +367,6 @@
     "ara": "جعل المشروع الحالي مشروع Qpro",
     "ru": "Сделать текущий проект проектом Qpro"
   },
-  "MenuHelp": {
-    "zh": "帮助",
-    "en": "Help",
-    "fra": "Aidez-moi",
-    "spa": "Ayuda",
-    "ara": "مساعدة",
-    "ru": "Помогите"
-  },
   "MenuCreate": {
     "zh": "创建项目",
     "en": "Create project",
@@ -401,7 +393,7 @@
   },
   "MenuSCP": {
     "zh": "上传路径到默认的远程映射对应位置",
-    "en": "Upload path to the default remote mapping corresponding position",
+    "en": "Upload to the default remote mapping corresponding position",
     "fra": "Téléchargez le chemin vers la position correspondante de la correspondance à distance par défaut",
     "spa": "Cargue la ruta en la posición correspondiente del mapeo remoto predeterminado",
     "ara": "تحميل المسار إلى الموضع المقابل للتعيين البعيد الافتراضي",
@@ -465,7 +457,7 @@
   },
   "MenuFmt": {
     "zh": "递归格式化目录下全部老版本的配置文件",
-    "en": "Recursively format all old version configuration files under the directory",
+    "en": "Format all old version configuration files under the directory",
     "fra": "Formatez récursivement tous les fichiers de configuration de l'ancienne version sous le répertoire",
     "spa": "Formate recursivamente todos los archivos de configuración de la versión anterior bajo el directorio",
     "ara": "تنسيق جميع الملفات القديمة تحت الدليل",
@@ -480,12 +472,12 @@
     "ru": "Бегун"
   },
   "WrongUsage": {
-    "zh": "请运行 \"Qpro -h\" 查看帮助!",
-    "en": "Please run \"Qpro -h\" to see help!",
-    "fra": "Veuillez exécuter \"Qpro -h\" pour voir l'aide!",
-    "spa": "¡Ejecute \"Qpro -h\" para ver la ayuda!",
-    "ara": "يرجى تشغيل \"Qpro -h\" لمشاهدة المساعدة!",
-    "ru": "Пожалуйста, запустите \"Qpro -h\", чтобы увидеть справку!"
+    "zh": "请运行 \"Qpro\" 查看帮助!",
+    "en": "Please run \"Qpro\" to see help!",
+    "fra": "Veuillez exécuter \"Qpro\" pour voir l'aide!",
+    "spa": "¡Ejecute \"Qpro\" para ver la ayuda!",
+    "ara": "يرجى تشغيل \"Qpro\" لمشاهدة المساعدة!",
+    "ru": "Пожалуйста, запустите \"Qpro\", чтобы увидеть справку!"
   },
   "HaveConfigured": {
     "zh": "你已经配置过这个项目啦, 查看配置表({})来调整它吧!",

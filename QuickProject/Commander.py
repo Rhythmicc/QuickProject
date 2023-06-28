@@ -59,13 +59,12 @@ class Commander:
                 """
                 return self.generate_complete(team, token, is_script)
 
-    def custom_complete(self, param: str, description: str = None):
+    def custom_complete(self, param: str):
         """
         自定义补全
         Custom complete
 
         :param param: 参数名
-        :param description: 参数描述
         :return:
         """
 
@@ -84,8 +83,6 @@ class Commander:
     def __op_cur_args(self, func_name, cur_args, name):
         if name in self.custom_complete_table.get(func_name, {}):
             cur_args["suggestions"] = self.custom_complete_table[func_name][name]
-            if description := self.custom_complete_table[func_name][name].get("description", None):
-                cur_args["description"] = description
 
     def command(self, hidden: bool = False):
         def wrapper(func):

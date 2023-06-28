@@ -77,10 +77,7 @@ class Commander:
                 func_name = func_name.replace("_", "-")
             if func_name not in self.custom_complete_table:
                 self.custom_complete_table[func_name] = {}
-            self.custom_complete_table[func_name][param] = {
-                "suggestions": func(),
-                "description": description,
-            }
+            self.custom_complete_table[func_name][param] = func()
 
         return wrapper
 
@@ -510,7 +507,7 @@ class Commander:
                 sub_cmd_opts = []
                 for arg in sub_cmd["args"]:
                     if "suggestions" in arg:
-                        for i in arg["suggestions"]["suggestions"]:
+                        for i in arg["suggestions"]:
                             sub_cmd_opts.append(
                                 f"{i['name']}:'{i.get('description', i['name'])}'"
                             )

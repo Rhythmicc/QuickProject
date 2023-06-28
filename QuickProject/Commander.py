@@ -510,7 +510,7 @@ class Commander:
                 sub_cmd_opts = []
                 for arg in sub_cmd["args"]:
                     if "suggestions" in arg:
-                        for i in arg["suggestions"]:
+                        for i in arg["suggestions"]["suggestions"]:
                             sub_cmd_opts.append(
                                 f"{i['name']}:'{i.get('description', i['name'])}'"
                             )

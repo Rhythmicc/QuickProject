@@ -128,11 +128,11 @@ def external_exec(
             if ignore_status:
                 continue
             line = line.strip()
-            if __expose and line.startswith("__START__"):
+            if line.startswith("__START__"):
                 QproDefaultStatus(line.replace("__START__", "")).start()
-            elif __expose and line.startswith("__STOP__"):
+            elif line.startswith("__STOP__"):
                 QproDefaultStatus.stop()
-            elif __expose and line.startswith("__SPLIT__"):
+            elif line.startswith("__SPLIT__"):
                 QproDefaultConsole.print(
                     Markdown("# " + line.replace("__SPLIT__", "").strip())
                 )

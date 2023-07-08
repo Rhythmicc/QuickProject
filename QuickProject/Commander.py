@@ -385,9 +385,10 @@ class Commander:
             func_info = self.command_table[func_name]
             args = func_info["parser"].parse_args()
             try:
+                args = {i[0].replace('-', '_'): i[1] for i in args._get_kwargs()}
                 if "pre_call" in func_info:
-                    func_info["pre_call"](**{i[0]: i[1] for i in args._get_kwargs()})
-                return func_info["func"](**{i[0]: i[1] for i in args._get_kwargs()})
+                    func_info["pre_call"](**args)
+                return func_info["func"](**args)
             except KeyboardInterrupt:
                 return QproDefaultConsole.print(QproErrorString, _lang["UserInterrupt"])
             except:

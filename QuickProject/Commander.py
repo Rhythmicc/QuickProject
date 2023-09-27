@@ -269,7 +269,7 @@ class Commander:
             show_edge=False,
             row_styles=["none", "dim"],
             box=SIMPLE_HEAVY,
-            title=f"[bold underline]{_lang['MenuHelp']}[/bold underline]\n",
+            title=f"[bold underline]{self.name}[/bold underline]\n",
         )
         table.add_column(_lang["SubCommand"], justify="center")
         table.add_column(_lang["Description"], justify="center")

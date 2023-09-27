@@ -444,10 +444,14 @@ def get_config(without_output: bool = False):
 
 
 def get_server_targets():
-    res = get_config()["server_targets"]
-    for item in res:
+    total = get_config()["server_targets"]
+    res = []
+    for item in total:
+        if not item.get('host'):
+            continue
         if not item["path"].endswith("/"):
             item["path"] += "/"
+        res.append(item)
     return res
 
 

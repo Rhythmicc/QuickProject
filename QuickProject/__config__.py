@@ -124,7 +124,7 @@ def set_timeout(num: int):
     return wrapper
 
 
-def _ask(question: dict, timeout: int = 0, _init: bool = False):
+def _ask(question: dict, timeout: int = 0, qmark: str = '?'):
     from inquirer_rhy.prompt import prompt
 
     record_status = QproDefaultStatus.status
@@ -136,9 +136,8 @@ def _ask(question: dict, timeout: int = 0, _init: bool = False):
             try:
                 res = prompt(
                     question,
-                    keyboard_interrupt_msg=_lang["UserInterrupt"]
-                    if not _init
-                    else None,
+                    keyboard_interrupt_msg=_lang["UserInterrupt"],
+                    qmark=qmark,
                 )[question["name"]]
             except:
                 os.system("stty echo")
@@ -154,9 +153,8 @@ def _ask(question: dict, timeout: int = 0, _init: bool = False):
             try:
                 res = prompt(
                     question,
-                    keyboard_interrupt_msg=_lang["UserInterrupt"]
-                    if not _init
-                    else None,
+                    keyboard_interrupt_msg=_lang["UserInterrupt"],
+                    qmark=qmark,
                 )[question["name"]]
             except Exception as e:
                 QproDefaultConsole.print(repr(e))

@@ -96,65 +96,50 @@ def external_exec(
     :param __no_wait: ⚠️是否不等待, 这意味着需要手动获取返回值和输出
     :return: status code, output | __no_wait 为 True 时返回进程对象
     """
-    from rich.markdown import Markdown
+    if __expose:
+        from rich.markdown import Markdown
     from subprocess import Popen, PIPE
-    from concurrent.futures import ThreadPoolExecutor, wait
+    import concurrent.futures
 
-    class MixContent:
-        def __init__(self):
-            self.content = ""
-
-        def __add__(self, other):
-            self.content += other
-            return self
-
-        def __str__(self):
-            return self.content
-
-    content = MixContent()
-
-    def _output(pipe_name: str, process: Popen, content: MixContent):
-        ignore_status = (
-            without_stdout if pipe_name == "stdout" else without_stderr
-        ) or without_output
-        for line in iter(eval(f"process.{pipe_name}.readline"), ""):
-            if not __expose and (
-                line.startswith("__START__")
-                or line.startswith("__STOP__")
-                or line.startswith("__SPLIT__")
-            ):
+    def _output(pipe, content, ignore_status):
+        for line in iter(pipe.readline, ""):
+            if not __expose and line.startswith((
+                        "__START__", "__STOP__",
+                        "__TITLE__", "__RULE__")):
                 continue
-            content += line
+            content.append(line)
             if ignore_status:
                 continue
             line = line.strip()
             if line.startswith("__START__"):
-                QproDefaultStatus(line.replace("__START__", "")).start()
+                QproDefaultStatus(line.replace("__START__", "").strip()).start()
             elif line.startswith("__STOP__"):
                 QproDefaultStatus.stop()
-            elif line.startswith("__SPLIT__"):
-                QproDefaultConsole.print(
-                    Markdown("# " + line.replace("__SPLIT__", "").strip())
-                )
+            elif line.startswith("__TITLE__"):
+                QproDefaultConsole.print(Markdown("# " + line.replace("__TITLE__", "").strip()))
+            elif line.startswith("__RULE__"):
+                QproDefaultConsole.rule(line.replace("__RULE__", "").strip())
             else:
                 QproDefaultConsole.print(line)
 
-    pool = ThreadPoolExecutor(2)
-    p = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE, bufsize=1, encoding="utf-8")
+    output_content = []
+    process = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE, bufsize=1, encoding="utf-8")
 
-    if __no_wait:
-        return p
+    if __no_wait or without_output:
+        return process
 
-    wait(
-        [
-            pool.submit(_output, "stdout", p, content),
-            pool.submit(_output, "stderr", p, content),
-        ]
-    )
-    pool.shutdown()
-    ret_code = p.wait()
+    with concurrent.futures.ThreadPoolExecutor(2) as executor:
+        futures = []
+        if not without_stdout:
+            futures.append(executor.submit(_output, process.stdout, output_content, without_output))
+        if not without_stderr:
+            futures.append(executor.submit(_output, process.stderr, output_content, without_output))
+        concurrent.futures.wait(futures)
 
-    return ret_code, str(content)
+    ret_code = process.wait()
+    process.stdout.close()
+    process.stderr.close()
+    return ret_code, ''.join(output_content)
 
 
 def requirePackage(

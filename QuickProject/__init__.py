@@ -125,7 +125,7 @@ def external_exec(
     output_content = []
     process = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE, bufsize=1, encoding="utf-8")
 
-    if __no_wait or without_output:
+    if __no_wait:
         return process
 
     with concurrent.futures.ThreadPoolExecutor(2) as executor:

@@ -128,6 +128,7 @@ def _ask(question: dict, timeout: int = 0, qmark: str = '?'):
     from inquirer_rhy.prompt import prompt
 
     record_status = QproDefaultStatus.status
+    _msg_UserInterrupt = _lang["UserInterrupt"] if _lang else "UserInterrupt"
 
     if timeout:
 
@@ -136,7 +137,7 @@ def _ask(question: dict, timeout: int = 0, qmark: str = '?'):
             try:
                 res = prompt(
                     question,
-                    keyboard_interrupt_msg=_lang["UserInterrupt"],
+                    keyboard_interrupt_msg=_msg_UserInterrupt,
                     qmark=qmark,
                 )[question["name"]]
             except:
@@ -153,7 +154,7 @@ def _ask(question: dict, timeout: int = 0, qmark: str = '?'):
             try:
                 res = prompt(
                     question,
-                    keyboard_interrupt_msg=_lang["UserInterrupt"],
+                    keyboard_interrupt_msg=_msg_UserInterrupt,
                     qmark=qmark,
                 )[question["name"]]
             except Exception as e:
@@ -202,7 +203,7 @@ problems = {
 def _init_config(configPath: str):
     config = {}
     for k, v in problems.items():
-        config[k] = _ask(v, _init=True)
+        config[k] = _ask(v)
     with open(configPath, "w") as f:
         json.dump(config, f, indent=4, ensure_ascii=False)
     QproDefaultConsole.print(

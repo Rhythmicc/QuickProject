@@ -105,7 +105,7 @@ def external_exec(
         for line in iter(pipe.readline, ""):
             if not __expose and line.startswith((
                         "__START__", "__STOP__",
-                        "__TITLE__", "__RULE__")):
+                        "__TITLE__", "__RULE__", "__MARKDOWN__")):
                 continue
             content.append(line)
             if ignore_status:
@@ -119,6 +119,8 @@ def external_exec(
                 QproDefaultConsole.print(Markdown("# " + line.replace("__TITLE__", "").strip()))
             elif line.startswith("__RULE__"):
                 QproDefaultConsole.rule(line.replace("__RULE__", "").strip())
+            elif line.startswith("__MARKDOWN__"):
+                QproDefaultConsole.print(Markdown(line.replace("__MARKDOWN__", "").strip().replace("\\n", "\n")))
             else:
                 QproDefaultConsole.print(line)
 

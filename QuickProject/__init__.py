@@ -120,7 +120,7 @@ def external_exec(
             elif line.startswith("__RULE__"):
                 QproDefaultConsole.rule(line.replace("__RULE__", "").strip())
             elif line.startswith("__MARKDOWN__"):
-                QproDefaultConsole.print(Markdown(line.replace("__MARKDOWN__", "").strip().replace("\\n", "\n")))
+                QproDefaultConsole.print(Markdown(line.replace("__MARKDOWN__", "").replace("\\n", "\n").strip()))
             else:
                 QproDefaultConsole.print(line)
 
@@ -129,19 +129,26 @@ def external_exec(
 
     if __no_wait:
         return process
+    try:
+        with concurrent.futures.ThreadPoolExecutor(2) as executor:
+            futures = []
+            if not without_stdout:
+                futures.append(executor.submit(_output, process.stdout, output_content, without_output))
+            if not without_stderr:
+                futures.append(executor.submit(_output, process.stderr, output_content, without_output))
+            concurrent.futures.wait(futures)
 
-    with concurrent.futures.ThreadPoolExecutor(2) as executor:
-        futures = []
-        if not without_stdout:
-            futures.append(executor.submit(_output, process.stdout, output_content, without_output))
-        if not without_stderr:
-            futures.append(executor.submit(_output, process.stderr, output_content, without_output))
-        concurrent.futures.wait(futures)
-
-    ret_code = process.wait()
-    process.stdout.close()
-    process.stderr.close()
-    return ret_code, ''.join(output_content)
+        ret_code = process.wait()
+        process.stdout.close()
+        process.stderr.close()
+        return ret_code, ''.join(output_content)
+    except KeyboardInterrupt:
+        process.terminate()
+        process.wait(timeout=3)
+        process.stdout.close()
+        process.stderr.close()
+        ret_code = -1
+        raise KeyboardInterrupt
 
 
 def requirePackage(

@@ -128,7 +128,7 @@ def _ask(question: dict, timeout: int = 0, qmark: str = '?'):
     from inquirer_rhy.prompt import prompt
 
     record_status = QproDefaultStatus.status
-    _msg_UserInterrupt = _lang["UserInterrupt"] if _lang else "UserInterrupt"
+    _msg_UserInterrupt = _lang["UserInterrupt"] if '_lang' in locals() else "UserInterrupt"
 
     if timeout:
 

@@ -7,7 +7,7 @@
       "user": "lianhaocheng",
       "host": "localhost",
       "port": 22,
-      "path": "/opt/homebrew/lib/python3.10/site-packages/"
+      "path": "/opt/homebrew/lib/python3.11/site-packages/"
     }
   ],
   "enable_complete": true

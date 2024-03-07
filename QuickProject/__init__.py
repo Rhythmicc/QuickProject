@@ -84,6 +84,7 @@ def external_exec(
     without_stderr: bool = False,
     __expose: bool = False,
     __no_wait: bool = False,
+    __bypass: bool = False,
 ):
     """
     外部执行命令
@@ -94,6 +95,7 @@ def external_exec(
     :param without_stderr: 是否不输出stderr
     :param __expose: ⚠️是否暴露, 这意味着命令行输出可能会被截断和修改
     :param __no_wait: ⚠️是否不等待, 这意味着需要手动获取返回值和输出
+    :param __bypass: 是否绕过输出格式化
     :return: status code, output | __no_wait 为 True 时返回进程对象
     """
     if __expose:
@@ -103,14 +105,17 @@ def external_exec(
 
     def _output(pipe, content, ignore_status):
         for line in iter(pipe.readline, ""):
+            content.append(line)
+            line = line.strip()
+            if __bypass:
+                print(line, flush=True)
+                continue
+            if ignore_status:
+                continue
             if not __expose and line.startswith((
                         "__START__", "__STOP__",
                         "__TITLE__", "__RULE__", "__MARKDOWN__")):
                 continue
-            content.append(line)
-            if ignore_status:
-                continue
-            line = line.strip()
             if line.startswith("__START__"):
                 QproDefaultStatus(line.replace("__START__", "").strip()).start()
             elif line.startswith("__STOP__"):

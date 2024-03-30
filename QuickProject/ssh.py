@@ -39,7 +39,7 @@ class ParamikoSSH:
 
         ssh = SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(*conn_id)
+        ssh.connect(conn_id[0], port=conn_id[2], username=conn_id[1], key_filename=conn_id[3])
         self.activate_connections[conn_id] = ssh
         return ssh
 

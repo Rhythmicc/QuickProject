@@ -584,12 +584,12 @@
     "ru": "Полный каталог уже существует, перезаписать?"
   },
   "InstallToFig": {
-    "zh": "安装到fig",
-    "en": "Install to fig",
-    "fra": "Installer dans fig",
-    "spa": "Instalar en fig",
-    "ara": "تثبيت إلى fig",
-    "ru": "Установить в fig"
+    "zh": "安装到Amazon Q",
+    "en": "Install to Amazon Q",
+    "fra": "Installer dans Amazon Q",
+    "spa": "Instalar en Amazon Q",
+    "ara": "تثبيت إلى Amazon Q",
+    "ru": "Установить в Amazon Q"
   },
   "NoDescription": {
     "zh": "没有描述",
@@ -742,5 +742,13 @@
     "spa": "Elegir idioma",
     "ara": "اختر اللغة",
     "ru": "Выберите язык"
+  },
+  "RemoveCompleteDir": {
+    "zh": "删除中间文件 (complete)",
+    "en": "Remove intermediate files (complete)",
+    "fra": "Supprimer les fichiers intermédiaires (complete)",
+    "spa": "Eliminar archivos intermedios (complete)",
+    "ara": "إزالة الملفات الوسيطة (complete)",
+    "ru": "Удалить промежуточные файлы (complete)"
   }
 }

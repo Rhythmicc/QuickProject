@@ -30,21 +30,23 @@ class ParamikoSSH:
             identity = self.identity
         port = host_config.get("port", port)
         return host, user, port, identity
-    
+
     def connect(self, host: str, user: str = None, port: int = 22, identity: str = None) -> SSHClient:
-        conn_id = self._parse_host(host, user, port, identity)
+        conn_info = self._parse_host(host, user, port, identity)
+        conn_id = hash(conn_info)
         
         if conn_id in self.activate_connections:
-            return self.activate_connections[conn_id]
+            return self.activate_connections[conn_info]
 
         ssh = SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(conn_id[0], port=conn_id[2], username=conn_id[1], key_filename=conn_id[3])
+        ssh.connect(conn_info[0], port=conn_info[2], username=conn_info[1], key_filename=conn_info[3])
         self.activate_connections[conn_id] = ssh
         return ssh
 
     def close(self, host: str, user: str = None, port: int = 22, identity: str = None):
-        conn_id = self._parse_host(host, user, port, identity)
+        conn_info = self._parse_host(host, user, port, identity)
+        conn_id = hash(conn_info)
         
         if conn_id in self.activate_connections:
             self.activate_connections[conn_id].close()

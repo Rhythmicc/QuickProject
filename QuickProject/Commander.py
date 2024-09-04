@@ -540,18 +540,7 @@ class Commander:
                 else zsh_file_comp2,
             )
             f.write(template)
-
-        if _ask(
-            {
-                "type": "confirm",
-                "message": _lang["InstallToFig"],
-                "default": False,
-            }
-        ):
-            external_exec(
-                f'npx @fig/publish-spec --spec-path complete/fig/*.ts --name {project_name}{" --team " + team if team else ""}{" --token " + token if token else ""}{" --is-script" if is_script else ""}'
-            )
-
+        
         if is_script:
             with open(f".{project_name}rc", "w") as f:
                 print("function {}() ".format(self.name), file=f, end="{\n")
@@ -567,6 +556,31 @@ class Commander:
                 QproInfoString,
                 _lang["ScriptComplete"].format(self.name),
             )
+
+        if _ask(
+            {
+                "type": "confirm",
+                "message": _lang["InstallToFig"],
+                "default": False,
+            }
+        ):
+            import shutil
+            if not os.path.exists(os.path.join(os.path.expanduser("~"), ".complete")):
+                os.mkdir(os.path.join(os.path.expanduser("~"), ".complete"))
+                os.mkdir(os.path.join(os.path.expanduser("~"), ".complete", 'src'))
+            shutil.copy(os.path.join("complete", "fig", f"{project_name}.ts"), os.path.join(os.path.expanduser("~"), ".complete", f'src/{project_name}.ts'))
+            pwd = os.getcwd()
+            os.chdir(os.path.join(os.path.expanduser("~"), ".complete"))
+            external_exec('npx @withfig/autocomplete-tools compile')
+            os.chdir(pwd)
+            if _ask(
+                {
+                    "type": "confirm",
+                    "message": _lang["RemoveCompleteDir"],
+                    "default": True,
+                }
+            ):
+                shutil.rmtree('complete')
 
     def __add__(self, other):
         """

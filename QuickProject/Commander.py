@@ -566,6 +566,13 @@ class Commander:
         ):
             import shutil
             if not os.path.exists(os.path.join(os.path.expanduser("~"), ".complete")):
+                if not _ask({
+                    'type': 'confirm',
+                    'message': _lang['create_complete_dir'],
+                    'default': True
+                }):
+                    QproDefaultConsole.print(QproErrorString, "Create ~/.complete dir failed!")
+                    return
                 os.mkdir(os.path.join(os.path.expanduser("~"), ".complete"))
                 os.mkdir(os.path.join(os.path.expanduser("~"), ".complete", 'src'))
             shutil.copy(os.path.join("complete", "fig", f"{project_name}.ts"), os.path.join(os.path.expanduser("~"), ".complete", f'src/{project_name}.ts'))

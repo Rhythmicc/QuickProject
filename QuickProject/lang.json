@@ -750,5 +750,13 @@
     "spa": "Eliminar archivos intermedios (complete)",
     "ara": "إزالة الملفات الوسيطة (complete)",
     "ru": "Удалить промежуточные файлы (complete)"
+  },
+  "create_complete_dir": {
+    "zh": "未发现补全脚本目录，是否创建",
+    "en": "Completion script directory not found, create?",
+    "fra": "Répertoire de script de complétion introuvable, créer?",
+    "spa": "Directorio de script de finalización no encontrado, ¿crear?",
+    "ara": "لم يتم العثور على دليل نص الاكمال ، هل تريد إنشاء",
+    "ru": "Каталог скрипта завершения не найден, создать?"
   }
 }

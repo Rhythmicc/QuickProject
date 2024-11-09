@@ -17,10 +17,41 @@ QproErrorString = f'[bold red][{_lang["error"]}][/]'
 QproInfoString = f'[bold cyan][{_lang["information"]}][/]'
 QproWarnString = f'[bold yellow][{_lang["warning"]}][/]'
 name = "QuickProject"
-configure_name = "project_configure.json"
+configure_name = "pyproject.toml"
 
 
-def __latest_filename(filename):
+def __convert_old_configure_to_new(old_configure_path):
+    """
+    将旧的配置文件转换为新的配置文件
+    """
+    import json
+    import toml
+
+    total_config = {}
+    remove_flag = False
+    new_configure_path = os.path.join(os.path.dirname(old_configure_path), configure_name)
+    if os.path.exists(new_configure_path):
+        with open(new_configure_path, "r") as f:
+            total_config = toml.load(f)
+        if total_config.get("tool", {}).get("qpro"):
+            return
+    else:
+        remove_flag = True
+    total_config["tool"] = total_config.get("tool", {})
+    with open(old_configure_path, "r") as f:
+        old_config = json.load(f)
+    server_targets = old_config.pop("server_targets", [])
+    total_config['tool']['qpro'] = {
+        'config': old_config,
+        'server_targets': server_targets
+    }
+    with open(new_configure_path, "w") as f:
+        toml.dump(total_config, f)
+    if remove_flag:
+        os.remove(old_configure_path)
+
+
+def __latest_filename(filename, old_configure_name="project_configure.json"):
     """
     获取最近的文件名 （不断向父目录遍历）
 
@@ -29,6 +60,8 @@ def __latest_filename(filename):
     """
     cur = os.getcwd()
     while cur != os.path.dirname(cur):
+        if os.path.exists(_path := os.path.join(cur, old_configure_name)):
+            __convert_old_configure_to_new(_path)
         if os.path.exists(_path := os.path.join(cur, filename)):
             return _path
         cur = os.path.dirname(cur)
@@ -423,18 +456,20 @@ def menu_output(menu):
 
 
 def get_config(without_output: bool = False):
-    config_path = __latest_filename("project_configure.json")
+    config_path = __latest_filename(configure_name)
     config = {}
     if config_path:
-        import json
+        import toml
 
         with open(config_path, "r") as f:
-            config = json.load(f)
+            qpro = toml.load(f)['tool']['qpro']
+            config = qpro['config']
+            config['server_targets'] = qpro['server_targets']
     else:
         if not without_output:
             QproDefaultConsole.print(
                 QproErrorString,
-                _lang["NoSuchFile"].format('"project_configure.json"')
+                _lang["NoSuchFile"].format(f'"{configure_name}"')
                 + "\n"
                 + _lang["RunCmd"].format('"Qpro init"'),
             )

@@ -23,6 +23,37 @@ def __format_json(info, path: str):
             json.dump(info, f, indent=1)
 
 
+def __format_toml(info, path: str):
+    """
+    回写配置表
+
+    :param info: 列表格式或字典格式
+    :param path: 路径
+    :return:
+    """
+    import toml
+
+    if os.path.exists(path):
+        with open(path, "r") as f:
+            total_config = toml.load(f)
+    else:
+        total_config = {}
+
+    with open(path, 'w') as f:
+        if isinstance(info, list):
+            config = {}
+            for line in info:
+                config[line[0]] = line[1] if line[0] != "server_targets" else line[1:]
+        else:
+            config = info
+        server_targets = config.pop("server_targets", [])
+        total_config['tool']['qpro'] = {
+            'config': config,
+            'server_targets': server_targets,
+        }
+        toml.dump(total_config, f)
+
+
 def __findAndReplace(dirPath, fo, to):
     """
     替换模板项目中的指定字段
@@ -73,7 +104,7 @@ def _create_empty_project(project_name):
     if os.path.exists(project_name):
         return QproDefaultConsole.print(QproErrorString, _lang["existsError"])
     os.mkdir(project_name)
-    __format_json(
+    __format_toml(
         [
             ["build", ""],
             ["entry_point", ""],
@@ -234,7 +265,7 @@ def create():
 
         config = get_config()
         config["server_targets"] = [__get_server_target_from_string()]
-        __format_json(config, configure_name)
+        __format_toml(config, configure_name)
 
         if _ask(
             {"type": "confirm", "message": _lang["OpenWithVscode"], "default": True}
@@ -379,7 +410,7 @@ def pro_init():
         ["executable", execute],
         ["server_targets", __get_server_target_from_string()],
     ]
-    __format_json(info, configure_name)
+    __format_toml(info, configure_name)
     if lang_name and lang_name == "custom":
         if _ask(
             {
@@ -542,69 +573,7 @@ def tele_ls():
 def enable_complete():
     config = get_config()
     config["enable_complete"] = True
-    __format_json(config, project_configure_path)
-
-
-def fmt():
-    import json
-
-    def adjust(filepath: str):
-        if filepath.endswith(".csv"):
-            with open(filepath, "r") as f:
-                data = f.read().splitlines()
-                data = {
-                    i[0]: i[1:] if len(i[1:]) > 1 else i[1]
-                    for i in [i.split(",") for i in data]
-                }
-        else:
-            with open(filepath, "r") as f:
-                data = json.load(f)
-        if "server_target" in data:
-            server_target = data.pop("server_target")
-            if server_target[0]:
-                ls = server_target[0].split("@")
-                if len(ls) == 2:
-                    user, target = ls
-                else:
-                    user, target = "", ls[0]
-                target = target.split(":")
-                host = ":".join(target[:-1])
-                path = target[-1]
-                data["server_targets"] = [
-                    {"user": user, "host": host, "path": path, "port": server_target[1]}
-                ]
-            else:
-                data["server_targets"] = [
-                    {"user": "", "host": "", "path": "", "port": "22"}
-                ]
-        new_json = {}
-        if "compile_tool" in data:
-            new_json["build"] = data.pop("compile_tool")
-        if "compile_filename" in data:
-            new_json["entry_point"] = data.pop("compile_filename")
-        if "executable_filename" in data:
-            new_json["executable"] = data.pop("executable_filename")
-        if 'input_file' in data:
-            data.pop('input_file')
-        if 'template_root' in data:
-            data.pop('template_root')
-        new_json.update(data)
-
-        with open(
-            os.path.join(os.path.dirname(filepath), "project_configure.json"), "w"
-        ) as f:
-            json.dump(new_json, f, indent=4, ensure_ascii=False)
-
-    # walk dir
-    for root, _, files in os.walk(os.getcwd()):
-        for file in files:
-            filepath = os.path.join(root, file)
-            if file == "project_configure.csv" or file == "project_configure.json":
-                try:
-                    adjust(filepath)
-                except Exception as e:
-                    QproDefaultConsole.print(QproErrorString, repr(e))
-                    QproDefaultConsole.print(QproErrorString, filepath)
+    __format_toml(config, project_configure_path)
 
 
 func = {
@@ -617,7 +586,6 @@ func = {
     "del": delete,
     "ls": tele_ls,
     "enable-complete": enable_complete,
-    "fmt": fmt,
 }
 
 
@@ -639,7 +607,6 @@ def main():
                     ("del-all", _lang["MenuDelAll"]),
                     ("ls  [bold magenta]<path>", _lang["MenuLs"]),
                     ("enable-complete", _lang["MenuComplete"]),
-                    ("fmt", _lang["MenuFmt"]),
                     ("qrun *", _lang["MenuQrun"]),
                 ],
                 "prefix": "Qpro",

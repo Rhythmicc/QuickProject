@@ -49,36 +49,28 @@ def run(use_txt=False, executable=str(config["executable"]), current_dir: str = 
     else:
         cmd = executable + " "
     if "--qrun-commander-complete" in argv:
-        if "enable_complete" in config and config["enable_complete"]:
-            os.system(cmd + " ".join(argv))
-        else:
-            print()
+        os.system(cmd + " ".join(argv))
         return
     if "--qrun-fig-complete" in argv:
-        if "enable_complete" in config and config["enable_complete"]:
-            project_name = os.path.basename(os.path.dirname(project_configure_path))
-            if os.path.exists("complete/fig") and os.path.exists(
-                f"complete/fig/{project_name}.ts"
-            ):
-                import re
-                import json
+        project_name = os.path.basename(os.path.dirname(project_configure_path))
+        if os.path.exists("complete/fig") and os.path.exists(
+            f"complete/fig/{project_name}.ts"
+        ):
+            import re
+            import json
 
-                with open(f"complete/fig/{project_name}.ts", "r") as f:
-                    json_content = re.findall(
-                        "const completionSpec: Fig\.Spec = (.*?);", f.read(), re.S
-                    )[0]
-                print(json.dumps(json.loads(json_content)["subcommands"], indent=4))
-            else:
-                os.system(cmd + " --qrun-fig-complete")
+            with open(f"complete/fig/{project_name}.ts", "r") as f:
+                json_content = re.findall(
+                    "const completionSpec: Fig\.Spec = (.*?);", f.read(), re.S
+                )[0]
+            print(json.dumps(json.loads(json_content)["subcommands"], indent=4))
         else:
-            print()
+            os.system(cmd + " --qrun-fig-complete")
         return
     if argv:
         cmd += " ".join(argv)
     if set_current_dir:
         cmd += f' --qrun-working-dir "{current_dir}"'
-    if "--qrun-commander-complete" in argv and not config["enable_complete"]:
-        return print()
     if cmd.strip():
         cmd += ' < "' + config["input_file"] + '"' if use_txt else ""
         os.system(cmd)
@@ -139,7 +131,7 @@ def main():
             cmd = cmd.replace(config["entry_point"], filename)
         os.system(cmd)
     if to_run:
-        run("-i" in qrun_argv or "-if" in qrun_argv, o_file, set_current_dir=config['enable_complete'])
+        run("-i" in qrun_argv or "-if" in qrun_argv, o_file, set_current_dir=True)
     if config["build"] and flag:
         if config["build"].split()[0] == "javac":
             os.remove("dist" + dir_char + record_file_name + ".class")

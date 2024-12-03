@@ -49,9 +49,6 @@ const completionSpec: Fig.Spec = {
         'name': 'ls',
         'description': '展示路径中的子项',
         'args': {'name': 'path', 'description': '路径', 'template': ["filepaths", "folders"]}
-    }, {
-        'name': 'enable-complete',
-        'description': '支持Commander应用的自动补全'
     }]
 };
 export default completionSpec;

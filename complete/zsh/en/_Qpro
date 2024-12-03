@@ -41,10 +41,6 @@ _qpro_main_zh() {
         del:'delete <path> in project'
         del-all:'delete Qpro project'
         ls:'list element in <path>'
-        bin:'Execute global command'
-        enable-complete:'Support Commander Tab Complete (slow)'
-        register:'Register global command'
-        unregister:'Unregister global command'
     )
 
     _describe -t common-commands 'common commands' args && _ret=0

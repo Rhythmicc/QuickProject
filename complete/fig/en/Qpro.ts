@@ -49,9 +49,6 @@ const completionSpec: Fig.Spec = {
     'name': 'ls',
     'description': 'List the subitems of the path',
     'args': {'name': 'path', 'description': 'path', 'template': ["filepaths", "folders"]}
-  }, {
-    'name': 'enable-complete',
-    'description': 'Support the auto completion of the Commander application'
   }]
 };
 export default completionSpec;

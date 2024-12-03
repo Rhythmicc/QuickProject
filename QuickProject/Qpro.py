@@ -570,12 +570,6 @@ def tele_ls():
         QproDefaultConsole.print(table, justify="center")
 
 
-def enable_complete():
-    config = get_config()
-    config["enable_complete"] = True
-    __format_toml(config, project_configure_path)
-
-
 func = {
     "create": create,
     "scp": scp,
@@ -585,7 +579,6 @@ func = {
     "del-all": delete_all,
     "del": delete,
     "ls": tele_ls,
-    "enable-complete": enable_complete,
 }
 
 
@@ -606,7 +599,6 @@ def main():
                     ("del [bold magenta]<path>", _lang["MenuDel"]),
                     ("del-all", _lang["MenuDelAll"]),
                     ("ls  [bold magenta]<path>", _lang["MenuLs"]),
-                    ("enable-complete", _lang["MenuComplete"]),
                     ("qrun *", _lang["MenuQrun"]),
                 ],
                 "prefix": "Qpro",

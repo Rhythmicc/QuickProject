@@ -206,9 +206,9 @@ def requirePackage(
     :param set_pip: pip3的路径
     :return: 库或模块的地址
     """
-    res_model = None
+    local_scope = locals()
     try:
-        exec(f"from {pname} import {module}" if module else f"import {pname}" + ';' + f"res_model = {module}" if module else f"res_model = {pname}")
+        exec((f"from {pname} import {module}" if module else f"import {pname}"), globals(), local_scope)
     except (ModuleNotFoundError, ImportError):
         if not_ask:
             return None
@@ -242,10 +242,10 @@ def requirePackage(
                     f"'{set_pip} install {package_name} -U'",
                 )
                 exit(-1)
-            exec(f"from {pname} import {module}" if module else f"import {pname}" + ';' + f"res_model = {module}" if module else f"res_model = {pname}")
+            exec((f"from {pname} import {module}" if module else f"import {pname}"), globals(), local_scope)
         else:
             exit(-1)
-    return res_model
+    return local_scope.get(module if module else pname)
 
 
 class SshProtocol:

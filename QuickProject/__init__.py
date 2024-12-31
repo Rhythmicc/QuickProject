@@ -159,6 +159,8 @@ def external_exec(
                 QproDefaultConsole.rule(line.replace("__RULE__", "").strip())
             elif line.startswith("__MARKDOWN__"):
                 QproDefaultConsole.print(Markdown(line.replace("__MARKDOWN__", "").replace("\\n", "\n").strip()))
+            elif line.startswith("__EXECUTE__"):
+                os.system(line.replace("__EXECUTE__", "").strip())
             else:
                 QproDefaultConsole.print(line)
 

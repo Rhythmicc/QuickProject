@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "qpro"
-version = "0.13.5"
+version = "0.13.6"
 description = "Small but powerful command line APP framework"
 authors = ["Rhythmicc <rhythmlian.cn@gmail.com>"]
 license = "MIT"

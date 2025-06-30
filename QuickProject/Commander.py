@@ -446,7 +446,7 @@ class Commander:
 
         import json
 
-        project_name = self.name
+        project_name = self.name if not self.seg_flag else self.name.replace("_", "-")
         project_subcommands = self.fig_table.copy()
 
         if self.non_complete:

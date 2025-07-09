@@ -454,7 +454,7 @@ def menu_output(menu):
         )
     QproDefaultConsole.print(tb, justify="center")
     QproDefaultConsole.print(
-        "\n" + _lang["docs"], "https://qpro-doc.rhythmlian.cn/", justify="center"
+        "\n" + _lang["docs"], "https://qpro-doc.lhc.studio/", justify="center"
     )
 
 

@@ -1,7 +1,7 @@
 {
   "error": {
     "zh": "错误",
-    "en": "Error",
+    "en": "ERRO",
     "fra": "Erreur",
     "spa": "Error",
     "ara": "خطأ",
@@ -9,7 +9,7 @@
   },
   "information": {
     "zh": "信息",
-    "en": "Information",
+    "en": "INFO",
     "fra": "Information",
     "spa": "Información",
     "ara": "معلومات",
@@ -17,7 +17,7 @@
   },
   "warning": {
     "zh": "警告",
-    "en": "Warning",
+    "en": "WARN",
     "fra": "Attention",
     "spa": "Advertencia",
     "ara": "تحذير",

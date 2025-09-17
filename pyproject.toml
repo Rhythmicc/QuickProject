@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "qpro"
-version = "0.13.8"
+version = "0.13.9"
 description = "Small but powerful command line APP framework"
 authors = ["Rhythmicc <rhythmlian.cn@gmail.com>"]
 license = "MIT"
@@ -14,6 +14,7 @@ rich = "^13.3.5"
 GitPython = "^3.1.32"
 inquirer-rhy = "^0.1.2"
 langsrc = "^0.0.8"
+toml = "^0.10.2"
 
 [tool.poetry.scripts]
 Qpro = "QuickProject.Qpro:main"

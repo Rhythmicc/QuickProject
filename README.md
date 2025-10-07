@@ -1,9 +1,9 @@
 # QuickProject
 
-> Do you know how to write Python functions? 
+> Do you know how to write Python functions?
 
-Yes! 
+Yes!
 
 > Then you now know how to build command-line applications!
 
-## [Docs](https://qpro-doc.rhythmlian.cn/)
+## [Docs](https://qpro-doc.rhythm.icu/)

@@ -26,7 +26,7 @@ Qpro = "QuickProject.Qpro:main"
 qrun = "QuickProject.qrun:main"
 
 [tool.qpro.config]
-build = "rm -rf dist; uv build"
+build = "rm -rf dist; uv run --with build python -m build"
 entry_point = ""
 executable = ""
 

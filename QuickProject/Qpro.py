@@ -139,7 +139,7 @@ def _search_supported_languages(is_CN=using_gitee):
         try:
             res = json.loads(
                 requests.get(
-                    f"https://qpro-lang.lhc.studio/?keyword={kw}&is_CN={str(is_CN).lower()}"
+                    f"https://qpro-lang.rhythm.icu/?keyword={kw}&is_CN={str(is_CN).lower()}"
                 ).text
             )
             if not res["status"]:

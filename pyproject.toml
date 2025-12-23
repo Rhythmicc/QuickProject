@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "qpro"
-version = "0.14.1"
+version = "0.14.2"
 description = "Small but powerful command line APP framework"
 readme = {file = "README.md", content-type = "text/markdown"}
 license = {text = "MIT"}

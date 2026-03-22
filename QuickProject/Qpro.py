@@ -118,6 +118,81 @@ def _create_empty_project(project_name):
 
 
 def _search_supported_languages(is_CN=using_gitee):
+    # 本地模板数据库
+    # 格式: {显示名称: [GitHub URL, Gitee URL, 替换字符串]}
+    QPRO_TEMPLATES = {
+        "C - QuickProject's C Template": [
+            "https://github.com/Rhythmicc/QproCTemplate",
+            "https://gitee.com/RhythmLian/QproCTemplate",
+            "QproCTemplate"
+        ],
+        "C++ - QuickProject's cpp": [
+            "https://github.com/Rhythmicc/QproCppTemplate",
+            "https://gitee.com/RhythmLian/QproCppTemplate",
+            "QproCppTemplate"
+        ],
+        "Teaching Assistant - 助教模板": [
+            "https://github.com/Rhythmicc/QproTeachingAssistantTemplate",
+            "https://gitee.com/RhythmLian/QproTeachingAssistantTemplate",
+            "QproTeachingAssistantTemplate"
+        ],
+        "Socket Server - Qpro SockServer Template": [
+            "https://github.com/Rhythmicc/QproSockServerTemplate",
+            "https://gitee.com/RhythmLian/QproSockServerTemplate",
+            "QproSockServerTemplate"
+        ],
+        "Commander - Qpro Commander Template": [
+            "https://github.com/Rhythmicc/QproCommanderTemplate",
+            "https://gitee.com/RhythmLian/QproCommanderTemplate",
+            "QproCommanderTemplate"
+        ],
+        "Verilog - A Qpro Verilog Template": [
+            "https://github.com/Rhythmicc/QproVerilogTemplate",
+            "https://gitee.com/RhythmLian/QproVerilogTemplate",
+            "QproVerilogTemplate"
+        ],
+        "Python2 - QuickProject's Python2 Template": [
+            "https://github.com/Rhythmicc/QproPythonTemplate",
+            "https://gitee.com/RhythmLian/QproPythonTemplate",
+            "QproPythonTemplate"
+        ],
+        "Python3 - QuickProject's Python3 Template": [
+            "https://github.com/Rhythmicc/QproPython3Template",
+            "https://gitee.com/RhythmLian/QproPython3Template",
+            "QproPython3Template"
+        ],
+        "RISC-V - Qpro RISC-V Template": [
+            "https://github.com/Rhythmicc/QproRiscVTemplate",
+            "https://gitee.com/RhythmLian/QproRiscVTemplate",
+            "QproRiscVTemplate"
+        ],
+        "Pypi - Qpro Pypi lib template": [
+            "https://github.com/Rhythmicc/QproPypiTemplate",
+            "https://gitee.com/RhythmLian/QproPypiTemplate",
+            "QproPypiTemplate"
+        ],
+        "Scala - Qpro Scala Template": [
+            "https://github.com/Rhythmicc/QproScalaTemplate",
+            "https://gitee.com/RhythmLian/QproScalaTemplate",
+            "QproScalaTemplate"
+        ],
+        "Java - QuickProject's Java Template": [
+            "https://github.com/Rhythmicc/QproJavaTemplate",
+            "https://gitee.com/RhythmLian/QproJavaTemplate",
+            "QproJavaTemplate"
+        ],
+        "DCU - QproDCUTemplate": [
+            "https://github.com/Rhythmicc/QproDCUTemplate",
+            "https://gitee.com/RhythmLian/QproDCUTemplate",
+            "QproDCUTemplate"
+        ],
+        "Pypi Commander - Qpro Pypi Commander Template": [
+            "https://github.com/Rhythmicc/QproPypiCommanderTemplate",
+            "https://gitee.com/RhythmLian/QproPypiCommanderTemplate",
+            "QproPypiCommanderTemplate"
+        ],
+    }
+    
     kw = _ask(
         {
             "type": "input",
@@ -125,47 +200,33 @@ def _search_supported_languages(is_CN=using_gitee):
         }
     )
 
-    QproDefaultStatus(_lang["SearchingTemplate"])
-    QproDefaultStatus.start()
+    # 本地搜索匹配
+    matched_templates = {}
+    kw_lower = kw.lower()
+    for name, urls in QPRO_TEMPLATES.items():
+        if kw_lower in name.lower():
+            matched_templates[name] = urls
 
-    import time
-    import json
-    import requests
-    from requests.exceptions import ProxyError
+    if not matched_templates:
+        QproDefaultConsole.print(QproErrorString, f"未找到匹配 '{kw}' 的模板")
+        return None
 
-    retry = 3
-
-    while retry:
-        try:
-            res = json.loads(
-                requests.get(
-                    f"https://qpro-lang.rhythm.icu/?keyword={kw}&is_CN={str(is_CN).lower()}"
-                ).text
-            )
-            if not res["status"]:
-                QproDefaultConsole.print(QproErrorString, res["message"])
-                return None
-            data = {i[0]: i[1:] for i in res["data"]}
-            QproDefaultStatus.stop()
-            return data[
-                _ask(
-                    {
-                        "type": "list",
-                        "message": _lang["ChooseSupportedTemplate"],
-                        "choices": list(data.keys()),
-                    }
-                )
-            ]
-        except ProxyError:
-            retry -= 1
-            time.sleep(3)
-        except Exception as e:
-            QproDefaultConsole.print(QproErrorString, repr(e))
-            return None
-
-    QproDefaultStatus.stop()
-    QproDefaultConsole.print(QproErrorString, _lang["TemplateServerError"])
-    return None
+    # 选择模板
+    selected_name = _ask(
+        {
+            "type": "list",
+            "message": _lang["ChooseSupportedTemplate"],
+            "choices": list(matched_templates.keys()),
+        }
+    )
+    
+    template_info = matched_templates[selected_name]
+    # 返回 [git_url, replace_string]
+    # 根据是否使用国内源选择 URL
+    git_url = template_info[1] if is_CN else template_info[0]
+    replace_string = template_info[2]
+    
+    return [git_url, replace_string]
 
 
 def _external_create(project_name: str, key: str = ""):

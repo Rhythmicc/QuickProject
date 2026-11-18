@@ -1,50 +1,28 @@
 [build-system]
-requires = ["hatchling>=1.24.0"]
+requires = ["hatchling>=1.24.0,<1.27.0"]
 build-backend = "hatchling.build"
 
 [project]
-name = "qpro"
-version = "0.14.3"
-description = "Small but powerful command line APP framework"
+name = "veyo"
+version = "0.15.0"
+description = "A lightweight CLI framework and terminal interaction toolkit"
 readme = {file = "README.md", content-type = "text/markdown"}
 license = {text = "MIT"}
-requires-python = ">=3.7"
+requires-python = ">=3.9"
 authors = [
 	{name = "Rhythmicc", email = "rhythmlian.cn@gmail.com"}
 ]
 dependencies = [
-	"pyperclip>=1.8.2",
 	"rich>=13.3.5",
-	"GitPython>=3.1.43",
 	"inquirer-rhy>=0.1.2",
-	"langsrc>=0.0.8",
-	"toml>=0.10.2"
 ]
 
-[project.scripts]
-Qpro = "QuickProject.Qpro:main"
-qrun = "QuickProject.qrun:main"
-
-[tool.qpro.config]
-build = "rm -rf dist; uv run --with build python -m build"
-entry_point = ""
-executable = ""
-
-[[tool.qpro.server_targets]]
-user = "lianhaocheng"
-host = "localhost"
-port = 22
-path = "/opt/homebrew/lib/python3.13/site-packages/"
-
 [tool.hatch.build.targets.wheel]
-packages = ["QuickProject"]
-
-[tool.hatch.build.targets.wheel.package-data]
-QuickProject = ["lang.json"]
+packages = ["veyo"]
 
 [tool.hatch.build.targets.sdist]
 include = [
-	"QuickProject",
+	"veyo",
 	"README.md",
-	"LICENSE"
+	"LICENSE",
 ]

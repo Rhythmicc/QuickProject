@@ -12,29 +12,21 @@ jobs:
   build_and_publish:
     name: Build and publish to PyPI
     runs-on: ubuntu-latest
-    if: github.event_name == 'release' || startsWith(github.ref, 'refs/tags/v')
+    if: github.event_name == 'release' || startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
     environment:
       name: pypi
-      url: https://pypi.org/p/qpro
+      url: https://pypi.org/p/veyo
     permissions:
       id-token: write  # For trusted publishing
 
     steps:
     - uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-
     - name: Install uv
       uses: astral-sh/setup-uv@v3
 
-    - name: Install build dependencies
-      run: uv pip install --system build
-
-    - name: Build source distribution only
-      run: python -m build --sdist
+    - name: Build distribution
+      run: uv build
 
     - name: List built packages
       run: ls -la dist/
